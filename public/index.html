@@ -4,69 +4,80 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Grama — Portal de Aplicadores</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#1a1a1a;font-size:15px}
+body{font-family:'Roboto',sans-serif;background:#f4f4f4;color:#1c402e;font-size:15px}
 .hidden{display:none!important}
-.app{max-width:900px;margin:0 auto;padding:1.5rem 1rem}
+.app{max-width:920px;margin:0 auto;padding:1.5rem 1rem}
 .card{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;border:1px solid #ccc;background:#fff;color:#1a1a1a;font-size:14px;cursor:pointer;transition:all .15s;font-family:inherit}
-.btn:hover{background:#f5f5f5}
-.btn-primary{background:#1A5C2E;border-color:#1A5C2E;color:#fff}
-.btn-primary:hover{background:#2D8A4E}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;border:1px solid #ccc;background:#fff;color:#1c402e;font-size:14px;cursor:pointer;transition:all .15s;font-family:'Roboto',sans-serif}
+.btn:hover{background:#f0f0f0}
+.btn-primary{background:#1f7344;border-color:#1f7344;color:#fff}
+.btn-primary:hover{background:#1c402e}
+.btn-danger{background:#fff;border-color:#c0392b;color:#c0392b}
+.btn-danger:hover{background:#fdf0ef}
 .btn-sm{padding:5px 12px;font-size:13px}
 .btn-full{width:100%}
-label{font-size:13px;color:#666;display:block;margin-bottom:5px;margin-top:12px}
-input,select,textarea{width:100%;padding:9px 12px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#1a1a1a;font-size:14px;font-family:inherit}
-input:focus,select:focus{outline:none;border-color:#2D8A4E;box-shadow:0 0 0 3px rgba(45,138,78,0.1)}
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
-.badge-semilla{background:#E8F5EC;color:#2D8A4E}
-.badge-verde{background:#C8E6C9;color:#1A5C2E}
-.badge-master{background:#1A5C2E;color:#fff}
-.badge-socio{background:#FFF8E1;color:#7B5800}
+label{font-size:13px;color:#5d5d5d;display:block;margin-bottom:5px;margin-top:12px}
+input,select,textarea{width:100%;padding:9px 12px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#1c402e;font-size:14px;font-family:'Roboto',sans-serif}
+input:focus,select:focus{outline:none;border-color:#1f7344;box-shadow:0 0 0 3px rgba(31,115,68,0.12)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
+.badge-semilla{background:#e8f5ec;color:#1f7344}
+.badge-verde{background:#c8e6c9;color:#1c402e}
+.badge-master{background:#1c402e;color:#fff}
+.badge-socio{background:#fff8e1;color:#7b5800}
 .alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:1rem}
-.alert-ok{background:#E8F5EC;color:#1A5C2E;border:1px solid #4CAF7D}
-.alert-err{background:#FCEBEB;color:#A32D2D;border:1px solid #E24B4A}
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #e0e0e0}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-dot{width:36px;height:36px;border-radius:50%;background:#1A5C2E;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px}
-.logo-name{font-weight:600;font-size:16px}
-.logo-sub{font-size:12px;color:#666}
+.alert-ok{background:#e8f5ec;color:#1c402e;border:1px solid #1f7344}
+.alert-err{background:#fdf0ef;color:#c0392b;border:1px solid #e74c3c}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #1f7344}
+.logo-img{height:44px;width:auto}
+.logo-sub{font-size:12px;color:#999999;margin-top:2px}
 .tabs{display:flex;gap:2px;border-bottom:1px solid #e0e0e0;margin-bottom:1.25rem;overflow-x:auto}
-.tab{padding:9px 16px;font-size:14px;cursor:pointer;border:none;background:none;color:#666;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit}
-.tab.on{color:#1A5C2E;border-bottom-color:#1A5C2E;font-weight:600}
+.tab{padding:9px 16px;font-size:14px;cursor:pointer;border:none;background:none;color:#5d5d5d;border-bottom:2px solid transparent;white-space:nowrap;font-family:'Roboto',sans-serif}
+.tab.on{color:#1f7344;border-bottom-color:#1f7344;font-weight:500}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 @media(max-width:600px){.grid4{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
-.stat{background:#f9f9f9;border-radius:10px;padding:1rem;text-align:center}
-.stat-v{font-size:22px;font-weight:600;color:#1A5C2E}
-.stat-l{font-size:12px;color:#888;margin-top:3px}
+.stat{background:#f4f4f4;border-radius:10px;padding:1rem;text-align:center;border-left:3px solid #1f7344}
+.stat-v{font-size:22px;font-weight:700;color:#1c402e}
+.stat-l{font-size:12px;color:#999999;margin-top:3px}
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:9px 10px;border-bottom:1px solid #e0e0e0;color:#666;font-weight:600;white-space:nowrap}
-td{padding:9px 10px;border-bottom:1px solid #f0f0f0;color:#1a1a1a}
+th{text-align:left;padding:9px 10px;border-bottom:2px solid #1f7344;color:#1c402e;font-weight:500}
+td{padding:9px 10px;border-bottom:1px solid #f0f0f0;color:#1c402e}
 tr:last-child td{border-bottom:none}
+tr:hover td{background:#f9fdf9}
 .ap-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f0f0}
 .ap-row:last-child{border-bottom:none}
-.avatar{width:34px;height:34px;border-radius:50%;background:#E8F5EC;color:#1A5C2E;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
-.spinner{display:inline-block;width:20px;height:20px;border:2px solid #e0e0e0;border-top-color:#1A5C2E;border-radius:50%;animation:spin .7s linear infinite}
+.avatar{width:34px;height:34px;border-radius:50%;background:#e8f5ec;color:#1f7344;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.spinner{display:inline-block;width:22px;height:22px;border:3px solid #e0e0e0;border-top-color:#1f7344;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,0.8);display:flex;align-items:center;justify-content:center;z-index:100}
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;z-index:100}
 .com-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:14px}
-.com-total{display:flex;justify-content:space-between;background:#E8F5EC;border-radius:8px;padding:12px 16px;font-weight:600;color:#1A5C2E;font-size:16px;margin-top:8px}
-.empty{color:#999;font-size:13px;padding:1rem 0;text-align:center}
+.com-total{display:flex;justify-content:space-between;background:#1c402e;border-radius:8px;padding:12px 16px;font-weight:700;color:#fff;font-size:16px;margin-top:8px}
+.empty{color:#999999;font-size:13px;padding:1rem 0;text-align:center}
+.precio-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.precio-row:last-child{border-bottom:none}
+.precio-label{flex:1;font-size:14px;color:#1c402e}
+.precio-input{width:120px;padding:6px 10px;border:1px solid #ccc;border-radius:6px;font-size:14px;font-family:'Roboto',sans-serif;color:#1c402e}
+.section-title{font-size:15px;font-weight:500;color:#1c402e;margin-bottom:1rem;padding-bottom:6px;border-bottom:1px solid #e0e0e0}
+.login-wrap{max-width:380px;margin:2rem auto}
+.login-logo{text-align:center;margin-bottom:2rem}
+.login-logo img{height:80px;width:auto}
+.login-tagline{font-size:13px;color:#999999;margin-top:8px}
 </style>
 </head>
 <body>
 <div id="loading-overlay" class="loading-overlay"><div class="spinner"></div></div>
 <div class="app">
 
+<!-- LOGIN -->
 <div id="s-login" class="hidden">
-  <div style="max-width:380px;margin:3rem auto">
-    <div style="text-align:center;margin-bottom:2rem">
-      <div class="logo-dot" style="width:56px;height:56px;font-size:24px;margin:0 auto 12px">G</div>
-      <div style="font-size:22px;font-weight:700">Grama</div>
-      <div style="font-size:13px;color:#888;margin-top:4px">Portal de Aplicadores Certificados</div>
+  <div class="login-wrap">
+    <div class="login-logo">
+      <img src="/Logo_Grama.png" alt="Grama" />
+      <div class="login-tagline">Portal de Aplicadores Certificados</div>
     </div>
     <div class="card">
       <div id="l-alert" class="hidden"></div>
@@ -79,11 +90,12 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
+<!-- ADMIN -->
 <div id="s-admin" class="hidden">
   <div class="topbar">
-    <div class="logo">
-      <div class="logo-dot">G</div>
-      <div><div class="logo-name">Grama Admin</div><div class="logo-sub">Panel de control</div></div>
+    <div>
+      <img src="/Logo_Grama.png" alt="Grama" class="logo-img" />
+      <div class="logo-sub">Panel de Administración</div>
     </div>
     <button class="btn btn-sm" onclick="doLogout()">Salir</button>
   </div>
@@ -92,33 +104,53 @@ tr:last-child td{border-bottom:none}
     <button class="tab" onclick="adminTab(this,'at-aps')">Aplicadores</button>
     <button class="tab" onclick="adminTab(this,'at-svcs')">Servicios</button>
     <button class="tab" onclick="adminTab(this,'at-coms')">Comisiones</button>
+    <button class="tab" onclick="adminTab(this,'at-precios')">Precios</button>
     <button class="tab" onclick="adminTab(this,'at-nuevo')">+ Nuevo aplicador</button>
   </div>
+
   <div id="at-res">
     <div class="grid4" id="a-stats" style="margin-bottom:1.25rem"></div>
     <div class="grid2">
-      <div class="card"><div style="font-weight:600;margin-bottom:1rem">Aplicadores activos</div><div id="a-ap-list"></div></div>
-      <div class="card"><div style="font-weight:600;margin-bottom:1rem">Servicios recientes</div><div id="a-svc-recent"></div></div>
+      <div class="card"><div class="section-title">Aplicadores activos</div><div id="a-ap-list"></div></div>
+      <div class="card"><div class="section-title">Servicios recientes</div><div id="a-svc-recent"></div></div>
     </div>
   </div>
+
   <div id="at-aps" class="hidden">
     <div class="card tbl-wrap"><table id="tbl-aps"></table></div>
   </div>
+
   <div id="at-svcs" class="hidden">
     <div class="card tbl-wrap">
-      <div style="font-weight:600;margin-bottom:1rem">Todos los servicios</div>
+      <div class="section-title">Todos los servicios</div>
       <table id="tbl-svcs-a"></table>
     </div>
   </div>
+
   <div id="at-coms" class="hidden">
     <div class="card tbl-wrap">
-      <div style="font-weight:600;margin-bottom:1rem">Comisiones estimadas del mes</div>
+      <div class="section-title">Comisiones estimadas del mes</div>
       <table id="tbl-coms"></table>
     </div>
   </div>
+
+  <div id="at-precios" class="hidden">
+    <div class="card" style="max-width:520px">
+      <div class="section-title">Precios de lista por producto y presentación</div>
+      <div id="precios-alert" class="hidden"></div>
+      <div id="precios-form"></div>
+      <button class="btn btn-primary" style="margin-top:18px" onclick="guardarPrecios()">Guardar precios</button>
+    </div>
+    <div class="card" style="max-width:520px;margin-top:1rem">
+      <div class="section-title">Esquema de comisiones por nivel</div>
+      <div id="comisiones-form"></div>
+      <button class="btn btn-primary" style="margin-top:18px" onclick="guardarComisiones()">Guardar comisiones</button>
+    </div>
+  </div>
+
   <div id="at-nuevo" class="hidden">
     <div class="card" style="max-width:460px">
-      <div style="font-weight:600;margin-bottom:1rem">Agregar nuevo aplicador</div>
+      <div class="section-title">Agregar nuevo aplicador</div>
       <div id="nuevo-alert" class="hidden"></div>
       <label>Nombre completo</label><input type="text" id="n-nombre" placeholder="Ej. Carlos Mendoza" />
       <label>Zona / ciudad</label><input type="text" id="n-zona" placeholder="Ej. CDMX Norte" />
@@ -136,13 +168,17 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
+<!-- APLICADOR -->
 <div id="s-ap" class="hidden">
   <div class="topbar">
-    <div class="logo">
-      <div class="logo-dot">G</div>
-      <div><div class="logo-name" id="ap-name"></div><div class="logo-sub" id="ap-nivel-sub"></div></div>
+    <div>
+      <img src="/Logo_Grama.png" alt="Grama" class="logo-img" />
+      <div class="logo-sub" id="ap-nivel-sub"></div>
     </div>
-    <button class="btn btn-sm" onclick="doLogout()">Salir</button>
+    <div style="text-align:right">
+      <div style="font-weight:500;font-size:14px" id="ap-name"></div>
+      <button class="btn btn-sm" style="margin-top:4px" onclick="doLogout()">Salir</button>
+    </div>
   </div>
   <div class="tabs">
     <button class="tab on" onclick="apTab(this,'apt-ini')">Inicio</button>
@@ -150,41 +186,45 @@ tr:last-child td{border-bottom:none}
     <button class="tab" onclick="apTab(this,'apt-hist')">Historial</button>
     <button class="tab" onclick="apTab(this,'apt-com')">Mi comisión</button>
   </div>
+
   <div id="apt-ini">
     <div class="grid4" id="ap-stats" style="margin-bottom:1.25rem"></div>
-    <div class="card"><div style="font-weight:600;margin-bottom:1rem">Últimos servicios</div><div id="ap-recientes"></div></div>
+    <div class="card"><div class="section-title">Últimos servicios</div><div id="ap-recientes"></div></div>
   </div>
+
   <div id="apt-reg" class="hidden">
     <div class="card" style="max-width:500px">
-      <div style="font-weight:600;margin-bottom:1rem">Registrar nuevo servicio</div>
+      <div class="section-title">Registrar nuevo servicio</div>
       <div id="r-alert" class="hidden"></div>
       <label>Fecha del servicio</label><input type="date" id="r-fecha" />
       <label>Cliente / propiedad</label><input type="text" id="r-cliente" placeholder="Ej. Hotel Las Palmas" />
       <label>Metros cuadrados aplicados</label><input type="number" id="r-m2" placeholder="Ej. 300" min="1" />
-      <label>Producto utilizado</label>
-      <select id="r-prod">
-        <option value="">-- Selecciona --</option>
-        <option>Pintapasto Verde Intenso 1L</option>
-        <option>Pintapasto Verde Intenso 4L</option>
-        <option>Pintapasto Verde Natural 1L</option>
-        <option>Pintapasto Verde Natural 4L</option>
-        <option>Pintura para Mulch 1L</option>
-        <option>Pintura para Mulch 4L</option>
+      <label>Producto</label>
+      <select id="r-prod" onchange="actualizarPresentaciones()">
+        <option value="">-- Selecciona producto --</option>
+        <option value="PintaPasto Grama">PintaPasto Grama</option>
+        <option value="PintaPasto GLF Grama">PintaPasto GLF Grama</option>
       </select>
-      <label>Litros utilizados</label><input type="number" id="r-litros" placeholder="Ej. 2" min="0.1" step="0.1" />
+      <label>Presentación</label>
+      <select id="r-pres">
+        <option value="">-- Selecciona presentación --</option>
+      </select>
+      <label>Cantidad de envases</label><input type="number" id="r-cant" placeholder="Ej. 2" min="1" step="1" />
       <label>Notas (opcional)</label><input type="text" id="r-notas" placeholder="Tipo de superficie, condiciones..." />
       <button class="btn btn-primary" style="margin-top:18px" onclick="registrar()">Guardar servicio</button>
     </div>
   </div>
+
   <div id="apt-hist" class="hidden">
     <div class="card tbl-wrap">
-      <div style="font-weight:600;margin-bottom:1rem">Historial completo</div>
+      <div class="section-title">Historial completo</div>
       <table id="tbl-hist"></table>
     </div>
   </div>
+
   <div id="apt-com" class="hidden">
     <div class="card" style="max-width:460px">
-      <div style="font-weight:600;margin-bottom:1rem">Mi comisión del mes</div>
+      <div class="section-title">Mi comisión del mes</div>
       <div id="ap-com-det"></div>
     </div>
   </div>
@@ -193,13 +233,20 @@ tr:last-child td{border-bottom:none}
 </div>
 <script>
 const API='';
+const PRESENTACIONES=['1L','4L','20L','200L'];
 const NIVELES={
   semilla:{label:'Semilla',pct:12,bono:80,min:0},
   verde:{label:'Verde',pct:15,bono:100,min:5000},
   master:{label:'Master',pct:18,bono:130,min:15000},
   socio:{label:'Socio',pct:22,bono:160,min:30000}
 };
+let PRECIOS={
+  'PintaPasto Grama':{'1L':180,'4L':620,'20L':2800,'200L':24000},
+  'PintaPasto GLF Grama':{'1L':200,'4L':680,'20L':3100,'200L':26000}
+};
+let COMS_CONFIG={...NIVELES};
 let state={user:null,ap:null,aplicadores:[],servicios:[]};
+
 async function api(path,method='GET',body=null){
   const opts={method,headers:{'Content-Type':'application/json'}};
   if(body)opts.body=JSON.stringify(body);
@@ -222,6 +269,75 @@ function calcCom(ap,svcs){
   const margen=svcs.reduce((a,s)=>a+(s.litros||0)*60,0);
   return{bono,pct,margen,total:bono+pct+margen};
 }
+
+function actualizarPresentaciones(){
+  const sel=document.getElementById('r-pres');
+  sel.innerHTML='<option value="">-- Selecciona presentación --</option>';
+  PRESENTACIONES.forEach(p=>{
+    const opt=document.createElement('option');
+    opt.value=p;opt.textContent=p;
+    sel.appendChild(opt);
+  });
+}
+
+function renderPreciosForm(){
+  const productos=Object.keys(PRECIOS);
+  let html='';
+  productos.forEach(prod=>{
+    html+=`<div style="margin-bottom:1.25rem"><div style="font-weight:500;color:#1c402e;margin-bottom:8px;font-size:14px">${prod}</div>`;
+    PRESENTACIONES.forEach(pres=>{
+      html+=`<div class="precio-row">
+        <span class="precio-label">${pres}</span>
+        <input class="precio-input" type="number" id="precio_${prod.replace(/ /g,'_')}_${pres}" value="${PRECIOS[prod][pres]||0}" min="0" />
+        <span style="font-size:13px;color:#999">MXN</span>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('precios-form').innerHTML=html;
+
+  let comHtml='';
+  Object.entries(NIVELES).forEach(([key,n])=>{
+    comHtml+=`<div style="margin-bottom:12px;padding:10px;background:#f9fdf9;border-radius:8px;border-left:3px solid #1f7344">
+      <div style="font-weight:500;margin-bottom:8px">${n.label}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><label style="margin-top:0">Comisión %</label><input type="number" id="com_pct_${key}" value="${n.pct}" min="0" max="100" class="precio-input" style="width:100%" /></div>
+        <div><label style="margin-top:0">Bono por servicio MXN</label><input type="number" id="com_bono_${key}" value="${n.bono}" min="0" class="precio-input" style="width:100%" /></div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('comisiones-form').innerHTML=comHtml;
+}
+
+function guardarPrecios(){
+  const productos=Object.keys(PRECIOS);
+  productos.forEach(prod=>{
+    PRESENTACIONES.forEach(pres=>{
+      const el=document.getElementById(`precio_${prod.replace(/ /g,'_')}_${pres}`);
+      if(el) PRECIOS[prod][pres]=parseFloat(el.value)||0;
+    });
+  });
+  const al=document.getElementById('precios-alert');
+  al.className='alert alert-ok';
+  al.textContent='Precios guardados correctamente.';
+  al.classList.remove('hidden');
+  setTimeout(()=>al.classList.add('hidden'),3000);
+}
+
+function guardarComisiones(){
+  Object.keys(NIVELES).forEach(key=>{
+    const pct=document.getElementById(`com_pct_${key}`);
+    const bono=document.getElementById(`com_bono_${key}`);
+    if(pct) NIVELES[key].pct=parseFloat(pct.value)||0;
+    if(bono) NIVELES[key].bono=parseFloat(bono.value)||0;
+  });
+  const al=document.getElementById('precios-alert');
+  al.className='alert alert-ok';
+  al.textContent='Comisiones guardadas correctamente.';
+  al.classList.remove('hidden');
+  setTimeout(()=>al.classList.add('hidden'),3000);
+}
+
 async function doLogin(){
   const usuario=document.getElementById('l-user').value.trim();
   const password=document.getElementById('l-pass').value;
@@ -258,6 +374,7 @@ async function loadAdmin(){
     state.aplicadores=Array.isArray(aps)?aps:[];
     state.servicios=Array.isArray(svcs)?svcs:[];
     renderAdminResumen();renderAdminAps();renderAdminSvcs();renderAdminComs();
+    renderPreciosForm();
   }finally{loading(false)}
 }
 function renderAdminResumen(){
@@ -271,11 +388,11 @@ function renderAdminResumen(){
     <div class="ap-row">
       <div style="display:flex;align-items:center;gap:10px">
         <div class="avatar">${initials(ap.nombre)}</div>
-        <div><div style="font-size:14px;font-weight:600">${ap.nombre}</div><div style="font-size:12px;color:#888">${ap.zona}</div></div>
+        <div><div style="font-size:14px;font-weight:500">${ap.nombre}</div><div style="font-size:12px;color:#999">${ap.zona}</div></div>
       </div>${badge(ap.nivel||'semilla')}</div>`).join(''):'<div class="empty">Sin aplicadores registrados</div>';
   document.getElementById('a-svc-recent').innerHTML=[...svcs].reverse().slice(0,5).map(s=>{
     const ap=state.aplicadores.find(a=>a.id===s.apId)||{nombre:'—'};
-    return`<div class="ap-row"><div><div style="font-size:13px;font-weight:600">${s.cliente}</div><div style="font-size:12px;color:#888">${ap.nombre} · ${s.m2} m²</div></div><div style="font-size:12px;color:#888">${fdate(s.fecha)}</div></div>`;
+    return`<div class="ap-row"><div><div style="font-size:13px;font-weight:500">${s.cliente}</div><div style="font-size:12px;color:#999">${ap.nombre} · ${s.m2} m²</div></div><div style="font-size:12px;color:#999">${fdate(s.fecha)}</div></div>`;
   }).join('')||'<div class="empty">Sin servicios aún</div>';
 }
 function renderAdminAps(){
@@ -284,15 +401,15 @@ function renderAdminAps(){
     (state.aplicadores.length?state.aplicadores.map(ap=>{
       const svcs=state.servicios.filter(s=>s.apId===ap.id).length;
       return`<tr><td><strong>${ap.nombre}</strong></td><td>${ap.zona}</td><td>${ap.perfil}</td><td>${badge(ap.nivel||'semilla')}</td><td>${fmx(ap.compras_mes||0)}</td><td>${svcs}</td></tr>`;
-    }).join(''):'<tr><td colspan="6" style="text-align:center;color:#999">Sin aplicadores</td></tr>')+`</tbody>`;
+    }).join(''):'<tr><td colspan="6" class="empty">Sin aplicadores</td></tr>')+`</tbody>`;
 }
 function renderAdminSvcs(){
   document.getElementById('tbl-svcs-a').innerHTML=
-    `<thead><tr><th>Fecha</th><th>Aplicador</th><th>Cliente</th><th>M²</th><th>Producto</th><th>Litros</th></tr></thead><tbody>`+
+    `<thead><tr><th>Fecha</th><th>Aplicador</th><th>Cliente</th><th>M²</th><th>Producto</th><th>Presentación</th><th>Cant.</th></tr></thead><tbody>`+
     ([...state.servicios].reverse().map(s=>{
       const ap=state.aplicadores.find(a=>a.id===s.apId)||{nombre:'—'};
-      return`<tr><td>${fdate(s.fecha)}</td><td>${ap.nombre}</td><td>${s.cliente}</td><td>${s.m2}</td><td style="font-size:12px">${s.producto}</td><td>${s.litros}</td></tr>`;
-    }).join('')||'<tr><td colspan="6" style="text-align:center;color:#999">Sin servicios</td></tr>')+`</tbody>`;
+      return`<tr><td>${fdate(s.fecha)}</td><td>${ap.nombre}</td><td>${s.cliente}</td><td>${s.m2}</td><td>${s.producto}</td><td>${s.litros}</td><td>${s.notas||'—'}</td></tr>`;
+    }).join('')||'<tr><td colspan="7" class="empty">Sin servicios</td></tr>')+`</tbody>`;
 }
 function renderAdminComs(){
   document.getElementById('tbl-coms').innerHTML=
@@ -301,7 +418,7 @@ function renderAdminComs(){
       const svcs=state.servicios.filter(s=>s.apId===ap.id);
       const c=calcCom(ap,svcs);
       return`<tr><td><strong>${ap.nombre}</strong></td><td>${badge(ap.nivel||'semilla')}</td><td>${svcs.length}</td><td>${fmx(c.bono)}</td><td>${fmx(c.pct)}</td><td>${fmx(c.margen)}</td><td><strong>${fmx(c.total)}</strong></td></tr>`;
-    }).join(''):'<tr><td colspan="7" style="text-align:center;color:#999">Sin datos</td></tr>')+`</tbody>`;
+    }).join(''):'<tr><td colspan="7" class="empty">Sin datos</td></tr>')+`</tbody>`;
 }
 async function crearAplicador(){
   const nombre=document.getElementById('n-nombre').value.trim();
@@ -349,15 +466,15 @@ function renderApStats(){
 }
 function renderApRecientes(){
   document.getElementById('ap-recientes').innerHTML=[...state.servicios].reverse().slice(0,4).map(s=>
-    `<div class="ap-row"><div><div style="font-size:14px;font-weight:600">${s.cliente}</div><div style="font-size:12px;color:#888">${s.m2} m² · ${s.producto}</div></div><div style="font-size:12px;color:#888">${fdate(s.fecha)}</div></div>`
+    `<div class="ap-row"><div><div style="font-size:14px;font-weight:500">${s.cliente}</div><div style="font-size:12px;color:#999">${s.m2} m² · ${s.producto} ${s.litros}</div></div><div style="font-size:12px;color:#999">${fdate(s.fecha)}</div></div>`
   ).join('')||'<div class="empty">Sin servicios registrados aún</div>';
 }
 function renderApHist(){
   document.getElementById('tbl-hist').innerHTML=
-    `<thead><tr><th>Fecha</th><th>Cliente</th><th>M²</th><th>Producto</th><th>Litros</th><th>Notas</th></tr></thead><tbody>`+
+    `<thead><tr><th>Fecha</th><th>Cliente</th><th>M²</th><th>Producto</th><th>Presentación</th><th>Cant.</th><th>Notas</th></tr></thead><tbody>`+
     ([...state.servicios].reverse().map(s=>
-      `<tr><td>${fdate(s.fecha)}</td><td>${s.cliente}</td><td>${s.m2}</td><td style="font-size:12px">${s.producto}</td><td>${s.litros}</td><td style="font-size:12px;color:#888">${s.notas||'—'}</td></tr>`
-    ).join('')||'<tr><td colspan="6" style="text-align:center;color:#999">Sin servicios aún</td></tr>')+`</tbody>`;
+      `<tr><td>${fdate(s.fecha)}</td><td>${s.cliente}</td><td>${s.m2}</td><td>${s.producto}</td><td>${s.litros}</td><td>${s.notas||'—'}</td><td></td></tr>`
+    ).join('')||'<tr><td colspan="7" class="empty">Sin servicios aún</td></tr>')+`</tbody>`;
 }
 function renderApCom(){
   const ap=state.ap,svcs=state.servicios;
@@ -366,43 +483,49 @@ function renderApCom(){
   const sig=Object.values(NIVELES).find(lv=>lv.min>(ap.compras_mes||0));
   document.getElementById('ap-com-det').innerHTML=`
     <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-      <span style="color:#666;font-size:14px">Nivel actual</span>${badge(ap.nivel||'semilla')}
+      <span style="color:#5d5d5d;font-size:14px">Nivel actual</span>${badge(ap.nivel||'semilla')}
     </div>
     <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-      <span style="color:#666;font-size:14px">Comisión sobre producto</span><span style="font-weight:600">${n.pct}%</span>
+      <span style="color:#5d5d5d;font-size:14px">Comisión sobre producto</span><span style="font-weight:500">${n.pct}%</span>
     </div>
     <div style="display:flex;justify-content:space-between;margin-bottom:16px">
-      <span style="color:#666;font-size:14px">Bono por aplicación</span><span style="font-weight:600">${fmx(n.bono)} c/u</span>
+      <span style="color:#5d5d5d;font-size:14px">Bono por servicio</span><span style="font-weight:500">${fmx(n.bono)}</span>
     </div>
     <div style="border-top:1px solid #e0e0e0;padding-top:14px;margin-bottom:8px">
-      <div style="font-size:12px;color:#888;font-weight:600;margin-bottom:8px">DESGLOSE DEL MES</div>
+      <div style="font-size:12px;color:#999;font-weight:500;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Desglose del mes</div>
       <div class="com-row"><span>${svcs.length} servicios × ${fmx(n.bono)}</span><span>${fmx(c.bono)}</span></div>
       <div class="com-row"><span>Comisión ${n.pct}% sobre ${fmx(ap.compras_mes||0)}</span><span>${fmx(c.pct)}</span></div>
       <div class="com-row"><span>Margen estimado en producto</span><span>${fmx(c.margen)}</span></div>
     </div>
     <div class="com-total"><span>Total estimado</span><span>${fmx(c.total)}</span></div>
-    <div style="margin-top:10px;font-size:12px;color:#888">${sig?'Para nivel '+sig.label+' necesitas '+fmx(sig.min-(ap.compras_mes||0))+' más en compras este mes.':'¡Eres Socio Grama — el nivel más alto!'}</div>`;
+    <div style="margin-top:10px;font-size:12px;color:#999">${sig?'Para nivel '+sig.label+' necesitas '+fmx(sig.min-(ap.compras_mes||0))+' más en compras este mes.':'¡Eres Socio Grama — el nivel más alto!'}</div>`;
 }
 async function registrar(){
   const fecha=document.getElementById('r-fecha').value;
   const cliente=document.getElementById('r-cliente').value.trim();
   const m2=parseFloat(document.getElementById('r-m2').value);
   const producto=document.getElementById('r-prod').value;
-  const litros=parseFloat(document.getElementById('r-litros').value);
+  const presentacion=document.getElementById('r-pres').value;
+  const cantidad=parseFloat(document.getElementById('r-cant').value);
   const notas=document.getElementById('r-notas').value.trim();
   const al=document.getElementById('r-alert');
-  if(!fecha||!cliente||!m2||!producto||!litros){showAlert(al,'Completa todos los campos obligatorios','err');return}
+  if(!fecha||!cliente||!m2||!producto||!presentacion||!cantidad){
+    showAlert(al,'Completa todos los campos obligatorios','err');return
+  }
   loading(true);
   try{
-    const r=await api('servicios','POST',{apId:state.ap.id,fecha,cliente,m2,producto,litros,notas});
+    const litros=presentacion;
+    const r=await api('servicios','POST',{apId:state.ap.id,fecha,cliente,m2,producto,litros,notas:cantidad+'x '+presentacion+(notas?' — '+notas:'')});
     if(r.ok){
-      state.ap.compras_mes=(state.ap.compras_mes||0)+litros*120;
+      const precio=PRECIOS[producto]?.[presentacion]||0;
+      state.ap.compras_mes=(state.ap.compras_mes||0)+(precio*cantidad*0.75);
       state.ap.nivel=getNivel(state.ap.compras_mes);
       document.getElementById('ap-nivel-sub').textContent='Aplicador Certificado · '+(NIVELES[state.ap.nivel]?.label||state.ap.nivel);
       document.getElementById('r-cliente').value='';
       document.getElementById('r-m2').value='';
       document.getElementById('r-prod').value='';
-      document.getElementById('r-litros').value='';
+      document.getElementById('r-pres').innerHTML='<option value="">-- Selecciona presentación --</option>';
+      document.getElementById('r-cant').value='';
       document.getElementById('r-notas').value='';
       showAlert(al,'Servicio registrado correctamente.','ok');
       await loadApSvcs();
@@ -412,7 +535,7 @@ async function registrar(){
 function adminTab(btn,target){
   document.querySelectorAll('#s-admin .tab').forEach(t=>t.classList.remove('on'));
   btn.classList.add('on');
-  ['at-res','at-aps','at-svcs','at-coms','at-nuevo'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  ['at-res','at-aps','at-svcs','at-coms','at-precios','at-nuevo'].forEach(id=>document.getElementById(id).classList.add('hidden'));
   show(target);
 }
 function apTab(btn,target){
