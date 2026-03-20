@@ -3,548 +3,943 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grama — Portal de Aplicadores</title>
+<title>Grama — Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Roboto',sans-serif;background:#f4f4f4;color:#1c402e;font-size:15px}
 .hidden{display:none!important}
-.app{max-width:920px;margin:0 auto;padding:1.5rem 1rem}
+.app{max-width:960px;margin:0 auto;padding:1.5rem 1rem}
 .card{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;border:1px solid #ccc;background:#fff;color:#1c402e;font-size:14px;cursor:pointer;transition:all .15s;font-family:'Roboto',sans-serif}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;border:1px solid #ccc;background:#fff;color:#1c402e;font-size:14px;cursor:pointer;font-family:'Roboto',sans-serif;transition:all .15s}
 .btn:hover{background:#f0f0f0}
 .btn-primary{background:#1f7344;border-color:#1f7344;color:#fff}
 .btn-primary:hover{background:#1c402e}
-.btn-danger{background:#fff;border-color:#c0392b;color:#c0392b}
+.btn-danger{color:#c0392b;border-color:#c0392b}
 .btn-danger:hover{background:#fdf0ef}
 .btn-sm{padding:5px 12px;font-size:13px}
-.btn-full{width:100%}
+.btn-full{width:100%;justify-content:center}
 label{font-size:13px;color:#5d5d5d;display:block;margin-bottom:5px;margin-top:12px}
 input,select,textarea{width:100%;padding:9px 12px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#1c402e;font-size:14px;font-family:'Roboto',sans-serif}
-input:focus,select:focus{outline:none;border-color:#1f7344;box-shadow:0 0 0 3px rgba(31,115,68,0.12)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#1f7344;box-shadow:0 0 0 3px rgba(31,115,68,0.1)}
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
 .badge-semilla{background:#e8f5ec;color:#1f7344}
 .badge-verde{background:#c8e6c9;color:#1c402e}
 .badge-master{background:#1c402e;color:#fff}
 .badge-socio{background:#fff8e1;color:#7b5800}
+.badge-superadmin{background:#1c402e;color:#fff}
+.badge-admin{background:#e8f5ec;color:#1c402e}
+.badge-vendedor{background:#e3f2fd;color:#0d47a1}
+.badge-aplicador{background:#f3e5f5;color:#6a1b9a}
+.badge-distribuidor{background:#fff3e0;color:#e65100}
+.badge-pendiente{background:#fff8e1;color:#f57f17}
+.badge-confirmado{background:#e8f5ec;color:#1f7344}
+.badge-enviado{background:#e3f2fd;color:#0d47a1}
+.badge-entregado{background:#c8e6c9;color:#1c402e}
+.badge-cancelado{background:#fdf0ef;color:#c0392b}
 .alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:1rem}
 .alert-ok{background:#e8f5ec;color:#1c402e;border:1px solid #1f7344}
 .alert-err{background:#fdf0ef;color:#c0392b;border:1px solid #e74c3c}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #1f7344}
-.logo-img{height:44px;width:auto}
-.logo-sub{font-size:12px;color:#999999;margin-top:2px}
+.logo-img{height:42px;width:auto}
 .tabs{display:flex;gap:2px;border-bottom:1px solid #e0e0e0;margin-bottom:1.25rem;overflow-x:auto}
 .tab{padding:9px 16px;font-size:14px;cursor:pointer;border:none;background:none;color:#5d5d5d;border-bottom:2px solid transparent;white-space:nowrap;font-family:'Roboto',sans-serif}
 .tab.on{color:#1f7344;border-bottom-color:#1f7344;font-weight:500}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-@media(max-width:600px){.grid4{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+@media(max-width:640px){.grid4{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
 .stat{background:#f4f4f4;border-radius:10px;padding:1rem;text-align:center;border-left:3px solid #1f7344}
 .stat-v{font-size:22px;font-weight:700;color:#1c402e}
-.stat-l{font-size:12px;color:#999999;margin-top:3px}
+.stat-l{font-size:12px;color:#999;margin-top:3px}
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:9px 10px;border-bottom:2px solid #1f7344;color:#1c402e;font-weight:500}
-td{padding:9px 10px;border-bottom:1px solid #f0f0f0;color:#1c402e}
-tr:last-child td{border-bottom:none}
+th{text-align:left;padding:9px 10px;border-bottom:2px solid #1f7344;color:#1c402e;font-weight:500;white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid #f0f0f0;color:#1c402e;vertical-align:middle}
 tr:hover td{background:#f9fdf9}
-.ap-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f0f0}
-.ap-row:last-child{border-bottom:none}
+.row-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f0f0}
+.row-item:last-child{border-bottom:none}
 .avatar{width:34px;height:34px;border-radius:50%;background:#e8f5ec;color:#1f7344;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .spinner{display:inline-block;width:22px;height:22px;border:3px solid #e0e0e0;border-top-color:#1f7344;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;z-index:100}
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;gap:12px}
+.loading-overlay span{color:#5d5d5d;font-size:14px}
 .com-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:14px}
 .com-total{display:flex;justify-content:space-between;background:#1c402e;border-radius:8px;padding:12px 16px;font-weight:700;color:#fff;font-size:16px;margin-top:8px}
-.empty{color:#999999;font-size:13px;padding:1rem 0;text-align:center}
-.precio-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0}
-.precio-row:last-child{border-bottom:none}
-.precio-label{flex:1;font-size:14px;color:#1c402e}
-.precio-input{width:120px;padding:6px 10px;border:1px solid #ccc;border-radius:6px;font-size:14px;font-family:'Roboto',sans-serif;color:#1c402e}
+.empty{color:#999;font-size:13px;padding:2rem 0;text-align:center}
 .section-title{font-size:15px;font-weight:500;color:#1c402e;margin-bottom:1rem;padding-bottom:6px;border-bottom:1px solid #e0e0e0}
-.login-wrap{max-width:380px;margin:2rem auto}
-.login-logo{text-align:center;margin-bottom:2rem}
-.login-logo img{height:80px;width:auto}
-.login-tagline{font-size:13px;color:#999999;margin-top:8px}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal{background:#fff;border-radius:12px;padding:1.5rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:17px;font-weight:500;margin-bottom:1.25rem;color:#1c402e}
+.progress-bar{height:6px;background:#e0e0e0;border-radius:3px;margin-top:6px}
+.progress-fill{height:100%;background:#1f7344;border-radius:3px;transition:width .3s}
+.stock-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500}
+.stock-ok{background:#e8f5ec;color:#1f7344}
+.stock-low{background:#fff8e1;color:#f57f17}
+.stock-out{background:#fdf0ef;color:#c0392b}
 </style>
 </head>
 <body>
-<div id="loading-overlay" class="loading-overlay"><div class="spinner"></div></div>
+<div id="loading-overlay" class="loading-overlay"><div class="spinner"></div><span id="loading-msg">Cargando...</span></div>
 <div class="app">
 
 <!-- LOGIN -->
 <div id="s-login" class="hidden">
-  <div class="login-wrap">
-    <div class="login-logo">
-      <img src="/Logo_Grama.png" alt="Grama" />
-      <div class="login-tagline">Portal de Aplicadores Certificados</div>
+  <div style="max-width:380px;margin:3rem auto">
+    <div style="text-align:center;margin-bottom:2rem">
+      <img src="/Logo_Grama.png" alt="Grama" style="height:80px;width:auto" />
+      <div style="font-size:13px;color:#999;margin-top:8px">Portal de Distribuidores y Aplicadores</div>
     </div>
     <div class="card">
       <div id="l-alert" class="hidden"></div>
-      <label>Usuario</label>
-      <input type="text" id="l-user" placeholder="tu.usuario" autocomplete="username" />
-      <label>Contraseña</label>
-      <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password" />
+      <label>Usuario</label><input type="text" id="l-user" placeholder="tu.usuario" autocomplete="username" />
+      <label>Contraseña</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" />
       <button class="btn btn-primary btn-full" style="margin-top:18px" onclick="doLogin()">Entrar</button>
     </div>
   </div>
 </div>
 
-<!-- ADMIN -->
+<!-- ADMIN / SUPERADMIN -->
 <div id="s-admin" class="hidden">
   <div class="topbar">
     <div>
       <img src="/Logo_Grama.png" alt="Grama" class="logo-img" />
-      <div class="logo-sub">Panel de Administración</div>
+      <div style="font-size:12px;color:#999;margin-top:2px" id="admin-sub"></div>
     </div>
-    <button class="btn btn-sm" onclick="doLogout()">Salir</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span style="font-size:13px;color:#5d5d5d" id="admin-name"></span>
+      <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
+      <button class="btn btn-sm" onclick="doLogout()">Salir</button>
+    </div>
   </div>
-  <div class="tabs">
-    <button class="tab on" onclick="adminTab(this,'at-res')">Resumen</button>
-    <button class="tab" onclick="adminTab(this,'at-aps')">Aplicadores</button>
-    <button class="tab" onclick="adminTab(this,'at-svcs')">Servicios</button>
-    <button class="tab" onclick="adminTab(this,'at-coms')">Comisiones</button>
-    <button class="tab" onclick="adminTab(this,'at-precios')">Precios</button>
-    <button class="tab" onclick="adminTab(this,'at-nuevo')">+ Nuevo aplicador</button>
+  <div class="tabs" id="admin-tabs">
+    <button class="tab on" onclick="adminTab(this,'at-dash')">Dashboard</button>
+    <button class="tab" onclick="adminTab(this,'at-usuarios')">Usuarios</button>
+    <button class="tab" onclick="adminTab(this,'at-pedidos')">Pedidos</button>
+    <button class="tab" onclick="adminTab(this,'at-servicios')">Servicios</button>
+    <button class="tab" onclick="adminTab(this,'at-stock')" id="tab-stock">Stock</button>
+    <button class="tab" onclick="adminTab(this,'at-config')" id="tab-config">Configuracion</button>
   </div>
 
-  <div id="at-res">
-    <div class="grid4" id="a-stats" style="margin-bottom:1.25rem"></div>
+  <div id="at-dash">
+    <div class="grid4" id="dash-stats" style="margin-bottom:1.25rem"></div>
     <div class="grid2">
-      <div class="card"><div class="section-title">Aplicadores activos</div><div id="a-ap-list"></div></div>
-      <div class="card"><div class="section-title">Servicios recientes</div><div id="a-svc-recent"></div></div>
+      <div class="card"><div class="section-title">Usuarios por tipo</div><div id="dash-tipos"></div></div>
+      <div class="card"><div class="section-title">Pedidos recientes</div><div id="dash-pedidos"></div></div>
+    </div>
+    <div class="grid2" style="margin-top:0">
+      <div class="card"><div class="section-title">Top vendedores del mes</div><div id="dash-top"></div></div>
+      <div class="card"><div class="section-title">Servicios recientes</div><div id="dash-svcs"></div></div>
     </div>
   </div>
 
-  <div id="at-aps" class="hidden">
-    <div class="card tbl-wrap"><table id="tbl-aps"></table></div>
+  <div id="at-usuarios" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <div style="display:flex;gap:8px">
+        <select id="filtro-rol" onchange="filtrarUsuarios()" style="width:auto;padding:7px 10px;font-size:13px">
+          <option value="">Todos los tipos</option>
+          <option value="vendedor">Vendedor</option>
+          <option value="aplicador">Aplicador</option>
+          <option value="distribuidor">Distribuidor</option>
+          <option value="admin">Admin</option>
+        </select>
+        <select id="filtro-nivel" onchange="filtrarUsuarios()" style="width:auto;padding:7px 10px;font-size:13px">
+          <option value="">Todos los niveles</option>
+          <option value="semilla">Semilla</option>
+          <option value="verde">Verde</option>
+          <option value="master">Master</option>
+          <option value="socio">Socio</option>
+        </select>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="showModalUsuario()">+ Nuevo usuario</button>
+    </div>
+    <div class="card tbl-wrap"><table id="tbl-usuarios"></table></div>
   </div>
 
-  <div id="at-svcs" class="hidden">
-    <div class="card tbl-wrap">
-      <div class="section-title">Todos los servicios</div>
-      <table id="tbl-svcs-a"></table>
-    </div>
-  </div>
-
-  <div id="at-coms" class="hidden">
-    <div class="card tbl-wrap">
-      <div class="section-title">Comisiones estimadas del mes</div>
-      <table id="tbl-coms"></table>
-    </div>
-  </div>
-
-  <div id="at-precios" class="hidden">
-    <div class="card" style="max-width:520px">
-      <div class="section-title">Precios de lista por producto y presentación</div>
-      <div id="precios-alert" class="hidden"></div>
-      <div id="precios-form"></div>
-      <button class="btn btn-primary" style="margin-top:18px" onclick="guardarPrecios()">Guardar precios</button>
-    </div>
-    <div class="card" style="max-width:520px;margin-top:1rem">
-      <div class="section-title">Esquema de comisiones por nivel</div>
-      <div id="comisiones-form"></div>
-      <button class="btn btn-primary" style="margin-top:18px" onclick="guardarComisiones()">Guardar comisiones</button>
-    </div>
-  </div>
-
-  <div id="at-nuevo" class="hidden">
-    <div class="card" style="max-width:460px">
-      <div class="section-title">Agregar nuevo aplicador</div>
-      <div id="nuevo-alert" class="hidden"></div>
-      <label>Nombre completo</label><input type="text" id="n-nombre" placeholder="Ej. Carlos Mendoza" />
-      <label>Zona / ciudad</label><input type="text" id="n-zona" placeholder="Ej. CDMX Norte" />
-      <label>Perfil</label>
-      <select id="n-perfil">
-        <option>Jardinero independiente</option>
-        <option>Empresa de mantenimiento</option>
-        <option>Paisajista</option>
-        <option>Proveedor de campos deportivos</option>
+  <div id="at-pedidos" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <select id="filtro-status" onchange="filtrarPedidos()" style="width:auto;padding:7px 10px;font-size:13px">
+        <option value="">Todos los status</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="confirmado">Confirmado</option>
+        <option value="enviado">Enviado</option>
+        <option value="entregado">Entregado</option>
+        <option value="cancelado">Cancelado</option>
       </select>
-      <label>Usuario (para login)</label><input type="text" id="n-usuario" placeholder="Ej. carlos.mendoza" />
-      <label>Contraseña inicial</label><input type="text" id="n-pass" placeholder="Ej. grama2025" />
-      <button class="btn btn-primary" style="margin-top:18px" onclick="crearAplicador()">Crear aplicador</button>
+    </div>
+    <div class="card tbl-wrap"><table id="tbl-pedidos-admin"></table></div>
+  </div>
+
+  <div id="at-servicios" class="hidden">
+    <div class="card tbl-wrap"><table id="tbl-svcs-admin"></table></div>
+  </div>
+
+  <div id="at-stock" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <div style="font-size:15px;font-weight:500">Inventario por CEDIS</div>
+      <button class="btn btn-primary btn-sm" onclick="showModalStock()">Actualizar stock</button>
+    </div>
+    <div id="stock-grid"></div>
+  </div>
+
+  <div id="at-config" class="hidden">
+    <div class="grid2">
+      <div class="card">
+        <div class="section-title">Niveles y precios por volumen</div>
+        <div id="config-niveles"></div>
+        <button class="btn btn-primary" style="margin-top:14px" onclick="guardarConfig('niveles')">Guardar</button>
+      </div>
+      <div class="card">
+        <div class="section-title">Comisiones por nivel</div>
+        <div id="config-comisiones"></div>
+        <button class="btn btn-primary" style="margin-top:14px" onclick="guardarConfig('comisiones')">Guardar</button>
+      </div>
+    </div>
+    <div class="card" style="max-width:400px">
+      <div class="section-title">Precios de productos</div>
+      <div id="config-precios"></div>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="guardarPrecios()">Guardar precios</button>
     </div>
   </div>
 </div>
 
-<!-- APLICADOR -->
-<div id="s-ap" class="hidden">
+<!-- USUARIO (vendedor/aplicador/distribuidor) -->
+<div id="s-user" class="hidden">
   <div class="topbar">
     <div>
       <img src="/Logo_Grama.png" alt="Grama" class="logo-img" />
-      <div class="logo-sub" id="ap-nivel-sub"></div>
+      <div style="font-size:12px;color:#999;margin-top:2px" id="user-nivel-sub"></div>
     </div>
-    <div style="text-align:right">
-      <div style="font-weight:500;font-size:14px" id="ap-name"></div>
-      <button class="btn btn-sm" style="margin-top:4px" onclick="doLogout()">Salir</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span style="font-size:13px;color:#5d5d5d" id="user-name-hdr"></span>
+      <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
+      <button class="btn btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
   <div class="tabs">
-    <button class="tab on" onclick="apTab(this,'apt-ini')">Inicio</button>
-    <button class="tab" onclick="apTab(this,'apt-reg')">Registrar</button>
-    <button class="tab" onclick="apTab(this,'apt-hist')">Historial</button>
-    <button class="tab" onclick="apTab(this,'apt-com')">Mi comisión</button>
+    <button class="tab on" onclick="userTab(this,'ut-inicio')">Inicio</button>
+    <button class="tab" onclick="userTab(this,'ut-pedido')">Hacer pedido</button>
+    <button class="tab" onclick="userTab(this,'ut-registro')">Registrar servicio</button>
+    <button class="tab" onclick="userTab(this,'ut-historial')">Historial</button>
+    <button class="tab" onclick="userTab(this,'ut-comision')">Mi comision</button>
   </div>
 
-  <div id="apt-ini">
-    <div class="grid4" id="ap-stats" style="margin-bottom:1.25rem"></div>
-    <div class="card"><div class="section-title">Últimos servicios</div><div id="ap-recientes"></div></div>
+  <div id="ut-inicio">
+    <div class="grid4" id="user-stats" style="margin-bottom:1.25rem"></div>
+    <div class="grid2">
+      <div class="card"><div class="section-title">Mis ultimos pedidos</div><div id="user-pedidos-rec"></div></div>
+      <div class="card"><div class="section-title">Mis ultimos servicios</div><div id="user-svcs-rec"></div></div>
+    </div>
+    <div class="card" style="margin-top:0">
+      <div class="section-title">Mi progreso de nivel</div>
+      <div id="user-progreso"></div>
+    </div>
   </div>
 
-  <div id="apt-reg" class="hidden">
+  <div id="ut-pedido" class="hidden">
+    <div class="card" style="max-width:560px">
+      <div class="section-title">Nuevo pedido</div>
+      <div id="pedido-alert" class="hidden"></div>
+      <label>CEDIS de entrega</label>
+      <select id="p-cedis"></select>
+      <div style="margin-top:1rem">
+        <div style="font-size:14px;font-weight:500;margin-bottom:8px">Productos</div>
+        <div id="pedido-items"></div>
+        <button class="btn btn-sm" style="margin-top:8px" onclick="agregarItemPedido()">+ Agregar producto</button>
+      </div>
+      <label>Notas (opcional)</label>
+      <textarea id="p-notas" rows="2" placeholder="Instrucciones de entrega, comentarios..."></textarea>
+      <div style="margin-top:14px;padding:12px;background:#f4f4f4;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:14px;font-weight:500">Total estimado</span>
+        <span style="font-size:18px;font-weight:700;color:#1f7344" id="pedido-total">$0 MXN</span>
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-top:14px" onclick="enviarPedido()">Enviar pedido</button>
+    </div>
+  </div>
+
+  <div id="ut-registro" class="hidden">
     <div class="card" style="max-width:500px">
-      <div class="section-title">Registrar nuevo servicio</div>
-      <div id="r-alert" class="hidden"></div>
-      <label>Fecha del servicio</label><input type="date" id="r-fecha" />
+      <div class="section-title">Registrar servicio aplicado</div>
+      <div id="reg-alert" class="hidden"></div>
+      <label>Fecha</label><input type="date" id="r-fecha" />
       <label>Cliente / propiedad</label><input type="text" id="r-cliente" placeholder="Ej. Hotel Las Palmas" />
       <label>Metros cuadrados aplicados</label><input type="number" id="r-m2" placeholder="Ej. 300" min="1" />
       <label>Producto</label>
-      <select id="r-prod" onchange="actualizarPresentaciones()">
-        <option value="">-- Selecciona producto --</option>
-        <option value="PintaPasto Grama">PintaPasto Grama</option>
-        <option value="PintaPasto GLF Grama">PintaPasto GLF Grama</option>
+      <select id="r-prod" onchange="updatePresentaciones()">
+        <option value="">-- Selecciona --</option>
       </select>
-      <label>Presentación</label>
-      <select id="r-pres">
-        <option value="">-- Selecciona presentación --</option>
-      </select>
-      <label>Cantidad de envases</label><input type="number" id="r-cant" placeholder="Ej. 2" min="1" step="1" />
-      <label>Notas (opcional)</label><input type="text" id="r-notas" placeholder="Tipo de superficie, condiciones..." />
-      <button class="btn btn-primary" style="margin-top:18px" onclick="registrar()">Guardar servicio</button>
+      <label>Presentacion</label>
+      <select id="r-pres"><option value="">-- Selecciona producto primero --</option></select>
+      <label>Cantidad de envases</label><input type="number" id="r-cant" placeholder="Ej. 2" min="1" />
+      <label>Notas</label><input type="text" id="r-notas" placeholder="Tipo de superficie, condiciones..." />
+      <button class="btn btn-primary" style="margin-top:18px" onclick="registrarServicio()">Guardar servicio</button>
     </div>
   </div>
 
-  <div id="apt-hist" class="hidden">
-    <div class="card tbl-wrap">
-      <div class="section-title">Historial completo</div>
-      <table id="tbl-hist"></table>
+  <div id="ut-historial" class="hidden">
+    <div class="tabs" style="margin-bottom:1rem">
+      <button class="tab on" onclick="histTab(this,'ht-svcs')">Servicios</button>
+      <button class="tab" onclick="histTab(this,'ht-peds')">Pedidos</button>
     </div>
+    <div id="ht-svcs"><div class="card tbl-wrap"><table id="tbl-hist-svcs"></table></div></div>
+    <div id="ht-peds" class="hidden"><div class="card tbl-wrap"><table id="tbl-hist-peds"></table></div></div>
   </div>
 
-  <div id="apt-com" class="hidden">
-    <div class="card" style="max-width:460px">
-      <div class="section-title">Mi comisión del mes</div>
-      <div id="ap-com-det"></div>
+  <div id="ut-comision" class="hidden">
+    <div class="card" style="max-width:480px">
+      <div class="section-title">Mi comision del mes</div>
+      <div id="user-com-det"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PERFIL -->
+<div id="modal-perfil" class="modal-bg hidden">
+  <div class="modal">
+    <div class="modal-title">Mi perfil</div>
+    <div id="perfil-alert" class="hidden"></div>
+    <label>Nombre</label><input type="text" id="pf-nombre" />
+    <label>Apellidos</label><input type="text" id="pf-apellidos" />
+    <label>Empresa</label><input type="text" id="pf-empresa" />
+    <label>Email</label><input type="email" id="pf-email" />
+    <label>Telefono</label><input type="tel" id="pf-telefono" />
+    <label>Ciudad</label><input type="text" id="pf-ciudad" />
+    <div style="border-top:1px solid #e0e0e0;margin-top:1rem;padding-top:1rem">
+      <div style="font-size:14px;font-weight:500;margin-bottom:8px">Cambiar contrasena</div>
+      <label>Nueva contrasena (dejar vacio para no cambiar)</label>
+      <input type="password" id="pf-pass" placeholder="Nueva contrasena" />
+    </div>
+    <div style="display:flex;gap:8px;margin-top:1.25rem">
+      <button class="btn btn-primary" onclick="guardarPerfil()">Guardar</button>
+      <button class="btn" onclick="hide('modal-perfil')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVO USUARIO -->
+<div id="modal-usuario" class="modal-bg hidden">
+  <div class="modal">
+    <div class="modal-title" id="modal-usr-title">Nuevo usuario</div>
+    <div id="usr-alert" class="hidden"></div>
+    <label>Nombre</label><input type="text" id="u-nombre" />
+    <label>Apellidos</label><input type="text" id="u-apellidos" />
+    <label>Empresa</label><input type="text" id="u-empresa" />
+    <label>Email</label><input type="email" id="u-email" />
+    <label>Telefono</label><input type="tel" id="u-tel" />
+    <label>Ciudad</label><input type="text" id="u-ciudad" />
+    <label>Tipo de usuario</label>
+    <select id="u-rol">
+      <option value="aplicador">Aplicador</option>
+      <option value="vendedor">Vendedor</option>
+      <option value="distribuidor">Distribuidor</option>
+      <option value="admin">Administrador</option>
+    </select>
+    <label>Usuario (login)</label><input type="text" id="u-usuario" />
+    <label>Contrasena</label><input type="text" id="u-pass" />
+    <div style="display:flex;gap:8px;margin-top:1.25rem">
+      <button class="btn btn-primary" onclick="guardarUsuario()">Crear usuario</button>
+      <button class="btn" onclick="hide('modal-usuario')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL STOCK -->
+<div id="modal-stock" class="modal-bg hidden">
+  <div class="modal">
+    <div class="modal-title">Actualizar stock</div>
+    <div id="stock-alert" class="hidden"></div>
+    <label>CEDIS</label>
+    <select id="st-cedis"></select>
+    <label>Producto</label>
+    <select id="st-prod"></select>
+    <label>Cantidad en inventario</label>
+    <input type="number" id="st-cant" min="0" placeholder="Ej. 50" />
+    <div style="display:flex;gap:8px;margin-top:1.25rem">
+      <button class="btn btn-primary" onclick="guardarStock()">Guardar</button>
+      <button class="btn" onclick="hide('modal-stock')">Cancelar</button>
     </div>
   </div>
 </div>
 
 </div>
 <script>
-const API='';
-const PRESENTACIONES=['1L','4L','20L','200L'];
-const NIVELES={
-  semilla:{label:'Semilla',pct:12,bono:80,min:0},
-  verde:{label:'Verde',pct:15,bono:100,min:5000},
-  master:{label:'Master',pct:18,bono:130,min:15000},
-  socio:{label:'Socio',pct:22,bono:160,min:30000}
-};
-let PRECIOS={
-  'PintaPasto Grama':{'1L':180,'4L':620,'20L':2800,'200L':24000},
-  'PintaPasto GLF Grama':{'1L':200,'4L':680,'20L':3100,'200L':26000}
-};
-let COMS_CONFIG={...NIVELES};
-let state={user:null,ap:null,aplicadores:[],servicios:[]};
+const NIVELES={semilla:{label:'Semilla',pct:12,bono:80,min:0},verde:{label:'Verde',pct:15,bono:100,min:5000},master:{label:'Master',pct:18,bono:130,min:15000},socio:{label:'Socio',pct:22,bono:160,min:30000}};
+let state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],config:{}};
+
+// Utils
+const show=id=>document.getElementById(id)?.classList.remove('hidden');
+const hide=id=>document.getElementById(id)?.classList.add('hidden');
+const el=id=>document.getElementById(id);
+const fmx=n=>'$'+Math.round(n||0).toLocaleString('es-MX')+' MXN';
+const fdate=d=>{if(!d)return'';const[y,m,dd]=(d+'').split('T')[0].split('-');return`${dd}/${m}/${y}`};
+const badge=(cls,txt)=>`<span class="badge badge-${cls}">${txt}</span>`;
+const rolBadge=r=>badge(r,r);
+const nivelBadge=n=>badge(n,NIVELES[n]?.label||n);
+const initials=n=>((n||'').split(' ').slice(0,2).map(w=>w[0]).join('')).toUpperCase();
+const stat=(v,l)=>`<div class="stat"><div class="stat-v">${v}</div><div class="stat-l">${l}</div></div>`;
+const getNivel=c=>c>=30000?'socio':c>=15000?'master':c>=5000?'verde':'semilla';
+
+function loading(on,msg='Cargando...'){
+  on?show('loading-overlay'):hide('loading-overlay');
+  const m=el('loading-msg');if(m)m.textContent=msg;
+}
+function showAlert(elId,msg,type){
+  const e=el(elId);if(!e)return;
+  e.className='alert alert-'+(type==='err'?'err':'ok');
+  e.textContent=msg;e.classList.remove('hidden');
+  if(type!=='err')setTimeout(()=>e.classList.add('hidden'),3500);
+}
 
 async function api(path,method='GET',body=null){
   const opts={method,headers:{'Content-Type':'application/json'}};
   if(body)opts.body=JSON.stringify(body);
-  const r=await fetch(API+'/api/'+path,opts);
+  const r=await fetch('/api/'+path,opts);
   return r.json();
 }
-function show(id){document.getElementById(id).classList.remove('hidden')}
-function hide(id){document.getElementById(id).classList.add('hidden')}
-function loading(on){on?show('loading-overlay'):hide('loading-overlay')}
-function fmx(n){return'$'+Math.round(n).toLocaleString('es-MX')+' MXN'}
-function fdate(d){if(!d)return'';const[y,m,dd]=d.split('-');return`${dd}/${m}/${y}`}
-function badge(nivel){return`<span class="badge badge-${nivel}">${NIVELES[nivel]?.label||nivel}</span>`}
-function initials(n){return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}
-function stat(v,l){return`<div class="stat"><div class="stat-v">${v}</div><div class="stat-l">${l}</div></div>`}
-function getNivel(c){return c>=30000?'socio':c>=15000?'master':c>=5000?'verde':'semilla'}
-function calcCom(ap,svcs){
-  const n=NIVELES[ap.nivel||'semilla'];
-  const bono=svcs.length*n.bono;
-  const pct=(ap.compras_mes||0)*n.pct/100;
-  const margen=svcs.reduce((a,s)=>a+(s.litros||0)*60,0);
-  return{bono,pct,margen,total:bono+pct+margen};
-}
 
-function actualizarPresentaciones(){
-  const sel=document.getElementById('r-pres');
-  sel.innerHTML='<option value="">-- Selecciona presentación --</option>';
-  PRESENTACIONES.forEach(p=>{
-    const opt=document.createElement('option');
-    opt.value=p;opt.textContent=p;
-    sel.appendChild(opt);
-  });
-}
-
-function renderPreciosForm(){
-  const productos=Object.keys(PRECIOS);
-  let html='';
-  productos.forEach(prod=>{
-    html+=`<div style="margin-bottom:1.25rem"><div style="font-weight:500;color:#1c402e;margin-bottom:8px;font-size:14px">${prod}</div>`;
-    PRESENTACIONES.forEach(pres=>{
-      html+=`<div class="precio-row">
-        <span class="precio-label">${pres}</span>
-        <input class="precio-input" type="number" id="precio_${prod.replace(/ /g,'_')}_${pres}" value="${PRECIOS[prod][pres]||0}" min="0" />
-        <span style="font-size:13px;color:#999">MXN</span>
-      </div>`;
-    });
-    html+='</div>';
-  });
-  document.getElementById('precios-form').innerHTML=html;
-
-  let comHtml='';
-  Object.entries(NIVELES).forEach(([key,n])=>{
-    comHtml+=`<div style="margin-bottom:12px;padding:10px;background:#f9fdf9;border-radius:8px;border-left:3px solid #1f7344">
-      <div style="font-weight:500;margin-bottom:8px">${n.label}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div><label style="margin-top:0">Comisión %</label><input type="number" id="com_pct_${key}" value="${n.pct}" min="0" max="100" class="precio-input" style="width:100%" /></div>
-        <div><label style="margin-top:0">Bono por servicio MXN</label><input type="number" id="com_bono_${key}" value="${n.bono}" min="0" class="precio-input" style="width:100%" /></div>
-      </div>
-    </div>`;
-  });
-  document.getElementById('comisiones-form').innerHTML=comHtml;
-}
-
-function guardarPrecios(){
-  const productos=Object.keys(PRECIOS);
-  productos.forEach(prod=>{
-    PRESENTACIONES.forEach(pres=>{
-      const el=document.getElementById(`precio_${prod.replace(/ /g,'_')}_${pres}`);
-      if(el) PRECIOS[prod][pres]=parseFloat(el.value)||0;
-    });
-  });
-  const al=document.getElementById('precios-alert');
-  al.className='alert alert-ok';
-  al.textContent='Precios guardados correctamente.';
-  al.classList.remove('hidden');
-  setTimeout(()=>al.classList.add('hidden'),3000);
-}
-
-function guardarComisiones(){
-  Object.keys(NIVELES).forEach(key=>{
-    const pct=document.getElementById(`com_pct_${key}`);
-    const bono=document.getElementById(`com_bono_${key}`);
-    if(pct) NIVELES[key].pct=parseFloat(pct.value)||0;
-    if(bono) NIVELES[key].bono=parseFloat(bono.value)||0;
-  });
-  const al=document.getElementById('precios-alert');
-  al.className='alert alert-ok';
-  al.textContent='Comisiones guardadas correctamente.';
-  al.classList.remove('hidden');
-  setTimeout(()=>al.classList.add('hidden'),3000);
-}
-
+// AUTH
 async function doLogin(){
-  const usuario=document.getElementById('l-user').value.trim();
-  const password=document.getElementById('l-pass').value;
-  const al=document.getElementById('l-alert');
-  if(!usuario||!password){showAlert(al,'Por favor ingresa usuario y contraseña','err');return}
-  loading(true);
+  const usuario=el('l-user').value.trim();
+  const password=el('l-pass').value;
+  if(!usuario||!password){showAlert('l-alert','Ingresa usuario y contrasena','err');return}
+  loading(true,'Iniciando sesion...');
   try{
     const r=await api('login','POST',{usuario,password});
-    if(!r.ok){showAlert(al,r.error||'Error al iniciar sesión','err');return}
-    state.user=r.user;state.ap=r.aplicador;
+    if(!r.ok){showAlert('l-alert',r.error||'Error al iniciar sesion','err');return}
+    state.user=r.user;
     hide('s-login');
-    if(r.user.rol==='admin'){await loadAdmin();show('s-admin')}
-    else{renderAplicador();show('s-ap')}
-  }catch(e){showAlert(al,'Error de conexión. Intenta de nuevo.','err')}
+    if(['superadmin','admin'].includes(r.user.rol)){await loadAdmin();show('s-admin')}
+    else{await loadUser();show('s-user')}
+  }catch(e){showAlert('l-alert','Error de conexion','err')}
   finally{loading(false)}
 }
+
 function doLogout(){
-  state={user:null,ap:null,aplicadores:[],servicios:[]};
-  hide('s-admin');hide('s-ap');
-  document.getElementById('l-user').value='';
-  document.getElementById('l-pass').value='';
+  state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],config:{}};
+  hide('s-admin');hide('s-user');
+  el('l-user').value='';el('l-pass').value='';
   show('s-login');
 }
-function showAlert(el,msg,type){
-  el.className='alert alert-'+(type==='err'?'err':'ok');
-  el.textContent=msg;
-  el.classList.remove('hidden');
-  if(type!=='err')setTimeout(()=>el.classList.add('hidden'),3500);
-}
+
+// ADMIN
 async function loadAdmin(){
-  loading(true);
+  loading(true,'Cargando datos...');
   try{
-    const[aps,svcs]=await Promise.all([api('aplicadores'),api('servicios')]);
-    state.aplicadores=Array.isArray(aps)?aps:[];
+    const[usuarios,pedidos,svcs,prods,cedis,stock]=await Promise.all([
+      api('usuarios'),api('pedidos?all=1'),api('servicios'),
+      api('data?resource=productos'),api('data?resource=cedis'),api('data?resource=stock')
+    ]);
+    state.usuarios=Array.isArray(usuarios)?usuarios:[];
+    state.pedidos=Array.isArray(pedidos)?pedidos:[];
     state.servicios=Array.isArray(svcs)?svcs:[];
-    renderAdminResumen();renderAdminAps();renderAdminSvcs();renderAdminComs();
-    renderPreciosForm();
+    state.productos=Array.isArray(prods)?prods:[];
+    state.cedis=Array.isArray(cedis)?cedis:[];
+    state.stock=Array.isArray(stock)?stock:[];
+
+    const u=state.user;
+    el('admin-name').textContent=u.nombre||u.usuario;
+    el('admin-sub').textContent=u.rol==='superadmin'?'Super Administrador':'Administrador';
+    if(u.rol!=='superadmin'){hide('tab-config')}
+
+    renderDash();renderUsuarios();renderPedidosAdmin();renderSvcsAdmin();renderStock();
+    if(u.rol==='superadmin')renderConfig();
   }finally{loading(false)}
 }
-function renderAdminResumen(){
-  const aps=state.aplicadores,svcs=state.servicios;
-  const totalM2=svcs.reduce((a,s)=>a+(s.m2||0),0);
-  const totalCompras=aps.reduce((a,ap)=>a+(ap.compras_mes||0),0);
-  document.getElementById('a-stats').innerHTML=
-    stat(aps.length,'Aplicadores')+stat(svcs.length,'Servicios')+
-    stat(totalM2.toLocaleString()+' m²','M² aplicados')+stat(fmx(totalCompras),'Compras del mes');
-  document.getElementById('a-ap-list').innerHTML=aps.length?aps.map(ap=>`
-    <div class="ap-row">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div class="avatar">${initials(ap.nombre)}</div>
-        <div><div style="font-size:14px;font-weight:500">${ap.nombre}</div><div style="font-size:12px;color:#999">${ap.zona}</div></div>
-      </div>${badge(ap.nivel||'semilla')}</div>`).join(''):'<div class="empty">Sin aplicadores registrados</div>';
-  document.getElementById('a-svc-recent').innerHTML=[...svcs].reverse().slice(0,5).map(s=>{
-    const ap=state.aplicadores.find(a=>a.id===s.apId)||{nombre:'—'};
-    return`<div class="ap-row"><div><div style="font-size:13px;font-weight:500">${s.cliente}</div><div style="font-size:12px;color:#999">${ap.nombre} · ${s.m2} m²</div></div><div style="font-size:12px;color:#999">${fdate(s.fecha)}</div></div>`;
-  }).join('')||'<div class="empty">Sin servicios aún</div>';
+
+function renderDash(){
+  const u=state.usuarios,p=state.pedidos,s=state.servicios;
+  const totalVentas=p.filter(x=>x.status==='entregado').reduce((a,x)=>a+(x.total||0),0);
+  el('dash-stats').innerHTML=
+    stat(u.length,'Usuarios activos')+stat(p.length,'Pedidos totales')+
+    stat(s.length,'Servicios registrados')+stat(fmx(totalVentas),'Ventas confirmadas');
+
+  const tipos={vendedor:0,aplicador:0,distribuidor:0,admin:0};
+  u.forEach(x=>{if(tipos[x.rol]!==undefined)tipos[x.rol]++});
+  el('dash-tipos').innerHTML=Object.entries(tipos).map(([k,v])=>
+    `<div class="row-item"><span style="font-size:14px">${rolBadge(k)}</span><span style="font-weight:500">${v}</span></div>`
+  ).join('');
+
+  el('dash-pedidos').innerHTML=[...p].slice(0,5).map(x=>{
+    const usr=state.usuarios.find(u=>u.id===x.usuario_id)||{nombre:'—'};
+    return`<div class="row-item"><div><div style="font-size:13px;font-weight:500">${usr.nombre||usr.usuario}</div><div style="font-size:12px;color:#999">${fmx(x.total)}</div></div>${badge('badge-'+x.status,x.status)}</div>`;
+  }).join('')||'<div class="empty">Sin pedidos</div>';
+
+  const topUsers=[...state.usuarios].sort((a,b)=>(b.compras_mes||0)-(a.compras_mes||0)).slice(0,5);
+  el('dash-top').innerHTML=topUsers.map(u=>
+    `<div class="row-item"><div style="display:flex;align-items:center;gap:8px"><div class="avatar">${initials(u.nombre)}</div><div><div style="font-size:13px;font-weight:500">${u.nombre||u.usuario}</div><div style="font-size:12px;color:#999">${u.ciudad||''}</div></div></div><span style="font-size:13px;font-weight:500">${fmx(u.compras_mes)}</span></div>`
+  ).join('')||'<div class="empty">Sin datos</div>';
+
+  el('dash-svcs').innerHTML=[...s].slice(0,5).map(x=>{
+    const usr=state.usuarios.find(u=>u.id===x.usuario_id)||{nombre:'—'};
+    return`<div class="row-item"><div><div style="font-size:13px;font-weight:500">${x.cliente}</div><div style="font-size:12px;color:#999">${usr.nombre||usr.usuario} · ${x.m2} m²</div></div><div style="font-size:12px;color:#999">${fdate(x.fecha)}</div></div>`;
+  }).join('')||'<div class="empty">Sin servicios</div>';
 }
-function renderAdminAps(){
-  document.getElementById('tbl-aps').innerHTML=
-    `<thead><tr><th>Nombre</th><th>Zona</th><th>Perfil</th><th>Nivel</th><th>Compras mes</th><th>Servicios</th></tr></thead><tbody>`+
-    (state.aplicadores.length?state.aplicadores.map(ap=>{
-      const svcs=state.servicios.filter(s=>s.apId===ap.id).length;
-      return`<tr><td><strong>${ap.nombre}</strong></td><td>${ap.zona}</td><td>${ap.perfil}</td><td>${badge(ap.nivel||'semilla')}</td><td>${fmx(ap.compras_mes||0)}</td><td>${svcs}</td></tr>`;
-    }).join(''):'<tr><td colspan="6" class="empty">Sin aplicadores</td></tr>')+`</tbody>`;
+
+function renderUsuarios(filtro={}){
+  let users=[...state.usuarios];
+  if(filtro.rol)users=users.filter(u=>u.rol===filtro.rol);
+  if(filtro.nivel)users=users.filter(u=>u.nivel===filtro.nivel);
+  el('tbl-usuarios').innerHTML=
+    `<thead><tr><th>Usuario</th><th>Nombre</th><th>Empresa</th><th>Ciudad</th><th>Tipo</th><th>Nivel</th><th>Compras mes</th><th>Acciones</th></tr></thead><tbody>`+
+    (users.length?users.map(u=>`<tr>
+      <td><strong>${u.usuario}</strong></td>
+      <td>${(u.nombre||'')+' '+(u.apellidos||'')}</td>
+      <td style="font-size:12px;color:#5d5d5d">${u.empresa||'—'}</td>
+      <td style="font-size:12px">${u.ciudad||'—'}</td>
+      <td>${rolBadge(u.rol)}</td>
+      <td>${nivelBadge(u.nivel||'semilla')}</td>
+      <td>${fmx(u.compras_mes)}</td>
+      <td><button class="btn btn-sm" onclick="editarUsuario('${u.id}')">Editar</button></td>
+    </tr>`).join(''):'<tr><td colspan="8" class="empty">Sin usuarios</td></tr>')+
+    '</tbody>';
 }
-function renderAdminSvcs(){
-  document.getElementById('tbl-svcs-a').innerHTML=
-    `<thead><tr><th>Fecha</th><th>Aplicador</th><th>Cliente</th><th>M²</th><th>Producto</th><th>Presentación</th><th>Cant.</th></tr></thead><tbody>`+
-    ([...state.servicios].reverse().map(s=>{
-      const ap=state.aplicadores.find(a=>a.id===s.apId)||{nombre:'—'};
-      return`<tr><td>${fdate(s.fecha)}</td><td>${ap.nombre}</td><td>${s.cliente}</td><td>${s.m2}</td><td>${s.producto}</td><td>${s.litros}</td><td>${s.notas||'—'}</td></tr>`;
-    }).join('')||'<tr><td colspan="7" class="empty">Sin servicios</td></tr>')+`</tbody>`;
+
+function filtrarUsuarios(){
+  renderUsuarios({rol:el('filtro-rol').value,nivel:el('filtro-nivel').value});
 }
-function renderAdminComs(){
-  document.getElementById('tbl-coms').innerHTML=
-    `<thead><tr><th>Aplicador</th><th>Nivel</th><th>Servicios</th><th>Bono</th><th>Comisión %</th><th>Margen</th><th>Total</th></tr></thead><tbody>`+
-    (state.aplicadores.length?state.aplicadores.map(ap=>{
-      const svcs=state.servicios.filter(s=>s.apId===ap.id);
-      const c=calcCom(ap,svcs);
-      return`<tr><td><strong>${ap.nombre}</strong></td><td>${badge(ap.nivel||'semilla')}</td><td>${svcs.length}</td><td>${fmx(c.bono)}</td><td>${fmx(c.pct)}</td><td>${fmx(c.margen)}</td><td><strong>${fmx(c.total)}</strong></td></tr>`;
-    }).join(''):'<tr><td colspan="7" class="empty">Sin datos</td></tr>')+`</tbody>`;
+
+function renderPedidosAdmin(filtro=''){
+  let peds=[...state.pedidos];
+  if(filtro)peds=peds.filter(p=>p.status===filtro);
+  el('tbl-pedidos-admin').innerHTML=
+    `<thead><tr><th>Fecha</th><th>Usuario</th><th>CEDIS</th><th>Total</th><th>Status</th><th>Accion</th></tr></thead><tbody>`+
+    (peds.length?peds.map(p=>{
+      const usr=state.usuarios.find(u=>u.id===p.usuario_id)||{nombre:'—'};
+      return`<tr>
+        <td>${fdate(p.creado_en)}</td>
+        <td>${usr.nombre||usr.usuario}</td>
+        <td style="font-size:12px">${p.cedis?.nombre||'—'}</td>
+        <td>${fmx(p.total)}</td>
+        <td>${badge(p.status,p.status)}</td>
+        <td>
+          <select onchange="cambiarStatusPedido('${p.id}',this.value)" style="width:auto;padding:4px 8px;font-size:12px">
+            ${['pendiente','confirmado','enviado','entregado','cancelado'].map(s=>`<option value="${s}"${s===p.status?' selected':''}>${s}</option>`).join('')}
+          </select>
+        </td>
+      </tr>`;
+    }).join(''):'<tr><td colspan="6" class="empty">Sin pedidos</td></tr>')+
+    '</tbody>';
 }
-async function crearAplicador(){
-  const nombre=document.getElementById('n-nombre').value.trim();
-  const zona=document.getElementById('n-zona').value.trim();
-  const perfil=document.getElementById('n-perfil').value;
-  const usuario=document.getElementById('n-usuario').value.trim();
-  const password=document.getElementById('n-pass').value.trim();
-  const al=document.getElementById('nuevo-alert');
-  if(!nombre||!usuario||!password){showAlert(al,'Nombre, usuario y contraseña son requeridos','err');return}
+
+function filtrarPedidos(){renderPedidosAdmin(el('filtro-status').value)}
+
+async function cambiarStatusPedido(id,status){
+  await api('pedidos','PUT',{id,status});
+  const p=state.pedidos.find(x=>x.id===id);
+  if(p)p.status=status;
+  renderPedidosAdmin(el('filtro-status').value);
+}
+
+function renderSvcsAdmin(){
+  el('tbl-svcs-admin').innerHTML=
+    `<thead><tr><th>Fecha</th><th>Usuario</th><th>Cliente</th><th>M²</th><th>Producto</th><th>Cant.</th></tr></thead><tbody>`+
+    ([...state.servicios].map(s=>{
+      const usr=state.usuarios.find(u=>u.id===s.usuario_id)||{nombre:'—'};
+      return`<tr><td>${fdate(s.fecha)}</td><td>${usr.nombre||usr.usuario}</td><td>${s.cliente}</td><td>${s.m2}</td><td style="font-size:12px">${s.productos?.nombre||'—'} ${s.presentacion||''}</td><td>${s.cantidad||'—'}</td></tr>`;
+    }).join('')||'<tr><td colspan="6" class="empty">Sin servicios</td></tr>')+
+    '</tbody>';
+}
+
+function renderStock(){
+  const cedis=state.cedis;
+  const productos=state.productos;
+  el('stock-grid').innerHTML=cedis.map(c=>{
+    const stockCedis=state.stock.filter(s=>s.cedis_id===c.id);
+    return`<div class="card" style="margin-bottom:1rem">
+      <div class="section-title">${c.nombre} — ${c.ciudad}</div>
+      <table style="width:100%">
+        <thead><tr><th>Producto</th><th>Presentacion</th><th>Stock</th></tr></thead>
+        <tbody>${productos.map(p=>{
+          const s=stockCedis.find(x=>x.producto_id===p.id);
+          const cant=s?.cantidad||0;
+          const cls=cant===0?'stock-out':cant<10?'stock-low':'stock-ok';
+          const lbl=cant===0?'Sin stock':cant<10?'Stock bajo':'OK';
+          return`<tr><td>${p.nombre}</td><td>${p.presentacion}</td><td>${cant} <span class="stock-badge ${cls}">${lbl}</span></td></tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+  }).join('');
+}
+
+function renderConfig(){
+  const niveles=state.config.niveles||NIVELES;
+  el('config-niveles').innerHTML=Object.entries(NIVELES).map(([k,n])=>
+    `<div style="padding:8px 0;border-bottom:1px solid #f0f0f0">
+      <div style="font-weight:500;font-size:13px;margin-bottom:4px">${n.label}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><label style="margin-top:0">Min litros/mes</label><input type="number" id="cfg_n_min_${k}" value="${n.min||0}" style="padding:6px" /></div>
+        <div><label style="margin-top:0">Precio x litro MXN</label><input type="number" id="cfg_n_precio_${k}" value="${niveles[k]?.precio||480}" style="padding:6px" /></div>
+      </div>
+    </div>`
+  ).join('');
+
+  el('config-comisiones').innerHTML=Object.entries(NIVELES).map(([k,n])=>
+    `<div style="padding:8px 0;border-bottom:1px solid #f0f0f0">
+      <div style="font-weight:500;font-size:13px;margin-bottom:4px">${n.label}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><label style="margin-top:0">Comision %</label><input type="number" id="cfg_c_pct_${k}" value="${n.pct}" style="padding:6px" /></div>
+        <div><label style="margin-top:0">Bono por servicio</label><input type="number" id="cfg_c_bono_${k}" value="${n.bono}" style="padding:6px" /></div>
+      </div>
+    </div>`
+  ).join('');
+
+  el('config-precios').innerHTML=state.productos.map(p=>
+    `<div class="row-item"><span style="font-size:13px">${p.nombre} ${p.presentacion}</span><div style="display:flex;align-items:center;gap:6px"><input type="number" id="precio_${p.id}" value="${p.precio_lista}" style="width:90px;padding:5px" /><span style="font-size:12px;color:#999">MXN</span></div></div>`
+  ).join('');
+}
+
+async function guardarConfig(tipo){
+  if(tipo==='niveles'){
+    const val={};
+    Object.keys(NIVELES).forEach(k=>{
+      val[k]={min:parseFloat(el(`cfg_n_min_${k}`)?.value||0),precio:parseFloat(el(`cfg_n_precio_${k}`)?.value||480)};
+    });
+    await api('data?resource=config','PUT',{clave:'niveles',valor:val});
+  } else {
+    const val={};
+    Object.keys(NIVELES).forEach(k=>{
+      val[k]={pct:parseFloat(el(`cfg_c_pct_${k}`)?.value||0),bono:parseFloat(el(`cfg_c_bono_${k}`)?.value||0)};
+      NIVELES[k].pct=val[k].pct;NIVELES[k].bono=val[k].bono;
+    });
+    await api('data?resource=config','PUT',{clave:'comisiones',valor:val});
+  }
+  alert('Guardado correctamente');
+}
+
+async function guardarPrecios(){
+  for(const p of state.productos){
+    const v=parseFloat(el(`precio_${p.id}`)?.value||0);
+    if(v!==p.precio_lista){
+      await api('data?resource=productos','PUT',{id:p.id,precio_lista:v});
+      p.precio_lista=v;
+    }
+  }
+  alert('Precios guardados');
+}
+
+// MODAL USUARIO
+function showModalUsuario(){
+  ['u-nombre','u-apellidos','u-empresa','u-email','u-tel','u-ciudad','u-usuario','u-pass'].forEach(id=>{const e=el(id);if(e)e.value='';});
+  el('modal-usr-title').textContent='Nuevo usuario';
+  el('modal-usuario').dataset.editId='';
+  show('modal-usuario');
+}
+
+function editarUsuario(id){
+  const u=state.usuarios.find(x=>x.id===id);if(!u)return;
+  el('u-nombre').value=u.nombre||'';
+  el('u-apellidos').value=u.apellidos||'';
+  el('u-empresa').value=u.empresa||'';
+  el('u-email').value=u.email||'';
+  el('u-tel').value=u.telefono||'';
+  el('u-ciudad').value=u.ciudad||'';
+  el('u-usuario').value=u.usuario||'';
+  el('u-rol').value=u.rol||'aplicador';
+  el('u-pass').value='';
+  el('modal-usr-title').textContent='Editar usuario';
+  el('modal-usuario').dataset.editId=id;
+  show('modal-usuario');
+}
+
+async function guardarUsuario(){
+  const editId=el('modal-usuario').dataset.editId;
+  const data={
+    nombre:el('u-nombre').value.trim(),
+    apellidos:el('u-apellidos').value.trim(),
+    empresa:el('u-empresa').value.trim(),
+    email:el('u-email').value.trim(),
+    telefono:el('u-tel').value.trim(),
+    ciudad:el('u-ciudad').value.trim(),
+    rol:el('u-rol').value,
+    usuario:el('u-usuario').value.trim(),
+    password:el('u-pass').value.trim(),
+  };
+  if(!data.nombre||!data.usuario){showAlert('usr-alert','Nombre y usuario son requeridos','err');return}
   loading(true);
   try{
-    const r=await api('aplicadores','POST',{nombre,zona,perfil,usuario,password});
-    if(r.ok){
-      showAlert(al,'Aplicador creado correctamente.','ok');
-      document.getElementById('n-nombre').value='';
-      document.getElementById('n-zona').value='';
-      document.getElementById('n-usuario').value='';
-      document.getElementById('n-pass').value='';
-      await loadAdmin();
-    }else{showAlert(al,r.error||'Error al crear','err')}
+    let r;
+    if(editId){r=await api('usuarios','PUT',{id:editId,...data})}
+    else{if(!data.password){showAlert('usr-alert','La contrasena es requerida','err');return}r=await api('usuarios','POST',data)}
+    if(r.ok||r.user){hide('modal-usuario');await loadAdmin()}
+    else showAlert('usr-alert',r.error||'Error','err');
   }finally{loading(false)}
 }
-function renderAplicador(){
-  const ap=state.ap;if(!ap)return;
-  document.getElementById('ap-name').textContent=ap.nombre;
-  document.getElementById('ap-nivel-sub').textContent='Aplicador Certificado · '+(NIVELES[ap.nivel||'semilla']?.label||ap.nivel);
-  loadApSvcs();
-  document.getElementById('r-fecha').value=new Date().toISOString().split('T')[0];
+
+// STOCK MODAL
+function showModalStock(){
+  const cedisOpts=state.cedis.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+  const prodOpts=state.productos.map(p=>`<option value="${p.id}">${p.nombre} ${p.presentacion}</option>`).join('');
+  el('st-cedis').innerHTML=cedisOpts;
+  el('st-prod').innerHTML=prodOpts;
+  el('st-cant').value='';
+  show('modal-stock');
 }
-async function loadApSvcs(){
+
+async function guardarStock(){
+  const cedis_id=el('st-cedis').value;
+  const producto_id=el('st-prod').value;
+  const cantidad=parseInt(el('st-cant').value||0);
+  const r=await api('data?resource=stock','PUT',{cedis_id,producto_id,cantidad});
+  if(r.ok){
+    const s=state.stock.find(x=>x.cedis_id===cedis_id&&x.producto_id===producto_id);
+    if(s)s.cantidad=cantidad;else state.stock.push({cedis_id,producto_id,cantidad});
+    renderStock();hide('modal-stock');
+  } else showAlert('stock-alert',r.error||'Error','err');
+}
+
+// PERFIL
+function showPerfil(){
+  const u=state.user;
+  el('pf-nombre').value=u.nombre||'';
+  el('pf-apellidos').value=u.apellidos||'';
+  el('pf-empresa').value=u.empresa||'';
+  el('pf-email').value=u.email||'';
+  el('pf-telefono').value=u.telefono||'';
+  el('pf-ciudad').value=u.ciudad||'';
+  el('pf-pass').value='';
+  show('modal-perfil');
+}
+
+async function guardarPerfil(){
+  const updates={
+    nombre:el('pf-nombre').value.trim(),
+    apellidos:el('pf-apellidos').value.trim(),
+    empresa:el('pf-empresa').value.trim(),
+    email:el('pf-email').value.trim(),
+    telefono:el('pf-telefono').value.trim(),
+    ciudad:el('pf-ciudad').value.trim(),
+  };
+  const pass=el('pf-pass').value.trim();
+  if(pass)updates.password=pass;
   loading(true);
   try{
-    const svcs=await api('servicios?apId='+state.ap.id);
+    const r=await api('usuarios','PUT',{id:state.user.id,...updates});
+    if(r.ok){Object.assign(state.user,updates);hide('modal-perfil');showAlert('perfil-alert','Guardado','ok')}
+    else showAlert('perfil-alert',r.error||'Error','err');
+  }finally{loading(false)}
+}
+
+// USER (vendedor/aplicador/distribuidor)
+async function loadUser(){
+  loading(true,'Cargando tu informacion...');
+  try{
+    const[svcs,peds,prods,cedis]=await Promise.all([
+      api('servicios?usuario_id='+state.user.id),
+      api('pedidos?usuario_id='+state.user.id),
+      api('data?resource=productos'),
+      api('data?resource=cedis')
+    ]);
     state.servicios=Array.isArray(svcs)?svcs:[];
-    renderApStats();renderApRecientes();renderApHist();renderApCom();
+    state.pedidos=Array.isArray(peds)?peds:[];
+    state.productos=Array.isArray(prods)?prods:[];
+    state.cedis=Array.isArray(cedis)?cedis:[];
+
+    const u=state.user;
+    el('user-name-hdr').textContent=u.nombre||u.usuario;
+    el('user-nivel-sub').textContent=`Aplicador Certificado · ${NIVELES[u.nivel||'semilla']?.label}`;
+
+    renderUserInicio();
+    renderUserHistorial();
+    renderUserComision();
+    renderPedidoForm();
+
+    // Llenar select de productos en registro
+    const prodSel=el('r-prod');
+    const prodNames=[...new Set(state.productos.map(p=>p.nombre))];
+    prodSel.innerHTML='<option value="">-- Selecciona --</option>'+prodNames.map(n=>`<option value="${n}">${n}</option>`).join('');
   }finally{loading(false)}
 }
-function renderApStats(){
-  const ap=state.ap,svcs=state.servicios;
-  const totalM2=svcs.reduce((a,s)=>a+(s.m2||0),0);
-  const com=calcCom(ap,svcs);
-  document.getElementById('ap-stats').innerHTML=
-    stat(svcs.length,'Servicios')+stat(totalM2.toLocaleString()+' m²','M² aplicados')+
-    stat(fmx(ap.compras_mes||0),'Compras del mes')+stat(fmx(com.total),'Comisión estimada');
-}
-function renderApRecientes(){
-  document.getElementById('ap-recientes').innerHTML=[...state.servicios].reverse().slice(0,4).map(s=>
-    `<div class="ap-row"><div><div style="font-size:14px;font-weight:500">${s.cliente}</div><div style="font-size:12px;color:#999">${s.m2} m² · ${s.producto} ${s.litros}</div></div><div style="font-size:12px;color:#999">${fdate(s.fecha)}</div></div>`
-  ).join('')||'<div class="empty">Sin servicios registrados aún</div>';
-}
-function renderApHist(){
-  document.getElementById('tbl-hist').innerHTML=
-    `<thead><tr><th>Fecha</th><th>Cliente</th><th>M²</th><th>Producto</th><th>Presentación</th><th>Cant.</th><th>Notas</th></tr></thead><tbody>`+
-    ([...state.servicios].reverse().map(s=>
-      `<tr><td>${fdate(s.fecha)}</td><td>${s.cliente}</td><td>${s.m2}</td><td>${s.producto}</td><td>${s.litros}</td><td>${s.notas||'—'}</td><td></td></tr>`
-    ).join('')||'<tr><td colspan="7" class="empty">Sin servicios aún</td></tr>')+`</tbody>`;
-}
-function renderApCom(){
-  const ap=state.ap,svcs=state.servicios;
-  const n=NIVELES[ap.nivel||'semilla'];
-  const c=calcCom(ap,svcs);
-  const sig=Object.values(NIVELES).find(lv=>lv.min>(ap.compras_mes||0));
-  document.getElementById('ap-com-det').innerHTML=`
-    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-      <span style="color:#5d5d5d;font-size:14px">Nivel actual</span>${badge(ap.nivel||'semilla')}
-    </div>
+
+function renderUserInicio(){
+  const u=state.user,s=state.servicios,p=state.pedidos;
+  const totalM2=s.reduce((a,x)=>a+(x.m2||0),0);
+  const com=calcCom(u,s);
+  el('user-stats').innerHTML=
+    stat(s.length,'Servicios')+stat(totalM2.toLocaleString()+' m²','M² aplicados')+
+    stat(fmx(u.compras_mes),'Compras del mes')+stat(fmx(com.total),'Comision estimada');
+
+  el('user-pedidos-rec').innerHTML=[...p].slice(0,4).map(x=>
+    `<div class="row-item"><div><div style="font-size:13px;font-weight:500">${x.cedis?.nombre||'—'}</div><div style="font-size:12px;color:#999">${fmx(x.total)} · ${fdate(x.creado_en)}</div></div>${badge(x.status,x.status)}</div>`
+  ).join('')||'<div class="empty">Sin pedidos aun</div>';
+
+  el('user-svcs-rec').innerHTML=[...s].slice(0,4).map(x=>
+    `<div class="row-item"><div><div style="font-size:13px;font-weight:500">${x.cliente}</div><div style="font-size:12px;color:#999">${x.m2} m² · ${x.productos?.nombre||''}</div></div><div style="font-size:12px;color:#999">${fdate(x.fecha)}</div></div>`
+  ).join('')||'<div class="empty">Sin servicios aun</div>';
+
+  // Progreso de nivel
+  const u2=state.user;
+  const niveles=[NIVELES.semilla,NIVELES.verde,NIVELES.master,NIVELES.socio];
+  const actual=NIVELES[u2.nivel||'semilla'];
+  const sig=niveles.find(n=>n.min>(u2.compras_mes||0));
+  const pct=sig?Math.min(100,((u2.compras_mes||0)/sig.min)*100):100;
+  el('user-progreso').innerHTML=`
     <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-      <span style="color:#5d5d5d;font-size:14px">Comisión sobre producto</span><span style="font-weight:500">${n.pct}%</span>
+      <span style="font-size:13px">Nivel actual: ${nivelBadge(u2.nivel||'semilla')}</span>
+      ${sig?`<span style="font-size:13px;color:#5d5d5d">Siguiente: <strong>${sig.label}</strong></span>`:'<span style="font-size:13px;color:#1f7344">Nivel maximo alcanzado</span>'}
     </div>
-    <div style="display:flex;justify-content:space-between;margin-bottom:16px">
-      <span style="color:#5d5d5d;font-size:14px">Bono por servicio</span><span style="font-weight:500">${fmx(n.bono)}</span>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div style="font-size:12px;color:#999;margin-top:4px">${fmx(u2.compras_mes)} ${sig?'de '+fmx(sig.min)+' para nivel '+sig.label:''}</div>`;
+}
+
+function renderUserHistorial(){
+  el('tbl-hist-svcs').innerHTML=
+    `<thead><tr><th>Fecha</th><th>Cliente</th><th>M²</th><th>Producto</th><th>Presentacion</th><th>Cantidad</th><th>Notas</th></tr></thead><tbody>`+
+    (state.servicios.length?state.servicios.map(s=>
+      `<tr><td>${fdate(s.fecha)}</td><td>${s.cliente}</td><td>${s.m2}</td><td>${s.productos?.nombre||'—'}</td><td>${s.presentacion||'—'}</td><td>${s.cantidad||'—'}</td><td style="font-size:12px;color:#5d5d5d">${s.notas||'—'}</td></tr>`
+    ).join(''):'<tr><td colspan="7" class="empty">Sin servicios aun</td></tr>')+
+    '</tbody>';
+
+  el('tbl-hist-peds').innerHTML=
+    `<thead><tr><th>Fecha</th><th>CEDIS</th><th>Total</th><th>Status</th></tr></thead><tbody>`+
+    (state.pedidos.length?state.pedidos.map(p=>
+      `<tr><td>${fdate(p.creado_en)}</td><td>${p.cedis?.nombre||'—'}</td><td>${fmx(p.total)}</td><td>${badge(p.status,p.status)}</td></tr>`
+    ).join(''):'<tr><td colspan="4" class="empty">Sin pedidos aun</td></tr>')+
+    '</tbody>';
+}
+
+function renderUserComision(){
+  const u=state.user,s=state.servicios;
+  const n=NIVELES[u.nivel||'semilla'];
+  const c=calcCom(u,s);
+  const sig=Object.values(NIVELES).find(lv=>lv.min>(u.compras_mes||0));
+  el('user-com-det').innerHTML=`
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+      <span style="color:#5d5d5d;font-size:14px">Nivel actual</span>${nivelBadge(u.nivel||'semilla')}
     </div>
-    <div style="border-top:1px solid #e0e0e0;padding-top:14px;margin-bottom:8px">
-      <div style="font-size:12px;color:#999;font-weight:500;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Desglose del mes</div>
-      <div class="com-row"><span>${svcs.length} servicios × ${fmx(n.bono)}</span><span>${fmx(c.bono)}</span></div>
-      <div class="com-row"><span>Comisión ${n.pct}% sobre ${fmx(ap.compras_mes||0)}</span><span>${fmx(c.pct)}</span></div>
+    <div class="com-row"><span>Comision sobre producto</span><span style="font-weight:500">${n.pct}%</span></div>
+    <div class="com-row"><span>Bono por servicio registrado</span><span style="font-weight:500">${fmx(n.bono)}</span></div>
+    <div style="border-top:1px solid #e0e0e0;padding-top:12px;margin-top:4px;margin-bottom:8px">
+      <div style="font-size:11px;color:#999;font-weight:500;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Desglose del mes</div>
+      <div class="com-row"><span>${s.length} servicios × ${fmx(n.bono)}</span><span>${fmx(c.bono)}</span></div>
+      <div class="com-row"><span>Comision ${n.pct}% sobre ${fmx(u.compras_mes)}</span><span>${fmx(c.pct)}</span></div>
       <div class="com-row"><span>Margen estimado en producto</span><span>${fmx(c.margen)}</span></div>
     </div>
     <div class="com-total"><span>Total estimado</span><span>${fmx(c.total)}</span></div>
-    <div style="margin-top:10px;font-size:12px;color:#999">${sig?'Para nivel '+sig.label+' necesitas '+fmx(sig.min-(ap.compras_mes||0))+' más en compras este mes.':'¡Eres Socio Grama — el nivel más alto!'}</div>`;
+    <div style="margin-top:10px;font-size:12px;color:#999">${sig?'Para nivel '+sig.label+' necesitas '+fmx(sig.min-(u.compras_mes||0))+' mas en compras este mes.':'Eres Socio Grama — el nivel mas alto.'}</div>`;
 }
-async function registrar(){
-  const fecha=document.getElementById('r-fecha').value;
-  const cliente=document.getElementById('r-cliente').value.trim();
-  const m2=parseFloat(document.getElementById('r-m2').value);
-  const producto=document.getElementById('r-prod').value;
-  const presentacion=document.getElementById('r-pres').value;
-  const cantidad=parseFloat(document.getElementById('r-cant').value);
-  const notas=document.getElementById('r-notas').value.trim();
-  const al=document.getElementById('r-alert');
-  if(!fecha||!cliente||!m2||!producto||!presentacion||!cantidad){
-    showAlert(al,'Completa todos los campos obligatorios','err');return
-  }
-  loading(true);
+
+function calcCom(u,svcs){
+  const n=NIVELES[u.nivel||'semilla'];
+  const bono=(svcs||[]).length*n.bono;
+  const pct=(u.compras_mes||0)*n.pct/100;
+  const margen=(svcs||[]).reduce((a,s)=>a+(s.cantidad||0)*60,0);
+  return{bono,pct,margen,total:bono+pct+margen};
+}
+
+// PEDIDO FORM
+function renderPedidoForm(){
+  el('p-cedis').innerHTML=state.cedis.map(c=>`<option value="${c.id}">${c.nombre} — ${c.ciudad}</option>`).join('');
+  el('pedido-items').innerHTML='';
+  agregarItemPedido();
+}
+
+function agregarItemPedido(){
+  const container=el('pedido-items');
+  const idx=container.children.length;
+  const prodOpts=state.productos.map(p=>`<option value="${p.id}" data-precio="${p.precio_lista}">${p.nombre} ${p.presentacion}</option>`).join('');
+  const div=document.createElement('div');
+  div.style.cssText='display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-bottom:8px;align-items:end';
+  div.innerHTML=`
+    <div><label style="margin-top:0">Producto</label><select class="item-prod" onchange="calcTotal()">${prodOpts}</select></div>
+    <div><label style="margin-top:0">Cantidad</label><input type="number" class="item-cant" value="1" min="1" style="width:70px" onchange="calcTotal()" /></div>
+    <button class="btn btn-danger btn-sm" style="margin-bottom:1px" onclick="this.parentElement.remove();calcTotal()">✕</button>`;
+  container.appendChild(div);
+  calcTotal();
+}
+
+function calcTotal(){
+  let total=0;
+  document.querySelectorAll('#pedido-items > div').forEach(row=>{
+    const sel=row.querySelector('.item-prod');
+    const cant=parseInt(row.querySelector('.item-cant')?.value||1);
+    const precio=parseFloat(sel?.selectedOptions[0]?.dataset.precio||0);
+    total+=precio*cant;
+  });
+  el('pedido-total').textContent=fmx(total);
+}
+
+async function enviarPedido(){
+  const cedis_id=el('p-cedis').value;
+  const notas=el('p-notas').value.trim();
+  const items=[];
+  document.querySelectorAll('#pedido-items > div').forEach(row=>{
+    const sel=row.querySelector('.item-prod');
+    const cant=parseInt(row.querySelector('.item-cant')?.value||1);
+    const precio=parseFloat(sel?.selectedOptions[0]?.dataset.precio||0);
+    if(sel?.value&&cant>0)items.push({producto_id:sel.value,cantidad:cant,precio_unitario:precio,subtotal:precio*cant});
+  });
+  if(!cedis_id||!items.length){showAlert('pedido-alert','Selecciona CEDIS y agrega al menos un producto','err');return}
+  loading(true,'Enviando pedido...');
   try{
-    const litros=presentacion;
-    const r=await api('servicios','POST',{apId:state.ap.id,fecha,cliente,m2,producto,litros,notas:cantidad+'x '+presentacion+(notas?' — '+notas:'')});
+    const r=await api('pedidos','POST',{usuario_id:state.user.id,cedis_id,items,notas});
     if(r.ok){
-      const precio=PRECIOS[producto]?.[presentacion]||0;
-      state.ap.compras_mes=(state.ap.compras_mes||0)+(precio*cantidad*0.75);
-      state.ap.nivel=getNivel(state.ap.compras_mes);
-      document.getElementById('ap-nivel-sub').textContent='Aplicador Certificado · '+(NIVELES[state.ap.nivel]?.label||state.ap.nivel);
-      document.getElementById('r-cliente').value='';
-      document.getElementById('r-m2').value='';
-      document.getElementById('r-prod').value='';
-      document.getElementById('r-pres').innerHTML='<option value="">-- Selecciona presentación --</option>';
-      document.getElementById('r-cant').value='';
-      document.getElementById('r-notas').value='';
-      showAlert(al,'Servicio registrado correctamente.','ok');
-      await loadApSvcs();
-    }else{showAlert(al,r.error||'Error al guardar','err')}
+      showAlert('pedido-alert','Pedido enviado correctamente. Te contactaremos para confirmar.','ok');
+      state.pedidos.unshift(r.pedido);
+      renderPedidoForm();renderUserHistorial();renderUserInicio();
+    }else showAlert('pedido-alert',r.error||'Error al enviar pedido','err');
   }finally{loading(false)}
 }
+
+// REGISTRO SERVICIO
+function updatePresentaciones(){
+  const nombre=el('r-prod').value;
+  const pres=[...new Set(state.productos.filter(p=>p.nombre===nombre).map(p=>p.presentacion))];
+  el('r-pres').innerHTML='<option value="">-- Selecciona --</option>'+pres.map(p=>`<option value="${p}">${p}</option>`).join('');
+}
+
+async function registrarServicio(){
+  const fecha=el('r-fecha').value;
+  const cliente=el('r-cliente').value.trim();
+  const m2=parseFloat(el('r-m2').value);
+  const prodNombre=el('r-prod').value;
+  const presentacion=el('r-pres').value;
+  const cantidad=parseInt(el('r-cant').value||1);
+  const notas=el('r-notas').value.trim();
+  if(!fecha||!cliente||!m2||!prodNombre||!presentacion){showAlert('reg-alert','Completa todos los campos','err');return}
+  const prod=state.productos.find(p=>p.nombre===prodNombre&&p.presentacion===presentacion);
+  if(!prod){showAlert('reg-alert','Producto no encontrado','err');return}
+  loading(true,'Guardando servicio...');
+  try{
+    const r=await api('servicios','POST',{usuario_id:state.user.id,fecha,cliente,m2,producto_id:prod.id,presentacion,cantidad,notas});
+    if(r.ok){
+      state.servicios.unshift(r.servicio||{fecha,cliente,m2,presentacion,cantidad,productos:{nombre:prodNombre}});
+      state.user.compras_mes=(state.user.compras_mes||0)+prod.precio_lista*cantidad*0.75;
+      state.user.nivel=getNivel(state.user.compras_mes);
+      el('user-nivel-sub').textContent=`Aplicador Certificado · ${NIVELES[state.user.nivel]?.label}`;
+      ['r-cliente','r-m2','r-notas','r-cant'].forEach(id=>{const e=el(id);if(e)e.value=''});
+      el('r-prod').value='';el('r-pres').innerHTML='<option>-- Selecciona producto primero --</option>';
+      showAlert('reg-alert','Servicio guardado correctamente','ok');
+      renderUserInicio();renderUserHistorial();renderUserComision();
+    }else showAlert('reg-alert',r.error||'Error','err');
+  }finally{loading(false)}
+}
+
+// TABS
 function adminTab(btn,target){
   document.querySelectorAll('#s-admin .tab').forEach(t=>t.classList.remove('on'));
   btn.classList.add('on');
-  ['at-res','at-aps','at-svcs','at-coms','at-precios','at-nuevo'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  ['at-dash','at-usuarios','at-pedidos','at-servicios','at-stock','at-config'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});
   show(target);
 }
-function apTab(btn,target){
-  document.querySelectorAll('#s-ap .tab').forEach(t=>t.classList.remove('on'));
+function userTab(btn,target){
+  document.querySelectorAll('#s-user .tab').forEach(t=>t.classList.remove('on'));
   btn.classList.add('on');
-  ['apt-ini','apt-reg','apt-hist','apt-com'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  ['ut-inicio','ut-pedido','ut-registro','ut-historial','ut-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});
   show(target);
 }
-window.addEventListener('load',()=>{hide('loading-overlay');show('s-login');});
+function histTab(btn,target){
+  document.querySelectorAll('#ut-historial .tab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  ['ht-svcs','ht-peds'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});
+  show(target);
+}
+
+// INIT
+window.addEventListener('load',()=>{
+  hide('loading-overlay');
+  el('r-fecha')&&(el('r-fecha').value=new Date().toISOString().split('T')[0]);
+  show('s-login');
+});
 </script>
 </body>
 </html>
