@@ -3,7 +3,6 @@ const { supabase, cors } = require('./_supabase');
 module.exports = async (req, res) => {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
-
   const { resource } = req.query;
 
   try {
@@ -28,14 +27,21 @@ module.exports = async (req, res) => {
         if (error) throw error;
         return res.status(200).json(data);
       }
+      if (resource === 'precios_dist') {
+        const { usuario_id } = req.query;
+        const { data, error } = await supabase.from('precios_distribuidor')
+          .select('*, productos(nombre,presentacion,precio_lista)')
+          .eq('usuario_id', usuario_id);
+        if (error) throw error;
+        return res.status(200).json(data);
+      }
     }
 
     if (req.method === 'PUT') {
       if (resource === 'config') {
         const { clave, valor } = req.body;
         const { error } = await supabase.from('configuracion')
-          .update({ valor: JSON.stringify(valor), actualizado_en: new Date() })
-          .eq('clave', clave);
+          .update({ valor: JSON.stringify(valor), actualizado_en: new Date() }).eq('clave', clave);
         if (error) throw error;
         return res.status(200).json({ ok: true });
       }
@@ -50,6 +56,15 @@ module.exports = async (req, res) => {
         const { id, precio_lista } = req.body;
         const { error } = await supabase.from('productos').update({ precio_lista }).eq('id', id);
         if (error) throw error;
+        return res.status(200).json({ ok: true });
+      }
+      if (resource === 'precios_dist') {
+        const { usuario_id, precios } = req.body;
+        for (const p of precios) {
+          await supabase.from('precios_distribuidor')
+            .upsert({ usuario_id, producto_id: p.producto_id, precio: p.precio, actualizado_en: new Date() },
+              { onConflict: 'usuario_id,producto_id' });
+        }
         return res.status(200).json({ ok: true });
       }
     }

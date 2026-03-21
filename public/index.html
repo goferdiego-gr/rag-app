@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grama — Portal</title>
+<title>Red de Distribuidores Grama</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -33,10 +33,13 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#1f7344;box-sh
 .badge-aplicador{background:#f3e5f5;color:#6a1b9a}
 .badge-distribuidor{background:#fff3e0;color:#e65100}
 .badge-pendiente{background:#fff8e1;color:#f57f17}
-.badge-confirmado{background:#e8f5ec;color:#1f7344}
-.badge-enviado{background:#e3f2fd;color:#0d47a1}
+.badge-confirmado,.badge-pedido_confirmado{background:#e8f5ec;color:#1f7344}
+.badge-enviado,.badge-pedido_enviado{background:#e3f2fd;color:#0d47a1}
 .badge-entregado{background:#c8e6c9;color:#1c402e}
+.badge-pagado{background:#1c402e;color:#fff}
 .badge-cancelado{background:#fdf0ef;color:#c0392b}
+.badge-en_espera{background:#f5f5f5;color:#5d5d5d}
+.badge-propuesta_enviada{background:#fff3e0;color:#e65100}
 .alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:1rem}
 .alert-ok{background:#e8f5ec;color:#1c402e;border:1px solid #1f7344}
 .alert-err{background:#fdf0ef;color:#c0392b;border:1px solid #e74c3c}
@@ -69,7 +72,7 @@ tr:hover td{background:#f9fdf9}
 .empty{color:#999;font-size:13px;padding:2rem 0;text-align:center}
 .section-title{font-size:15px;font-weight:500;color:#1c402e;margin-bottom:1rem;padding-bottom:6px;border-bottom:1px solid #e0e0e0}
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
-.modal{background:#fff;border-radius:12px;padding:1.5rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal{background:#fff;border-radius:12px;padding:1.5rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
 .modal-title{font-size:17px;font-weight:500;margin-bottom:1.25rem;color:#1c402e}
 .progress-bar{height:6px;background:#e0e0e0;border-radius:3px;margin-top:6px}
 .progress-fill{height:100%;background:#1f7344;border-radius:3px;transition:width .3s}
@@ -77,6 +80,9 @@ tr:hover td{background:#f9fdf9}
 .stock-ok{background:#e8f5ec;color:#1f7344}
 .stock-low{background:#fff8e1;color:#f57f17}
 .stock-out{background:#fdf0ef;color:#c0392b}
+.precio-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.precio-row:last-child{border-bottom:none}
+.precio-sugerido{font-size:11px;color:#999;margin-top:2px}
 </style>
 </head>
 <body>
@@ -88,34 +94,32 @@ tr:hover td{background:#f9fdf9}
   <div style="max-width:380px;margin:3rem auto">
     <div style="text-align:center;margin-bottom:2rem">
       <img src="/Logo_Grama.png" alt="Grama" style="height:80px;width:auto" />
-      <div style="font-size:13px;color:#999;margin-top:8px">Portal de Distribuidores y Aplicadores</div>
+      <div style="font-size:13px;color:#999;margin-top:8px">Red de Distribuidores Grama</div>
     </div>
     <div class="card">
       <div id="l-alert" class="hidden"></div>
       <label>Usuario</label><input type="text" id="l-user" placeholder="tu.usuario" autocomplete="username" />
-      <label>Contraseña</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" />
+      <label>Contraseña</label><input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
       <button class="btn btn-primary btn-full" style="margin-top:18px" onclick="doLogin()">Entrar</button>
     </div>
   </div>
 </div>
 
-<!-- ADMIN / SUPERADMIN -->
+<!-- ADMIN -->
 <div id="s-admin" class="hidden">
   <div class="topbar">
-    <div>
-      <img src="/Logo_Grama.png" alt="Grama" class="logo-img" />
-      <div style="font-size:12px;color:#999;margin-top:2px" id="admin-sub"></div>
-    </div>
+    <div><img src="/Logo_Grama.png" alt="Grama" class="logo-img" /><div style="font-size:12px;color:#999;margin-top:2px" id="admin-sub"></div></div>
     <div style="display:flex;gap:8px;align-items:center">
       <span style="font-size:13px;color:#5d5d5d" id="admin-name"></span>
       <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
       <button class="btn btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
-  <div class="tabs" id="admin-tabs">
+  <div class="tabs">
     <button class="tab on" onclick="adminTab(this,'at-dash')">Dashboard</button>
     <button class="tab" onclick="adminTab(this,'at-usuarios')">Usuarios</button>
     <button class="tab" onclick="adminTab(this,'at-pedidos')">Pedidos</button>
+    <button class="tab" onclick="adminTab(this,'at-clientes')">Clientes</button>
     <button class="tab" onclick="adminTab(this,'at-servicios')">Servicios</button>
     <button class="tab" onclick="adminTab(this,'at-stock')" id="tab-stock">Stock</button>
     <button class="tab" onclick="adminTab(this,'at-config')" id="tab-config">Configuracion</button>
@@ -127,15 +131,15 @@ tr:hover td{background:#f9fdf9}
       <div class="card"><div class="section-title">Usuarios por tipo</div><div id="dash-tipos"></div></div>
       <div class="card"><div class="section-title">Pedidos recientes</div><div id="dash-pedidos"></div></div>
     </div>
-    <div class="grid2" style="margin-top:0">
-      <div class="card"><div class="section-title">Top vendedores del mes</div><div id="dash-top"></div></div>
-      <div class="card"><div class="section-title">Servicios recientes</div><div id="dash-svcs"></div></div>
+    <div class="grid2">
+      <div class="card"><div class="section-title">Top compradores del mes</div><div id="dash-top"></div></div>
+      <div class="card"><div class="section-title">Clientes recientes</div><div id="dash-clientes"></div></div>
     </div>
   </div>
 
   <div id="at-usuarios" class="hidden">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-      <div style="display:flex;gap:8px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
         <select id="filtro-rol" onchange="filtrarUsuarios()" style="width:auto;padding:7px 10px;font-size:13px">
           <option value="">Todos los tipos</option>
           <option value="vendedor">Vendedor</option>
@@ -157,17 +161,25 @@ tr:hover td{background:#f9fdf9}
   </div>
 
   <div id="at-pedidos" class="hidden">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+    <div style="display:flex;gap:8px;margin-bottom:1rem">
       <select id="filtro-status" onchange="filtrarPedidos()" style="width:auto;padding:7px 10px;font-size:13px">
-        <option value="">Todos los status</option>
+        <option value="">Todos</option>
         <option value="pendiente">Pendiente</option>
         <option value="confirmado">Confirmado</option>
         <option value="enviado">Enviado</option>
         <option value="entregado">Entregado</option>
+        <option value="pagado">Pagado</option>
         <option value="cancelado">Cancelado</option>
       </select>
     </div>
     <div class="card tbl-wrap"><table id="tbl-pedidos-admin"></table></div>
+  </div>
+
+  <div id="at-clientes" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <div style="font-size:15px;font-weight:500">Todos los clientes</div>
+    </div>
+    <div class="card tbl-wrap"><table id="tbl-clientes-admin"></table></div>
   </div>
 
   <div id="at-servicios" class="hidden">
@@ -185,7 +197,7 @@ tr:hover td{background:#f9fdf9}
   <div id="at-config" class="hidden">
     <div class="grid2">
       <div class="card">
-        <div class="section-title">Niveles y precios por volumen</div>
+        <div class="section-title">Niveles y precios (Aplicadores)</div>
         <div id="config-niveles"></div>
         <button class="btn btn-primary" style="margin-top:14px" onclick="guardarConfig('niveles')">Guardar</button>
       </div>
@@ -195,100 +207,205 @@ tr:hover td{background:#f9fdf9}
         <button class="btn btn-primary" style="margin-top:14px" onclick="guardarConfig('comisiones')">Guardar</button>
       </div>
     </div>
-    <div class="card" style="max-width:400px">
-      <div class="section-title">Precios de productos</div>
+    <div class="card">
+      <div class="section-title">Precios de lista (base para distribuidores)</div>
       <div id="config-precios"></div>
       <button class="btn btn-primary" style="margin-top:14px" onclick="guardarPrecios()">Guardar precios</button>
     </div>
   </div>
 </div>
 
-<!-- USUARIO (vendedor/aplicador/distribuidor) -->
-<div id="s-user" class="hidden">
+<!-- DISTRIBUIDOR -->
+<div id="s-dist" class="hidden">
   <div class="topbar">
-    <div>
-      <img src="/Logo_Grama.png" alt="Grama" class="logo-img" />
-      <div style="font-size:12px;color:#999;margin-top:2px" id="user-nivel-sub"></div>
-    </div>
+    <div><img src="/Logo_Grama.png" alt="Grama" class="logo-img" /><div style="font-size:12px;color:#999;margin-top:2px">Distribuidor Grama</div></div>
     <div style="display:flex;gap:8px;align-items:center">
-      <span style="font-size:13px;color:#5d5d5d" id="user-name-hdr"></span>
+      <span style="font-size:13px;color:#5d5d5d" id="dist-name"></span>
       <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
       <button class="btn btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
   <div class="tabs">
-    <button class="tab on" onclick="userTab(this,'ut-inicio')">Inicio</button>
-    <button class="tab" onclick="userTab(this,'ut-pedido')">Hacer pedido</button>
-    <button class="tab" onclick="userTab(this,'ut-registro')">Registrar servicio</button>
-    <button class="tab" onclick="userTab(this,'ut-historial')">Historial</button>
-    <button class="tab" onclick="userTab(this,'ut-comision')">Mi comision</button>
+    <button class="tab on" onclick="distTab(this,'dt-inicio')">Inicio</button>
+    <button class="tab" onclick="distTab(this,'dt-precios')">Lista de precios</button>
+    <button class="tab" onclick="distTab(this,'dt-pedido')">Hacer pedido</button>
+    <button class="tab" onclick="distTab(this,'dt-historial')">Mis pedidos</button>
   </div>
 
-  <div id="ut-inicio">
-    <div class="grid4" id="user-stats" style="margin-bottom:1.25rem"></div>
-    <div class="grid2">
-      <div class="card"><div class="section-title">Mis ultimos pedidos</div><div id="user-pedidos-rec"></div></div>
-      <div class="card"><div class="section-title">Mis ultimos servicios</div><div id="user-svcs-rec"></div></div>
-    </div>
-    <div class="card" style="margin-top:0">
-      <div class="section-title">Mi progreso de nivel</div>
-      <div id="user-progreso"></div>
+  <div id="dt-inicio">
+    <div class="grid3" id="dist-stats" style="margin-bottom:1.25rem"></div>
+    <div class="card"><div class="section-title">Pedidos recientes</div><div id="dist-peds-rec"></div></div>
+  </div>
+
+  <div id="dt-precios" class="hidden">
+    <div class="card">
+      <div class="section-title">Tus precios de compra y precio sugerido de venta</div>
+      <div id="dist-lista-precios"></div>
     </div>
   </div>
 
-  <div id="ut-pedido" class="hidden">
+  <div id="dt-pedido" class="hidden">
     <div class="card" style="max-width:560px">
       <div class="section-title">Nuevo pedido</div>
-      <div id="pedido-alert" class="hidden"></div>
-      <label>CEDIS de entrega</label>
-      <select id="p-cedis"></select>
+      <div id="dist-pedido-alert" class="hidden"></div>
+      <label>CEDIS de entrega</label><select id="dp-cedis"></select>
       <div style="margin-top:1rem">
         <div style="font-size:14px;font-weight:500;margin-bottom:8px">Productos</div>
-        <div id="pedido-items"></div>
-        <button class="btn btn-sm" style="margin-top:8px" onclick="agregarItemPedido()">+ Agregar producto</button>
+        <div id="dist-items"></div>
+        <button class="btn btn-sm" style="margin-top:8px" onclick="agregarItemDist()">+ Agregar producto</button>
       </div>
-      <label>Notas (opcional)</label>
-      <textarea id="p-notas" rows="2" placeholder="Instrucciones de entrega, comentarios..."></textarea>
-      <div style="margin-top:14px;padding:12px;background:#f4f4f4;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:14px;font-weight:500">Total estimado</span>
-        <span style="font-size:18px;font-weight:700;color:#1f7344" id="pedido-total">$0 MXN</span>
+      <label>Notas</label><textarea id="dp-notas" rows="2"></textarea>
+      <div style="margin-top:14px;padding:12px;background:#f4f4f4;border-radius:8px;display:flex;justify-content:space-between">
+        <span style="font-size:14px;font-weight:500">Total</span>
+        <span style="font-size:18px;font-weight:700;color:#1f7344" id="dist-total">$0 MXN</span>
       </div>
-      <button class="btn btn-primary btn-full" style="margin-top:14px" onclick="enviarPedido()">Enviar pedido</button>
+      <button class="btn btn-primary btn-full" style="margin-top:14px" onclick="enviarPedidoDist()">Enviar pedido</button>
     </div>
   </div>
 
-  <div id="ut-registro" class="hidden">
+  <div id="dt-historial" class="hidden">
+    <div class="card tbl-wrap"><table id="tbl-dist-peds"></table></div>
+  </div>
+</div>
+
+<!-- VENDEDOR -->
+<div id="s-vend" class="hidden">
+  <div class="topbar">
+    <div><img src="/Logo_Grama.png" alt="Grama" class="logo-img" /><div style="font-size:12px;color:#999;margin-top:2px">Vendedor Grama</div></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span style="font-size:13px;color:#5d5d5d" id="vend-name"></span>
+      <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
+      <button class="btn btn-sm" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" onclick="vendTab(this,'vt-inicio')">Inicio</button>
+    <button class="tab" onclick="vendTab(this,'vt-clientes')">Mis clientes</button>
+    <button class="tab" onclick="vendTab(this,'vt-nuevo-cliente')">+ Nuevo cliente</button>
+    <button class="tab" onclick="vendTab(this,'vt-comision')">Mi comision</button>
+  </div>
+
+  <div id="vt-inicio">
+    <div class="grid4" id="vend-stats" style="margin-bottom:1.25rem"></div>
+    <div class="card"><div class="section-title">Clientes recientes</div><div id="vend-clientes-rec"></div></div>
+  </div>
+
+  <div id="vt-clientes" class="hidden">
+    <div class="card tbl-wrap">
+      <div class="section-title">Mis clientes</div>
+      <table id="tbl-vend-clientes"></table>
+    </div>
+  </div>
+
+  <div id="vt-nuevo-cliente" class="hidden">
+    <div class="card" style="max-width:540px">
+      <div class="section-title">Registrar nuevo cliente</div>
+      <div id="nc-alert" class="hidden"></div>
+      <div class="grid2">
+        <div><label>Empresa</label><input type="text" id="nc-empresa" placeholder="Nombre de la empresa" /></div>
+        <div><label>Nombre de contacto *</label><input type="text" id="nc-contacto" placeholder="Nombre completo" /></div>
+      </div>
+      <div class="grid2">
+        <div><label>Telefono</label><input type="tel" id="nc-tel" placeholder="+52 55 0000 0000" /></div>
+        <div><label>Correo</label><input type="email" id="nc-email" placeholder="correo@empresa.com" /></div>
+      </div>
+      <div class="grid2">
+        <div><label>Estado</label><input type="text" id="nc-estado" placeholder="Ej. CDMX" /></div>
+        <div><label>Ciudad</label><input type="text" id="nc-ciudad" placeholder="Ej. Benito Juarez" /></div>
+      </div>
+      <label>Direccion</label><input type="text" id="nc-dir" placeholder="Calle, numero, colonia" />
+      <label>RFC</label><input type="text" id="nc-rfc" placeholder="XAXX010101000" />
+      <label>Notas</label><textarea id="nc-notas" rows="2" placeholder="Comentarios, tipo de propiedad, etc."></textarea>
+      <button class="btn btn-primary" style="margin-top:18px" onclick="guardarCliente()">Guardar cliente</button>
+    </div>
+  </div>
+
+  <div id="vt-comision" class="hidden">
+    <div class="card" style="max-width:480px">
+      <div class="section-title">Mi comision del mes</div>
+      <div id="vend-com-det"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APLICADOR -->
+<div id="s-aplic" class="hidden">
+  <div class="topbar">
+    <div><img src="/Logo_Grama.png" alt="Grama" class="logo-img" /><div style="font-size:12px;color:#999;margin-top:2px" id="aplic-nivel-sub"></div></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span style="font-size:13px;color:#5d5d5d" id="aplic-name"></span>
+      <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
+      <button class="btn btn-sm" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" onclick="aplicTab(this,'apt-inicio')">Inicio</button>
+    <button class="tab" onclick="aplicTab(this,'apt-pedido')">Hacer pedido</button>
+    <button class="tab" onclick="aplicTab(this,'apt-registro')">Registrar servicio</button>
+    <button class="tab" onclick="aplicTab(this,'apt-historial')">Historial</button>
+    <button class="tab" onclick="aplicTab(this,'apt-comision')">Mi comision</button>
+  </div>
+
+  <div id="apt-inicio">
+    <div class="grid4" id="aplic-stats" style="margin-bottom:1.25rem"></div>
+    <div class="grid2">
+      <div class="card"><div class="section-title">Ultimos pedidos</div><div id="aplic-peds-rec"></div></div>
+      <div class="card"><div class="section-title">Ultimos servicios</div><div id="aplic-svcs-rec"></div></div>
+    </div>
+    <div class="card"><div class="section-title">Mi progreso de nivel</div><div id="aplic-progreso"></div></div>
+  </div>
+
+  <div id="apt-pedido" class="hidden">
+    <div class="card" style="max-width:560px">
+      <div class="section-title">Nuevo pedido</div>
+      <div id="aplic-pedido-alert" class="hidden"></div>
+      <label>CEDIS de entrega</label><select id="ap-cedis"></select>
+      <div style="margin-top:1rem">
+        <div style="font-size:14px;font-weight:500;margin-bottom:8px">Productos</div>
+        <div id="aplic-items"></div>
+        <button class="btn btn-sm" style="margin-top:8px" onclick="agregarItemAplic()">+ Agregar producto</button>
+      </div>
+      <label>Notas</label><textarea id="ap-notas" rows="2"></textarea>
+      <div style="margin-top:14px;padding:12px;background:#f4f4f4;border-radius:8px;display:flex;justify-content:space-between">
+        <span style="font-size:14px;font-weight:500">Total</span>
+        <span style="font-size:18px;font-weight:700;color:#1f7344" id="aplic-total">$0 MXN</span>
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-top:14px" onclick="enviarPedidoAplic()">Enviar pedido</button>
+    </div>
+  </div>
+
+  <div id="apt-registro" class="hidden">
     <div class="card" style="max-width:500px">
       <div class="section-title">Registrar servicio aplicado</div>
       <div id="reg-alert" class="hidden"></div>
       <label>Fecha</label><input type="date" id="r-fecha" />
-      <label>Cliente / propiedad</label><input type="text" id="r-cliente" placeholder="Ej. Hotel Las Palmas" />
-      <label>Metros cuadrados aplicados</label><input type="number" id="r-m2" placeholder="Ej. 300" min="1" />
+      <label>Cliente / propiedad</label><input type="text" id="r-cliente" />
+      <label>Metros cuadrados</label><input type="number" id="r-m2" min="1" />
       <label>Producto</label>
-      <select id="r-prod" onchange="updatePresentaciones()">
+      <select id="r-prod" onchange="updatePres()">
         <option value="">-- Selecciona --</option>
       </select>
       <label>Presentacion</label>
       <select id="r-pres"><option value="">-- Selecciona producto primero --</option></select>
-      <label>Cantidad de envases</label><input type="number" id="r-cant" placeholder="Ej. 2" min="1" />
-      <label>Notas</label><input type="text" id="r-notas" placeholder="Tipo de superficie, condiciones..." />
-      <button class="btn btn-primary" style="margin-top:18px" onclick="registrarServicio()">Guardar servicio</button>
+      <label>Cantidad</label><input type="number" id="r-cant" min="1" value="1" />
+      <label>Notas</label><input type="text" id="r-notas" />
+      <button class="btn btn-primary" style="margin-top:18px" onclick="registrarServicio()">Guardar</button>
     </div>
   </div>
 
-  <div id="ut-historial" class="hidden">
+  <div id="apt-historial" class="hidden">
     <div class="tabs" style="margin-bottom:1rem">
       <button class="tab on" onclick="histTab(this,'ht-svcs')">Servicios</button>
       <button class="tab" onclick="histTab(this,'ht-peds')">Pedidos</button>
     </div>
-    <div id="ht-svcs"><div class="card tbl-wrap"><table id="tbl-hist-svcs"></table></div></div>
-    <div id="ht-peds" class="hidden"><div class="card tbl-wrap"><table id="tbl-hist-peds"></table></div></div>
+    <div id="ht-svcs"><div class="card tbl-wrap"><table id="tbl-aplic-svcs"></table></div></div>
+    <div id="ht-peds" class="hidden"><div class="card tbl-wrap"><table id="tbl-aplic-peds"></table></div></div>
   </div>
 
-  <div id="ut-comision" class="hidden">
+  <div id="apt-comision" class="hidden">
     <div class="card" style="max-width:480px">
       <div class="section-title">Mi comision del mes</div>
-      <div id="user-com-det"></div>
+      <div id="aplic-com-det"></div>
     </div>
   </div>
 </div>
@@ -298,16 +415,19 @@ tr:hover td{background:#f9fdf9}
   <div class="modal">
     <div class="modal-title">Mi perfil</div>
     <div id="perfil-alert" class="hidden"></div>
-    <label>Nombre</label><input type="text" id="pf-nombre" />
-    <label>Apellidos</label><input type="text" id="pf-apellidos" />
+    <div class="grid2">
+      <div><label>Nombre</label><input type="text" id="pf-nombre" /></div>
+      <div><label>Apellidos</label><input type="text" id="pf-apellidos" /></div>
+    </div>
     <label>Empresa</label><input type="text" id="pf-empresa" />
-    <label>Email</label><input type="email" id="pf-email" />
-    <label>Telefono</label><input type="tel" id="pf-telefono" />
+    <div class="grid2">
+      <div><label>Email</label><input type="email" id="pf-email" /></div>
+      <div><label>Telefono</label><input type="tel" id="pf-telefono" /></div>
+    </div>
     <label>Ciudad</label><input type="text" id="pf-ciudad" />
     <div style="border-top:1px solid #e0e0e0;margin-top:1rem;padding-top:1rem">
-      <div style="font-size:14px;font-weight:500;margin-bottom:8px">Cambiar contrasena</div>
-      <label>Nueva contrasena (dejar vacio para no cambiar)</label>
-      <input type="password" id="pf-pass" placeholder="Nueva contrasena" />
+      <div style="font-size:14px;font-weight:500;margin-bottom:6px">Cambiar contrasena</div>
+      <input type="password" id="pf-pass" placeholder="Nueva contrasena (dejar vacio para no cambiar)" />
     </div>
     <div style="display:flex;gap:8px;margin-top:1.25rem">
       <button class="btn btn-primary" onclick="guardarPerfil()">Guardar</button>
@@ -316,28 +436,38 @@ tr:hover td{background:#f9fdf9}
   </div>
 </div>
 
-<!-- MODAL NUEVO USUARIO -->
+<!-- MODAL USUARIO -->
 <div id="modal-usuario" class="modal-bg hidden">
   <div class="modal">
     <div class="modal-title" id="modal-usr-title">Nuevo usuario</div>
     <div id="usr-alert" class="hidden"></div>
-    <label>Nombre</label><input type="text" id="u-nombre" />
-    <label>Apellidos</label><input type="text" id="u-apellidos" />
+    <div class="grid2">
+      <div><label>Nombre *</label><input type="text" id="u-nombre" /></div>
+      <div><label>Apellidos</label><input type="text" id="u-apellidos" /></div>
+    </div>
     <label>Empresa</label><input type="text" id="u-empresa" />
-    <label>Email</label><input type="email" id="u-email" />
-    <label>Telefono</label><input type="tel" id="u-tel" />
+    <div class="grid2">
+      <div><label>Email</label><input type="email" id="u-email" /></div>
+      <div><label>Telefono</label><input type="tel" id="u-tel" /></div>
+    </div>
     <label>Ciudad</label><input type="text" id="u-ciudad" />
-    <label>Tipo de usuario</label>
-    <select id="u-rol">
+    <label>Tipo de usuario *</label>
+    <select id="u-rol" onchange="toggleComisionField()">
       <option value="aplicador">Aplicador</option>
       <option value="vendedor">Vendedor</option>
       <option value="distribuidor">Distribuidor</option>
       <option value="admin">Administrador</option>
     </select>
-    <label>Usuario (login)</label><input type="text" id="u-usuario" />
-    <label>Contrasena</label><input type="text" id="u-pass" />
+    <div id="campo-comision" class="hidden">
+      <label>Comision % (vendedor)</label>
+      <input type="number" id="u-comision" placeholder="Ej. 8" min="0" max="100" step="0.5" />
+    </div>
+    <div class="grid2">
+      <div><label>Usuario *</label><input type="text" id="u-usuario" /></div>
+      <div><label>Contrasena *</label><input type="text" id="u-pass" /></div>
+    </div>
     <div style="display:flex;gap:8px;margin-top:1.25rem">
-      <button class="btn btn-primary" onclick="guardarUsuario()">Crear usuario</button>
+      <button class="btn btn-primary" onclick="guardarUsuario()">Guardar</button>
       <button class="btn" onclick="hide('modal-usuario')">Cancelar</button>
     </div>
   </div>
@@ -348,12 +478,9 @@ tr:hover td{background:#f9fdf9}
   <div class="modal">
     <div class="modal-title">Actualizar stock</div>
     <div id="stock-alert" class="hidden"></div>
-    <label>CEDIS</label>
-    <select id="st-cedis"></select>
-    <label>Producto</label>
-    <select id="st-prod"></select>
-    <label>Cantidad en inventario</label>
-    <input type="number" id="st-cant" min="0" placeholder="Ej. 50" />
+    <label>CEDIS</label><select id="st-cedis"></select>
+    <label>Producto</label><select id="st-prod"></select>
+    <label>Cantidad en inventario</label><input type="number" id="st-cant" min="0" />
     <div style="display:flex;gap:8px;margin-top:1.25rem">
       <button class="btn btn-primary" onclick="guardarStock()">Guardar</button>
       <button class="btn" onclick="hide('modal-stock')">Cancelar</button>
@@ -361,34 +488,54 @@ tr:hover td{background:#f9fdf9}
   </div>
 </div>
 
+<!-- MODAL CLIENTE DETALLE -->
+<div id="modal-cliente" class="modal-bg hidden">
+  <div class="modal">
+    <div class="modal-title">Detalle del cliente</div>
+    <div id="modal-cliente-body"></div>
+    <div style="margin-top:1.25rem;display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="guardarStatusCliente()">Guardar cambios</button>
+      <button class="btn" onclick="hide('modal-cliente')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PRECIOS DIST -->
+<div id="modal-precios-dist" class="modal-bg hidden">
+  <div class="modal">
+    <div class="modal-title">Precios personalizados — <span id="mpd-nombre"></span></div>
+    <div id="mpd-alert" class="hidden"></div>
+    <div id="mpd-form"></div>
+    <div style="display:flex;gap:8px;margin-top:1.25rem">
+      <button class="btn btn-primary" onclick="guardarPreciosDist()">Guardar</button>
+      <button class="btn" onclick="hide('modal-precios-dist')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 </div>
 <script>
 const NIVELES={semilla:{label:'Semilla',pct:12,bono:80,min:0},verde:{label:'Verde',pct:15,bono:100,min:5000},master:{label:'Master',pct:18,bono:130,min:15000},socio:{label:'Socio',pct:22,bono:160,min:30000}};
-let state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],config:{}};
+const STATUS_CLIENTE=['en_espera','propuesta_enviada','pedido_confirmado','pedido_enviado','entregado','pagado','cancelado'];
+const STATUS_LABELS={'en_espera':'En espera','propuesta_enviada':'Propuesta enviada','pedido_confirmado':'Pedido confirmado','pedido_enviado':'Pedido enviado','entregado':'Entregado','pagado':'Pagado','cancelado':'Cancelado'};
+let state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],clientes:[],preciosDist:[]};
+let editClienteId=null;
 
-// Utils
 const show=id=>document.getElementById(id)?.classList.remove('hidden');
 const hide=id=>document.getElementById(id)?.classList.add('hidden');
 const el=id=>document.getElementById(id);
 const fmx=n=>'$'+Math.round(n||0).toLocaleString('es-MX')+' MXN';
 const fdate=d=>{if(!d)return'';const[y,m,dd]=(d+'').split('T')[0].split('-');return`${dd}/${m}/${y}`};
-const badge=(cls,txt)=>`<span class="badge badge-${cls}">${txt}</span>`;
+const badge=(cls,txt)=>`<span class="badge badge-${cls.replace(/ /g,'_')}">${txt}</span>`;
 const rolBadge=r=>badge(r,r);
 const nivelBadge=n=>badge(n,NIVELES[n]?.label||n);
-const initials=n=>((n||'').split(' ').slice(0,2).map(w=>w[0]).join('')).toUpperCase();
+const initials=n=>((n||'').split(' ').slice(0,2).map(w=>w[0]).join('')).toUpperCase()||'?';
 const stat=(v,l)=>`<div class="stat"><div class="stat-v">${v}</div><div class="stat-l">${l}</div></div>`;
 const getNivel=c=>c>=30000?'socio':c>=15000?'master':c>=5000?'verde':'semilla';
+const statusClienteLabel=s=>STATUS_LABELS[s]||s;
 
-function loading(on,msg='Cargando...'){
-  on?show('loading-overlay'):hide('loading-overlay');
-  const m=el('loading-msg');if(m)m.textContent=msg;
-}
-function showAlert(elId,msg,type){
-  const e=el(elId);if(!e)return;
-  e.className='alert alert-'+(type==='err'?'err':'ok');
-  e.textContent=msg;e.classList.remove('hidden');
-  if(type!=='err')setTimeout(()=>e.classList.add('hidden'),3500);
-}
+function loading(on,msg='Cargando...'){on?show('loading-overlay'):hide('loading-overlay');const m=el('loading-msg');if(m)m.textContent=msg;}
+function showAlert(elId,msg,type){const e=el(elId);if(!e)return;e.className='alert alert-'+(type==='err'?'err':'ok');e.textContent=msg;e.classList.remove('hidden');if(type!=='err')setTimeout(()=>e.classList.add('hidden'),3500);}
 
 async function api(path,method='GET',body=null){
   const opts={method,headers:{'Content-Type':'application/json'}};
@@ -397,37 +544,38 @@ async function api(path,method='GET',body=null){
   return r.json();
 }
 
-// AUTH
 async function doLogin(){
-  const usuario=el('l-user').value.trim();
-  const password=el('l-pass').value;
+  const usuario=el('l-user').value.trim(),password=el('l-pass').value;
   if(!usuario||!password){showAlert('l-alert','Ingresa usuario y contrasena','err');return}
   loading(true,'Iniciando sesion...');
   try{
     const r=await api('login','POST',{usuario,password});
-    if(!r.ok){showAlert('l-alert',r.error||'Error al iniciar sesion','err');return}
-    state.user=r.user;
-    hide('s-login');
-    if(['superadmin','admin'].includes(r.user.rol)){await loadAdmin();show('s-admin')}
-    else{await loadUser();show('s-user')}
+    if(!r.ok){showAlert('l-alert',r.error||'Error','err');return}
+    state.user=r.user;hide('s-login');
+    const rol=r.user.rol;
+    if(['superadmin','admin'].includes(rol)){await loadAdmin();show('s-admin')}
+    else if(rol==='distribuidor'){await loadDist();show('s-dist')}
+    else if(rol==='vendedor'){await loadVend();show('s-vend')}
+    else{await loadAplic();show('s-aplic')}
   }catch(e){showAlert('l-alert','Error de conexion','err')}
   finally{loading(false)}
 }
 
 function doLogout(){
-  state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],config:{}};
-  hide('s-admin');hide('s-user');
-  el('l-user').value='';el('l-pass').value='';
-  show('s-login');
+  state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],clientes:[],preciosDist:[]};
+  ['s-admin','s-dist','s-vend','s-aplic'].forEach(hide);
+  el('l-user').value='';el('l-pass').value='';show('s-login');
 }
 
-// ADMIN
+// ─── ADMIN ────────────────────────────────────────────────────────────────
+
 async function loadAdmin(){
   loading(true,'Cargando datos...');
   try{
-    const[usuarios,pedidos,svcs,prods,cedis,stock]=await Promise.all([
+    const[usuarios,pedidos,svcs,prods,cedis,stock,clientes]=await Promise.all([
       api('usuarios'),api('pedidos?all=1'),api('servicios'),
-      api('data?resource=productos'),api('data?resource=cedis'),api('data?resource=stock')
+      api('data?resource=productos'),api('data?resource=cedis'),
+      api('data?resource=stock'),api('clientes')
     ]);
     state.usuarios=Array.isArray(usuarios)?usuarios:[];
     state.pedidos=Array.isArray(pedidos)?pedidos:[];
@@ -435,44 +583,35 @@ async function loadAdmin(){
     state.productos=Array.isArray(prods)?prods:[];
     state.cedis=Array.isArray(cedis)?cedis:[];
     state.stock=Array.isArray(stock)?stock:[];
-
+    state.clientes=Array.isArray(clientes)?clientes:[];
     const u=state.user;
     el('admin-name').textContent=u.nombre||u.usuario;
     el('admin-sub').textContent=u.rol==='superadmin'?'Super Administrador':'Administrador';
     if(u.rol!=='superadmin'){hide('tab-config')}
-
-    renderDash();renderUsuarios();renderPedidosAdmin();renderSvcsAdmin();renderStock();
+    renderDash();renderUsuarios();renderPedidosAdmin();renderSvcsAdmin();renderStock();renderClientesAdmin();
     if(u.rol==='superadmin')renderConfig();
   }finally{loading(false)}
 }
 
 function renderDash(){
-  const u=state.usuarios,p=state.pedidos,s=state.servicios;
-  const totalVentas=p.filter(x=>x.status==='entregado').reduce((a,x)=>a+(x.total||0),0);
-  el('dash-stats').innerHTML=
-    stat(u.length,'Usuarios activos')+stat(p.length,'Pedidos totales')+
-    stat(s.length,'Servicios registrados')+stat(fmx(totalVentas),'Ventas confirmadas');
-
+  const u=state.usuarios,p=state.pedidos,s=state.servicios,c=state.clientes;
+  const totalVentas=p.filter(x=>x.status==='pagado').reduce((a,x)=>a+(x.total||0),0);
+  el('dash-stats').innerHTML=stat(u.length,'Usuarios')+stat(p.length,'Pedidos')+stat(c.length,'Clientes registrados')+stat(fmx(totalVentas),'Ventas pagadas');
   const tipos={vendedor:0,aplicador:0,distribuidor:0,admin:0};
   u.forEach(x=>{if(tipos[x.rol]!==undefined)tipos[x.rol]++});
   el('dash-tipos').innerHTML=Object.entries(tipos).map(([k,v])=>
-    `<div class="row-item"><span style="font-size:14px">${rolBadge(k)}</span><span style="font-weight:500">${v}</span></div>`
-  ).join('');
-
+    `<div class="row-item"><span>${rolBadge(k)}</span><span style="font-weight:500">${v}</span></div>`).join('');
   el('dash-pedidos').innerHTML=[...p].slice(0,5).map(x=>{
     const usr=state.usuarios.find(u=>u.id===x.usuario_id)||{nombre:'—'};
-    return`<div class="row-item"><div><div style="font-size:13px;font-weight:500">${usr.nombre||usr.usuario}</div><div style="font-size:12px;color:#999">${fmx(x.total)}</div></div>${badge('badge-'+x.status,x.status)}</div>`;
+    return`<div class="row-item"><div><div style="font-size:13px;font-weight:500">${usr.nombre||usr.usuario}</div><div style="font-size:12px;color:#999">${fmx(x.total)}</div></div>${badge(x.status,STATUS_LABELS[x.status]||x.status)}</div>`;
   }).join('')||'<div class="empty">Sin pedidos</div>';
-
   const topUsers=[...state.usuarios].sort((a,b)=>(b.compras_mes||0)-(a.compras_mes||0)).slice(0,5);
   el('dash-top').innerHTML=topUsers.map(u=>
-    `<div class="row-item"><div style="display:flex;align-items:center;gap:8px"><div class="avatar">${initials(u.nombre)}</div><div><div style="font-size:13px;font-weight:500">${u.nombre||u.usuario}</div><div style="font-size:12px;color:#999">${u.ciudad||''}</div></div></div><span style="font-size:13px;font-weight:500">${fmx(u.compras_mes)}</span></div>`
+    `<div class="row-item"><div style="display:flex;align-items:center;gap:8px"><div class="avatar">${initials(u.nombre)}</div><div><div style="font-size:13px;font-weight:500">${u.nombre||u.usuario}</div><div style="font-size:12px;color:#999">${rolBadge(u.rol)}</div></div></div><span style="font-size:13px;font-weight:500">${fmx(u.compras_mes)}</span></div>`
   ).join('')||'<div class="empty">Sin datos</div>';
-
-  el('dash-svcs').innerHTML=[...s].slice(0,5).map(x=>{
-    const usr=state.usuarios.find(u=>u.id===x.usuario_id)||{nombre:'—'};
-    return`<div class="row-item"><div><div style="font-size:13px;font-weight:500">${x.cliente}</div><div style="font-size:12px;color:#999">${usr.nombre||usr.usuario} · ${x.m2} m²</div></div><div style="font-size:12px;color:#999">${fdate(x.fecha)}</div></div>`;
-  }).join('')||'<div class="empty">Sin servicios</div>';
+  el('dash-clientes').innerHTML=[...c].slice(0,5).map(x=>
+    `<div class="row-item"><div><div style="font-size:13px;font-weight:500">${x.empresa||x.contacto}</div><div style="font-size:12px;color:#999">${x.ciudad||''}</div></div>${badge(x.status,statusClienteLabel(x.status))}</div>`
+  ).join('')||'<div class="empty">Sin clientes</div>';
 }
 
 function renderUsuarios(filtro={}){
@@ -480,42 +619,42 @@ function renderUsuarios(filtro={}){
   if(filtro.rol)users=users.filter(u=>u.rol===filtro.rol);
   if(filtro.nivel)users=users.filter(u=>u.nivel===filtro.nivel);
   el('tbl-usuarios').innerHTML=
-    `<thead><tr><th>Usuario</th><th>Nombre</th><th>Empresa</th><th>Ciudad</th><th>Tipo</th><th>Nivel</th><th>Compras mes</th><th>Acciones</th></tr></thead><tbody>`+
+    `<thead><tr><th>Usuario</th><th>Nombre</th><th>Empresa</th><th>Tipo</th><th>Nivel</th><th>Compras mes</th><th>Comision%</th><th>Acciones</th></tr></thead><tbody>`+
     (users.length?users.map(u=>`<tr>
       <td><strong>${u.usuario}</strong></td>
       <td>${(u.nombre||'')+' '+(u.apellidos||'')}</td>
-      <td style="font-size:12px;color:#5d5d5d">${u.empresa||'—'}</td>
-      <td style="font-size:12px">${u.ciudad||'—'}</td>
+      <td style="font-size:12px">${u.empresa||'—'}</td>
       <td>${rolBadge(u.rol)}</td>
-      <td>${nivelBadge(u.nivel||'semilla')}</td>
+      <td>${u.rol==='distribuidor'?'—':nivelBadge(u.nivel||'semilla')}</td>
       <td>${fmx(u.compras_mes)}</td>
-      <td><button class="btn btn-sm" onclick="editarUsuario('${u.id}')">Editar</button></td>
+      <td>${u.comision_pct||0}%</td>
+      <td style="display:flex;gap:4px">
+        <button class="btn btn-sm" onclick="editarUsuario('${u.id}')">Editar</button>
+        ${u.rol==='distribuidor'?`<button class="btn btn-sm" onclick="editarPreciosDist('${u.id}','${u.nombre||u.usuario}')">Precios</button>`:''}
+      </td>
     </tr>`).join(''):'<tr><td colspan="8" class="empty">Sin usuarios</td></tr>')+
     '</tbody>';
 }
 
-function filtrarUsuarios(){
-  renderUsuarios({rol:el('filtro-rol').value,nivel:el('filtro-nivel').value});
-}
+function filtrarUsuarios(){renderUsuarios({rol:el('filtro-rol').value,nivel:el('filtro-nivel').value})}
 
 function renderPedidosAdmin(filtro=''){
   let peds=[...state.pedidos];
   if(filtro)peds=peds.filter(p=>p.status===filtro);
   el('tbl-pedidos-admin').innerHTML=
-    `<thead><tr><th>Fecha</th><th>Usuario</th><th>CEDIS</th><th>Total</th><th>Status</th><th>Accion</th></tr></thead><tbody>`+
+    `<thead><tr><th>Fecha</th><th>Usuario</th><th>CEDIS</th><th>Productos</th><th>Total</th><th>Status</th></tr></thead><tbody>`+
     (peds.length?peds.map(p=>{
-      const usr=state.usuarios.find(u=>u.id===p.usuario_id)||{nombre:'—'};
+      const usr=state.usuarios.find(u=>u.id===p.usuario_id)||p.usuarios||{nombre:'—'};
+      const items=(p.pedido_items||[]).map(i=>`${i.productos?.nombre||''} ${i.productos?.presentacion||''} x${i.cantidad}`).join(', ');
       return`<tr>
         <td>${fdate(p.creado_en)}</td>
-        <td>${usr.nombre||usr.usuario}</td>
+        <td>${usr.nombre||usr.usuario||'—'}</td>
         <td style="font-size:12px">${p.cedis?.nombre||'—'}</td>
+        <td style="font-size:12px;max-width:200px">${items||'—'}</td>
         <td>${fmx(p.total)}</td>
-        <td>${badge(p.status,p.status)}</td>
-        <td>
-          <select onchange="cambiarStatusPedido('${p.id}',this.value)" style="width:auto;padding:4px 8px;font-size:12px">
-            ${['pendiente','confirmado','enviado','entregado','cancelado'].map(s=>`<option value="${s}"${s===p.status?' selected':''}>${s}</option>`).join('')}
-          </select>
-        </td>
+        <td><select onchange="cambiarStatusPedido('${p.id}',this.value)" style="width:auto;padding:4px 8px;font-size:12px">
+          ${['pendiente','confirmado','enviado','entregado','pagado','cancelado'].map(s=>`<option value="${s}"${s===p.status?' selected':''}>${STATUS_LABELS[s]||s}</option>`).join('')}
+        </select></td>
       </tr>`;
     }).join(''):'<tr><td colspan="6" class="empty">Sin pedidos</td></tr>')+
     '</tbody>';
@@ -524,118 +663,110 @@ function renderPedidosAdmin(filtro=''){
 function filtrarPedidos(){renderPedidosAdmin(el('filtro-status').value)}
 
 async function cambiarStatusPedido(id,status){
-  await api('pedidos','PUT',{id,status});
-  const p=state.pedidos.find(x=>x.id===id);
-  if(p)p.status=status;
-  renderPedidosAdmin(el('filtro-status').value);
+  loading(true,'Actualizando...');
+  try{
+    const r=await api('pedidos','PUT',{id,status});
+    if(r.ok){
+      const p=state.pedidos.find(x=>x.id===id);
+      if(p)p.status=status;
+      renderPedidosAdmin(el('filtro-status').value);
+      renderStock();
+    }
+  }finally{loading(false)}
+}
+
+function renderClientesAdmin(){
+  el('tbl-clientes-admin').innerHTML=
+    `<thead><tr><th>Empresa</th><th>Contacto</th><th>Ciudad</th><th>Vendedor</th><th>Status</th><th>Monto</th><th>Comision</th></tr></thead><tbody>`+
+    (state.clientes.length?state.clientes.map(c=>{
+      const vend=state.usuarios.find(u=>u.id===c.vendedor_id)||{nombre:'—'};
+      return`<tr>
+        <td>${c.empresa||'—'}</td><td>${c.contacto}</td><td style="font-size:12px">${c.ciudad||'—'}</td>
+        <td style="font-size:12px">${vend.nombre||vend.usuario}</td>
+        <td>${badge(c.status,statusClienteLabel(c.status))}</td>
+        <td>${fmx(c.monto_vendido)}</td><td>${fmx(c.comision_ganada)}</td>
+      </tr>`;
+    }).join(''):'<tr><td colspan="7" class="empty">Sin clientes</td></tr>')+
+    '</tbody>';
 }
 
 function renderSvcsAdmin(){
   el('tbl-svcs-admin').innerHTML=
-    `<thead><tr><th>Fecha</th><th>Usuario</th><th>Cliente</th><th>M²</th><th>Producto</th><th>Cant.</th></tr></thead><tbody>`+
-    ([...state.servicios].map(s=>{
+    `<thead><tr><th>Fecha</th><th>Aplicador</th><th>Cliente</th><th>M²</th><th>Producto</th></tr></thead><tbody>`+
+    (state.servicios.length?state.servicios.map(s=>{
       const usr=state.usuarios.find(u=>u.id===s.usuario_id)||{nombre:'—'};
-      return`<tr><td>${fdate(s.fecha)}</td><td>${usr.nombre||usr.usuario}</td><td>${s.cliente}</td><td>${s.m2}</td><td style="font-size:12px">${s.productos?.nombre||'—'} ${s.presentacion||''}</td><td>${s.cantidad||'—'}</td></tr>`;
-    }).join('')||'<tr><td colspan="6" class="empty">Sin servicios</td></tr>')+
+      return`<tr><td>${fdate(s.fecha)}</td><td>${usr.nombre||'—'}</td><td>${s.cliente}</td><td>${s.m2}</td><td style="font-size:12px">${s.productos?.nombre||'—'} ${s.presentacion||''}</td></tr>`;
+    }).join(''):'<tr><td colspan="5" class="empty">Sin servicios</td></tr>')+
     '</tbody>';
 }
 
 function renderStock(){
-  const cedis=state.cedis;
-  const productos=state.productos;
-  el('stock-grid').innerHTML=cedis.map(c=>{
-    const stockCedis=state.stock.filter(s=>s.cedis_id===c.id);
-    return`<div class="card" style="margin-bottom:1rem">
-      <div class="section-title">${c.nombre} — ${c.ciudad}</div>
-      <table style="width:100%">
-        <thead><tr><th>Producto</th><th>Presentacion</th><th>Stock</th></tr></thead>
-        <tbody>${productos.map(p=>{
-          const s=stockCedis.find(x=>x.producto_id===p.id);
-          const cant=s?.cantidad||0;
-          const cls=cant===0?'stock-out':cant<10?'stock-low':'stock-ok';
-          const lbl=cant===0?'Sin stock':cant<10?'Stock bajo':'OK';
-          return`<tr><td>${p.nombre}</td><td>${p.presentacion}</td><td>${cant} <span class="stock-badge ${cls}">${lbl}</span></td></tr>`;
-        }).join('')}</tbody>
-      </table>
-    </div>`;
+  el('stock-grid').innerHTML=state.cedis.map(c=>{
+    const stockC=state.stock.filter(s=>s.cedis_id===c.id);
+    return`<div class="card"><div class="section-title">${c.nombre} — ${c.ciudad}</div>
+      <table><thead><tr><th>Producto</th><th>Presentacion</th><th>Stock</th></tr></thead><tbody>
+      ${state.productos.map(p=>{
+        const s=stockC.find(x=>x.producto_id===p.id);
+        const cant=s?.cantidad||0;
+        const cls=cant===0?'stock-out':cant<10?'stock-low':'stock-ok';
+        return`<tr><td>${p.nombre}</td><td>${p.presentacion}</td><td>${cant} <span class="stock-badge ${cls}">${cant===0?'Sin stock':cant<10?'Bajo':'OK'}</span></td></tr>`;
+      }).join('')}</tbody></table></div>`;
   }).join('');
 }
 
 function renderConfig(){
-  const niveles=state.config.niveles||NIVELES;
   el('config-niveles').innerHTML=Object.entries(NIVELES).map(([k,n])=>
-    `<div style="padding:8px 0;border-bottom:1px solid #f0f0f0">
-      <div style="font-weight:500;font-size:13px;margin-bottom:4px">${n.label}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div><label style="margin-top:0">Min litros/mes</label><input type="number" id="cfg_n_min_${k}" value="${n.min||0}" style="padding:6px" /></div>
-        <div><label style="margin-top:0">Precio x litro MXN</label><input type="number" id="cfg_n_precio_${k}" value="${niveles[k]?.precio||480}" style="padding:6px" /></div>
-      </div>
-    </div>`
-  ).join('');
-
+    `<div style="padding:8px 0;border-bottom:1px solid #f0f0f0"><div style="font-weight:500;font-size:13px;margin-bottom:4px">${n.label}</div>
+    <div class="grid2">
+      <div><label style="margin-top:0">Min litros/mes</label><input type="number" id="cfg_n_min_${k}" value="${n.min||0}" style="padding:6px" /></div>
+      <div><label style="margin-top:0">Precio x litro</label><input type="number" id="cfg_n_precio_${k}" value="${480}" style="padding:6px" /></div>
+    </div></div>`).join('');
   el('config-comisiones').innerHTML=Object.entries(NIVELES).map(([k,n])=>
-    `<div style="padding:8px 0;border-bottom:1px solid #f0f0f0">
-      <div style="font-weight:500;font-size:13px;margin-bottom:4px">${n.label}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div><label style="margin-top:0">Comision %</label><input type="number" id="cfg_c_pct_${k}" value="${n.pct}" style="padding:6px" /></div>
-        <div><label style="margin-top:0">Bono por servicio</label><input type="number" id="cfg_c_bono_${k}" value="${n.bono}" style="padding:6px" /></div>
-      </div>
-    </div>`
-  ).join('');
-
+    `<div style="padding:8px 0;border-bottom:1px solid #f0f0f0"><div style="font-weight:500;font-size:13px;margin-bottom:4px">${n.label}</div>
+    <div class="grid2">
+      <div><label style="margin-top:0">Comision %</label><input type="number" id="cfg_c_pct_${k}" value="${n.pct}" style="padding:6px" /></div>
+      <div><label style="margin-top:0">Bono x servicio</label><input type="number" id="cfg_c_bono_${k}" value="${n.bono}" style="padding:6px" /></div>
+    </div></div>`).join('');
   el('config-precios').innerHTML=state.productos.map(p=>
-    `<div class="row-item"><span style="font-size:13px">${p.nombre} ${p.presentacion}</span><div style="display:flex;align-items:center;gap:6px"><input type="number" id="precio_${p.id}" value="${p.precio_lista}" style="width:90px;padding:5px" /><span style="font-size:12px;color:#999">MXN</span></div></div>`
+    `<div class="precio-row"><div><div style="font-size:13px;font-weight:500">${p.nombre}</div><div style="font-size:12px;color:#999">${p.presentacion}</div></div>
+    <div style="display:flex;align-items:center;gap:6px"><input type="number" id="precio_${p.id}" value="${p.precio_lista}" style="width:100px;padding:5px" /><span style="font-size:12px;color:#999">MXN</span></div></div>`
   ).join('');
 }
 
 async function guardarConfig(tipo){
-  if(tipo==='niveles'){
-    const val={};
-    Object.keys(NIVELES).forEach(k=>{
-      val[k]={min:parseFloat(el(`cfg_n_min_${k}`)?.value||0),precio:parseFloat(el(`cfg_n_precio_${k}`)?.value||480)};
-    });
-    await api('data?resource=config','PUT',{clave:'niveles',valor:val});
-  } else {
-    const val={};
-    Object.keys(NIVELES).forEach(k=>{
-      val[k]={pct:parseFloat(el(`cfg_c_pct_${k}`)?.value||0),bono:parseFloat(el(`cfg_c_bono_${k}`)?.value||0)};
-      NIVELES[k].pct=val[k].pct;NIVELES[k].bono=val[k].bono;
-    });
-    await api('data?resource=config','PUT',{clave:'comisiones',valor:val});
-  }
+  const val={};
+  if(tipo==='niveles'){Object.keys(NIVELES).forEach(k=>{val[k]={min:parseFloat(el(`cfg_n_min_${k}`)?.value||0),precio:parseFloat(el(`cfg_n_precio_${k}`)?.value||480)}})}
+  else{Object.keys(NIVELES).forEach(k=>{val[k]={pct:parseFloat(el(`cfg_c_pct_${k}`)?.value||0),bono:parseFloat(el(`cfg_c_bono_${k}`)?.value||0)};NIVELES[k].pct=val[k].pct;NIVELES[k].bono=val[k].bono})}
+  await api('data?resource=config','PUT',{clave:tipo==='niveles'?'niveles':'comisiones',valor:val});
   alert('Guardado correctamente');
 }
 
 async function guardarPrecios(){
-  for(const p of state.productos){
-    const v=parseFloat(el(`precio_${p.id}`)?.value||0);
-    if(v!==p.precio_lista){
-      await api('data?resource=productos','PUT',{id:p.id,precio_lista:v});
-      p.precio_lista=v;
-    }
-  }
+  for(const p of state.productos){const v=parseFloat(el(`precio_${p.id}`)?.value||0);if(v!==p.precio_lista){await api('data?resource=productos','PUT',{id:p.id,precio_lista:v});p.precio_lista=v}}
   alert('Precios guardados');
 }
 
 // MODAL USUARIO
+function toggleComisionField(){
+  el('u-rol').value==='vendedor'?show('campo-comision'):hide('campo-comision');
+}
+
 function showModalUsuario(){
-  ['u-nombre','u-apellidos','u-empresa','u-email','u-tel','u-ciudad','u-usuario','u-pass'].forEach(id=>{const e=el(id);if(e)e.value='';});
+  ['u-nombre','u-apellidos','u-empresa','u-email','u-tel','u-ciudad','u-usuario','u-pass'].forEach(id=>{const e=el(id);if(e)e.value=''});
+  el('u-comision').value='';
   el('modal-usr-title').textContent='Nuevo usuario';
   el('modal-usuario').dataset.editId='';
+  hide('campo-comision');
   show('modal-usuario');
 }
 
 function editarUsuario(id){
   const u=state.usuarios.find(x=>x.id===id);if(!u)return;
-  el('u-nombre').value=u.nombre||'';
-  el('u-apellidos').value=u.apellidos||'';
-  el('u-empresa').value=u.empresa||'';
-  el('u-email').value=u.email||'';
-  el('u-tel').value=u.telefono||'';
-  el('u-ciudad').value=u.ciudad||'';
-  el('u-usuario').value=u.usuario||'';
-  el('u-rol').value=u.rol||'aplicador';
-  el('u-pass').value='';
+  el('u-nombre').value=u.nombre||'';el('u-apellidos').value=u.apellidos||'';el('u-empresa').value=u.empresa||'';
+  el('u-email').value=u.email||'';el('u-tel').value=u.telefono||'';el('u-ciudad').value=u.ciudad||'';
+  el('u-usuario').value=u.usuario||'';el('u-rol').value=u.rol||'aplicador';el('u-pass').value='';
+  el('u-comision').value=u.comision_pct||0;
+  u.rol==='vendedor'?show('campo-comision'):hide('campo-comision');
   el('modal-usr-title').textContent='Editar usuario';
   el('modal-usuario').dataset.editId=id;
   show('modal-usuario');
@@ -643,17 +774,10 @@ function editarUsuario(id){
 
 async function guardarUsuario(){
   const editId=el('modal-usuario').dataset.editId;
-  const data={
-    nombre:el('u-nombre').value.trim(),
-    apellidos:el('u-apellidos').value.trim(),
-    empresa:el('u-empresa').value.trim(),
-    email:el('u-email').value.trim(),
-    telefono:el('u-tel').value.trim(),
-    ciudad:el('u-ciudad').value.trim(),
-    rol:el('u-rol').value,
-    usuario:el('u-usuario').value.trim(),
-    password:el('u-pass').value.trim(),
-  };
+  const data={nombre:el('u-nombre').value.trim(),apellidos:el('u-apellidos').value.trim(),empresa:el('u-empresa').value.trim(),
+    email:el('u-email').value.trim(),telefono:el('u-tel').value.trim(),ciudad:el('u-ciudad').value.trim(),
+    rol:el('u-rol').value,usuario:el('u-usuario').value.trim(),password:el('u-pass').value.trim(),
+    comision_pct:parseFloat(el('u-comision').value||0)};
   if(!data.nombre||!data.usuario){showAlert('usr-alert','Nombre y usuario son requeridos','err');return}
   loading(true);
   try{
@@ -665,160 +789,375 @@ async function guardarUsuario(){
   }finally{loading(false)}
 }
 
-// STOCK MODAL
+// PRECIOS DISTRIBUIDOR
+async function editarPreciosDist(userId,nombre){
+  el('mpd-nombre').textContent=nombre;
+  el('modal-precios-dist').dataset.userId=userId;
+  loading(true);
+  try{
+    const precios=await api(`data?resource=precios_dist&usuario_id=${userId}`);
+    const preciosMap={};
+    (Array.isArray(precios)?precios:[]).forEach(p=>{preciosMap[p.producto_id]=p.precio});
+    el('mpd-form').innerHTML=state.productos.map(p=>
+      `<div class="precio-row">
+        <div><div style="font-size:13px;font-weight:500">${p.nombre}</div><div class="precio-sugerido">${p.presentacion} — Precio lista: ${fmx(p.precio_lista)}</div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+          <div style="display:flex;align-items:center;gap:6px"><input type="number" id="mpd_${p.id}" value="${preciosMap[p.id]||p.precio_lista}" style="width:100px;padding:5px" /><span style="font-size:12px;color:#999">MXN</span></div>
+          <div class="precio-sugerido">Sugerido venta: ${fmx(p.precio_lista)}</div>
+        </div>
+      </div>`
+    ).join('');
+    show('modal-precios-dist');
+  }finally{loading(false)}
+}
+
+async function guardarPreciosDist(){
+  const userId=el('modal-precios-dist').dataset.userId;
+  const precios=state.productos.map(p=>({producto_id:p.id,precio:parseFloat(el(`mpd_${p.id}`)?.value||p.precio_lista)}));
+  loading(true);
+  try{
+    const r=await api('data?resource=precios_dist','PUT',{usuario_id:userId,precios});
+    if(r.ok){hide('modal-precios-dist');showAlert('mpd-alert','Precios guardados','ok')}
+    else showAlert('mpd-alert',r.error||'Error','err');
+  }finally{loading(false)}
+}
+
+// STOCK
 function showModalStock(){
-  const cedisOpts=state.cedis.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
-  const prodOpts=state.productos.map(p=>`<option value="${p.id}">${p.nombre} ${p.presentacion}</option>`).join('');
-  el('st-cedis').innerHTML=cedisOpts;
-  el('st-prod').innerHTML=prodOpts;
-  el('st-cant').value='';
-  show('modal-stock');
+  el('st-cedis').innerHTML=state.cedis.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+  el('st-prod').innerHTML=state.productos.map(p=>`<option value="${p.id}">${p.nombre} ${p.presentacion}</option>`).join('');
+  el('st-cant').value='';show('modal-stock');
 }
 
 async function guardarStock(){
-  const cedis_id=el('st-cedis').value;
-  const producto_id=el('st-prod').value;
-  const cantidad=parseInt(el('st-cant').value||0);
+  const cedis_id=el('st-cedis').value,producto_id=el('st-prod').value,cantidad=parseInt(el('st-cant').value||0);
   const r=await api('data?resource=stock','PUT',{cedis_id,producto_id,cantidad});
-  if(r.ok){
-    const s=state.stock.find(x=>x.cedis_id===cedis_id&&x.producto_id===producto_id);
-    if(s)s.cantidad=cantidad;else state.stock.push({cedis_id,producto_id,cantidad});
-    renderStock();hide('modal-stock');
-  } else showAlert('stock-alert',r.error||'Error','err');
+  if(r.ok){const s=state.stock.find(x=>x.cedis_id===cedis_id&&x.producto_id===producto_id);if(s)s.cantidad=cantidad;else state.stock.push({cedis_id,producto_id,cantidad});renderStock();hide('modal-stock');}
+  else showAlert('stock-alert',r.error||'Error','err');
 }
 
 // PERFIL
 function showPerfil(){
   const u=state.user;
-  el('pf-nombre').value=u.nombre||'';
-  el('pf-apellidos').value=u.apellidos||'';
-  el('pf-empresa').value=u.empresa||'';
-  el('pf-email').value=u.email||'';
-  el('pf-telefono').value=u.telefono||'';
-  el('pf-ciudad').value=u.ciudad||'';
-  el('pf-pass').value='';
-  show('modal-perfil');
+  el('pf-nombre').value=u.nombre||'';el('pf-apellidos').value=u.apellidos||'';el('pf-empresa').value=u.empresa||'';
+  el('pf-email').value=u.email||'';el('pf-telefono').value=u.telefono||'';el('pf-ciudad').value=u.ciudad||'';
+  el('pf-pass').value='';show('modal-perfil');
 }
 
 async function guardarPerfil(){
-  const updates={
-    nombre:el('pf-nombre').value.trim(),
-    apellidos:el('pf-apellidos').value.trim(),
-    empresa:el('pf-empresa').value.trim(),
-    email:el('pf-email').value.trim(),
-    telefono:el('pf-telefono').value.trim(),
-    ciudad:el('pf-ciudad').value.trim(),
-  };
-  const pass=el('pf-pass').value.trim();
-  if(pass)updates.password=pass;
+  const updates={nombre:el('pf-nombre').value.trim(),apellidos:el('pf-apellidos').value.trim(),empresa:el('pf-empresa').value.trim(),
+    email:el('pf-email').value.trim(),telefono:el('pf-telefono').value.trim(),ciudad:el('pf-ciudad').value.trim()};
+  const pass=el('pf-pass').value.trim();if(pass)updates.password=pass;
   loading(true);
   try{
     const r=await api('usuarios','PUT',{id:state.user.id,...updates});
-    if(r.ok){Object.assign(state.user,updates);hide('modal-perfil');showAlert('perfil-alert','Guardado','ok')}
+    if(r.ok){Object.assign(state.user,updates);hide('modal-perfil');alert('Perfil guardado')}
     else showAlert('perfil-alert',r.error||'Error','err');
   }finally{loading(false)}
 }
 
-// USER (vendedor/aplicador/distribuidor)
-async function loadUser(){
-  loading(true,'Cargando tu informacion...');
+// ─── DISTRIBUIDOR ──────────────────────────────────────────────────────────
+
+async function loadDist(){
+  loading(true,'Cargando...');
+  try{
+    const[peds,prods,cedis,preciosDist]=await Promise.all([
+      api('pedidos?usuario_id='+state.user.id),
+      api('data?resource=productos'),api('data?resource=cedis'),
+      api('data?resource=precios_dist&usuario_id='+state.user.id)
+    ]);
+    state.pedidos=Array.isArray(peds)?peds:[];
+    state.productos=Array.isArray(prods)?prods:[];
+    state.cedis=Array.isArray(cedis)?cedis:[];
+    state.preciosDist=Array.isArray(preciosDist)?preciosDist:[];
+    const u=state.user;
+    el('dist-name').textContent=u.nombre||u.usuario;
+    renderDistInicio();renderDistPrecios();renderDistPedidos();renderDistPedidoForm();
+  }finally{loading(false)}
+}
+
+function renderDistInicio(){
+  const p=state.pedidos;
+  const totalCompras=p.filter(x=>x.status==='pagado').reduce((a,x)=>a+(x.total||0),0);
+  el('dist-stats').innerHTML=stat(p.length,'Pedidos totales')+stat(p.filter(x=>x.status==='pendiente').length,'Pedidos pendientes')+stat(fmx(totalCompras),'Total comprado');
+  el('dist-peds-rec').innerHTML=[...p].slice(0,5).map(x=>
+    `<div class="row-item"><div><div style="font-size:13px;font-weight:500">${x.cedis?.nombre||'—'}</div><div style="font-size:12px;color:#999">${fmx(x.total)} · ${fdate(x.creado_en)}</div></div>${badge(x.status,STATUS_LABELS[x.status]||x.status)}</div>`
+  ).join('')||'<div class="empty">Sin pedidos aun</div>';
+}
+
+function renderDistPrecios(){
+  const preciosMap={};
+  state.preciosDist.forEach(p=>{preciosMap[p.producto_id]=p.precio});
+  el('dist-lista-precios').innerHTML=`
+    <table style="width:100%">
+      <thead><tr><th>Producto</th><th>Presentacion</th><th>Tu precio</th><th>Precio sugerido de venta</th></tr></thead>
+      <tbody>${state.productos.map(p=>{
+        const tuPrecio=preciosMap[p.producto_id]||preciosMap[p.id]||p.precio_lista;
+        return`<tr>
+          <td>${p.nombre}</td><td>${p.presentacion}</td>
+          <td><strong>${fmx(tuPrecio)}</strong></td>
+          <td style="color:#1f7344">${fmx(p.precio_lista)}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+}
+
+function renderDistPedidos(){
+  el('tbl-dist-peds').innerHTML=
+    `<thead><tr><th>Fecha</th><th>CEDIS</th><th>Productos</th><th>Total</th><th>Status</th></tr></thead><tbody>`+
+    (state.pedidos.length?state.pedidos.map(p=>{
+      const items=(p.pedido_items||[]).map(i=>`${i.productos?.nombre||''} ${i.productos?.presentacion||''} x${i.cantidad}`).join(', ');
+      return`<tr><td>${fdate(p.creado_en)}</td><td>${p.cedis?.nombre||'—'}</td><td style="font-size:12px">${items||'—'}</td><td>${fmx(p.total)}</td><td>${badge(p.status,STATUS_LABELS[p.status]||p.status)}</td></tr>`;
+    }).join(''):'<tr><td colspan="5" class="empty">Sin pedidos</td></tr>')+
+    '</tbody>';
+}
+
+function renderDistPedidoForm(){
+  el('dp-cedis').innerHTML=state.cedis.map(c=>`<option value="${c.id}">${c.nombre} — ${c.ciudad}</option>`).join('');
+  el('dist-items').innerHTML='';
+  agregarItemDist();
+}
+
+function agregarItemDist(){
+  const preciosMap={};
+  state.preciosDist.forEach(p=>{preciosMap[p.producto_id]=p.precio});
+  const container=el('dist-items');
+  const prodOpts=state.productos.map(p=>{
+    const precio=preciosMap[p.producto_id]||preciosMap[p.id]||p.precio_lista;
+    return`<option value="${p.id}" data-precio="${precio}">${p.nombre} ${p.presentacion} — ${fmx(precio)}</option>`;
+  }).join('');
+  const div=document.createElement('div');
+  div.style.cssText='display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-bottom:8px;align-items:end';
+  div.innerHTML=`<div><label style="margin-top:0">Producto</label><select class="item-prod" onchange="calcTotalDist()">${prodOpts}</select></div>
+    <div><label style="margin-top:0">Cantidad</label><input type="number" class="item-cant" value="1" min="1" style="width:70px" onchange="calcTotalDist()" /></div>
+    <button class="btn btn-danger btn-sm" style="margin-bottom:1px" onclick="this.parentElement.remove();calcTotalDist()">✕</button>`;
+  container.appendChild(div);calcTotalDist();
+}
+
+function calcTotalDist(){
+  let total=0;
+  document.querySelectorAll('#dist-items > div').forEach(row=>{
+    const sel=row.querySelector('.item-prod');
+    const cant=parseInt(row.querySelector('.item-cant')?.value||1);
+    total+=parseFloat(sel?.selectedOptions[0]?.dataset.precio||0)*cant;
+  });
+  el('dist-total').textContent=fmx(total);
+}
+
+async function enviarPedidoDist(){
+  const cedis_id=el('dp-cedis').value,notas=el('dp-notas').value.trim();
+  const items=[];
+  document.querySelectorAll('#dist-items > div').forEach(row=>{
+    const sel=row.querySelector('.item-prod');
+    const cant=parseInt(row.querySelector('.item-cant')?.value||1);
+    const precio=parseFloat(sel?.selectedOptions[0]?.dataset.precio||0);
+    if(sel?.value&&cant>0)items.push({producto_id:sel.value,cantidad:cant,precio_unitario:precio,subtotal:precio*cant});
+  });
+  if(!cedis_id||!items.length){showAlert('dist-pedido-alert','Selecciona CEDIS y agrega productos','err');return}
+  loading(true,'Enviando pedido...');
+  try{
+    const r=await api('pedidos','POST',{usuario_id:state.user.id,cedis_id,items,notas});
+    if(r.ok){showAlert('dist-pedido-alert','Pedido enviado correctamente','ok');state.pedidos.unshift(r.pedido||{});renderDistInicio();renderDistPedidos();renderDistPedidoForm();}
+    else showAlert('dist-pedido-alert',r.error||'Error','err');
+  }finally{loading(false)}
+}
+
+// ─── VENDEDOR ──────────────────────────────────────────────────────────────
+
+async function loadVend(){
+  loading(true,'Cargando...');
+  try{
+    const[clientes]=await Promise.all([api('clientes?vendedor_id='+state.user.id)]);
+    state.clientes=Array.isArray(clientes)?clientes:[];
+    const u=state.user;
+    el('vend-name').textContent=u.nombre||u.usuario;
+    renderVendInicio();renderVendClientes();renderVendComision();
+  }finally{loading(false)}
+}
+
+function renderVendInicio(){
+  const c=state.clientes;
+  const pagados=c.filter(x=>x.status==='pagado');
+  const comisionTotal=pagados.reduce((a,x)=>a+(x.comision_ganada||0),0);
+  el('vend-stats').innerHTML=stat(c.length,'Clientes registrados')+stat(c.filter(x=>x.status==='en_espera').length,'En espera')+stat(pagados.length,'Pagados')+stat(fmx(comisionTotal),'Comision ganada');
+  el('vend-clientes-rec').innerHTML=[...c].slice(0,5).map(x=>
+    `<div class="row-item" onclick="showDetalleCliente('${x.id}')" style="cursor:pointer">
+      <div><div style="font-size:13px;font-weight:500">${x.empresa||x.contacto}</div><div style="font-size:12px;color:#999">${x.ciudad||''} · ${x.contacto}</div></div>
+      ${badge(x.status,statusClienteLabel(x.status))}
+    </div>`
+  ).join('')||'<div class="empty">Sin clientes registrados</div>';
+}
+
+function renderVendClientes(){
+  el('tbl-vend-clientes').innerHTML=
+    `<thead><tr><th>Empresa</th><th>Contacto</th><th>Ciudad</th><th>Tel</th><th>Status</th><th>Monto</th><th>Comision</th><th></th></tr></thead><tbody>`+
+    (state.clientes.length?state.clientes.map(c=>
+      `<tr>
+        <td>${c.empresa||'—'}</td><td>${c.contacto}</td><td style="font-size:12px">${c.ciudad||'—'}</td>
+        <td style="font-size:12px">${c.telefono||'—'}</td>
+        <td>${badge(c.status,statusClienteLabel(c.status))}</td>
+        <td>${fmx(c.monto_vendido)}</td><td>${fmx(c.comision_ganada)}</td>
+        <td><button class="btn btn-sm" onclick="showDetalleCliente('${c.id}')">Ver</button></td>
+      </tr>`
+    ).join(''):'<tr><td colspan="8" class="empty">Sin clientes</td></tr>')+
+    '</tbody>';
+}
+
+function renderVendComision(){
+  const c=state.clientes;
+  const pagados=c.filter(x=>x.status==='pagado');
+  const comisionTotal=pagados.reduce((a,x)=>a+(x.comision_ganada||0),0);
+  const montoTotal=pagados.reduce((a,x)=>a+(x.monto_vendido||0),0);
+  const pct=state.user.comision_pct||0;
+  el('vend-com-det').innerHTML=`
+    <div class="com-row"><span>Tu comision base</span><span style="font-weight:500">${pct}%</span></div>
+    <div class="com-row"><span>Clientes pagados este mes</span><span style="font-weight:500">${pagados.length}</span></div>
+    <div class="com-row"><span>Monto total de ventas pagadas</span><span style="font-weight:500">${fmx(montoTotal)}</span></div>
+    <div class="com-total"><span>Tu comision ganada</span><span>${fmx(comisionTotal)}</span></div>
+    <div style="margin-top:10px;font-size:12px;color:#999">La comision se acumula cuando el cliente llega a status "Pagado".</div>`;
+}
+
+async function guardarCliente(){
+  const contacto=el('nc-contacto').value.trim();
+  if(!contacto){showAlert('nc-alert','El nombre de contacto es requerido','err');return}
+  loading(true,'Guardando cliente...');
+  try{
+    const r=await api('clientes','POST',{
+      vendedor_id:state.user.id,empresa:el('nc-empresa').value.trim(),contacto,
+      telefono:el('nc-tel').value.trim(),email:el('nc-email').value.trim(),
+      estado:el('nc-estado').value.trim(),ciudad:el('nc-ciudad').value.trim(),
+      direccion:el('nc-dir').value.trim(),rfc:el('nc-rfc').value.trim(),
+      notas:el('nc-notas').value.trim(),comision_pct:state.user.comision_pct||0
+    });
+    if(r.ok){
+      showAlert('nc-alert','Cliente guardado correctamente','ok');
+      state.clientes.unshift(r.cliente||{});
+      ['nc-empresa','nc-contacto','nc-tel','nc-email','nc-estado','nc-ciudad','nc-dir','nc-rfc','nc-notas'].forEach(id=>{const e=el(id);if(e)e.value=''});
+      renderVendInicio();renderVendClientes();
+    }else showAlert('nc-alert',r.error||'Error','err');
+  }finally{loading(false)}
+}
+
+function showDetalleCliente(id){
+  const c=state.clientes.find(x=>x.id===id);if(!c)return;
+  editClienteId=id;
+  el('modal-cliente-body').innerHTML=`
+    <div class="grid2" style="margin-bottom:1rem">
+      <div><div style="font-size:12px;color:#999">Empresa</div><div style="font-weight:500">${c.empresa||'—'}</div></div>
+      <div><div style="font-size:12px;color:#999">Contacto</div><div style="font-weight:500">${c.contacto}</div></div>
+      <div><div style="font-size:12px;color:#999">Telefono</div><div>${c.telefono||'—'}</div></div>
+      <div><div style="font-size:12px;color:#999">Email</div><div>${c.email||'—'}</div></div>
+      <div><div style="font-size:12px;color:#999">Ciudad</div><div>${c.ciudad||'—'}, ${c.estado||''}</div></div>
+      <div><div style="font-size:12px;color:#999">RFC</div><div>${c.rfc||'—'}</div></div>
+    </div>
+    <div style="border-top:1px solid #e0e0e0;padding-top:1rem">
+      <label>Status del cliente</label>
+      <select id="dc-status">
+        ${STATUS_CLIENTE.map(s=>`<option value="${s}"${s===c.status?' selected':''}>${statusClienteLabel(s)}</option>`).join('')}
+      </select>
+      <label>Monto de venta (cuando este confirmado el pedido)</label>
+      <input type="number" id="dc-monto" value="${c.monto_vendido||0}" placeholder="0" />
+      <label>Notas</label>
+      <textarea id="dc-notas" rows="2">${c.notas||''}</textarea>
+    </div>`;
+  show('modal-cliente');
+}
+
+async function guardarStatusCliente(){
+  if(!editClienteId)return;
+  const status=el('dc-status').value;
+  const monto_vendido=parseFloat(el('dc-monto').value||0);
+  const notas=el('dc-notas').value.trim();
+  loading(true);
+  try{
+    const r=await api('clientes','PUT',{id:editClienteId,status,monto_vendido,notas});
+    if(r.ok){
+      const c=state.clientes.find(x=>x.id===editClienteId);
+      if(c){c.status=status;c.monto_vendido=monto_vendido;c.notas=notas;
+        if(status==='pagado')c.comision_ganada=(monto_vendido*(state.user.comision_pct||0))/100;}
+      hide('modal-cliente');renderVendInicio();renderVendClientes();renderVendComision();
+    }else alert(r.error||'Error');
+  }finally{loading(false)}
+}
+
+// ─── APLICADOR ─────────────────────────────────────────────────────────────
+
+async function loadAplic(){
+  loading(true,'Cargando...');
   try{
     const[svcs,peds,prods,cedis]=await Promise.all([
-      api('servicios?usuario_id='+state.user.id),
-      api('pedidos?usuario_id='+state.user.id),
-      api('data?resource=productos'),
-      api('data?resource=cedis')
+      api('servicios?usuario_id='+state.user.id),api('pedidos?usuario_id='+state.user.id),
+      api('data?resource=productos'),api('data?resource=cedis')
     ]);
     state.servicios=Array.isArray(svcs)?svcs:[];
     state.pedidos=Array.isArray(peds)?peds:[];
     state.productos=Array.isArray(prods)?prods:[];
     state.cedis=Array.isArray(cedis)?cedis:[];
-
     const u=state.user;
-    el('user-name-hdr').textContent=u.nombre||u.usuario;
-    el('user-nivel-sub').textContent=`Aplicador Certificado · ${NIVELES[u.nivel||'semilla']?.label}`;
-
-    renderUserInicio();
-    renderUserHistorial();
-    renderUserComision();
-    renderPedidoForm();
-
-    // Llenar select de productos en registro
-    const prodSel=el('r-prod');
+    el('aplic-name').textContent=u.nombre||u.usuario;
+    el('aplic-nivel-sub').textContent=`Aplicador Certificado · ${NIVELES[u.nivel||'semilla']?.label}`;
+    renderAplicInicio();renderAplicHistorial();renderAplicComision();renderAplicPedidoForm();
     const prodNames=[...new Set(state.productos.map(p=>p.nombre))];
-    prodSel.innerHTML='<option value="">-- Selecciona --</option>'+prodNames.map(n=>`<option value="${n}">${n}</option>`).join('');
+    el('r-prod').innerHTML='<option value="">-- Selecciona --</option>'+prodNames.map(n=>`<option value="${n}">${n}</option>`).join('');
+    el('r-fecha').value=new Date().toISOString().split('T')[0];
   }finally{loading(false)}
 }
 
-function renderUserInicio(){
+function renderAplicInicio(){
   const u=state.user,s=state.servicios,p=state.pedidos;
   const totalM2=s.reduce((a,x)=>a+(x.m2||0),0);
-  const com=calcCom(u,s);
-  el('user-stats').innerHTML=
-    stat(s.length,'Servicios')+stat(totalM2.toLocaleString()+' m²','M² aplicados')+
-    stat(fmx(u.compras_mes),'Compras del mes')+stat(fmx(com.total),'Comision estimada');
-
-  el('user-pedidos-rec').innerHTML=[...p].slice(0,4).map(x=>
-    `<div class="row-item"><div><div style="font-size:13px;font-weight:500">${x.cedis?.nombre||'—'}</div><div style="font-size:12px;color:#999">${fmx(x.total)} · ${fdate(x.creado_en)}</div></div>${badge(x.status,x.status)}</div>`
-  ).join('')||'<div class="empty">Sin pedidos aun</div>';
-
-  el('user-svcs-rec').innerHTML=[...s].slice(0,4).map(x=>
+  const com=calcComAplic(u,s);
+  el('aplic-stats').innerHTML=stat(s.length,'Servicios')+stat(totalM2.toLocaleString()+' m²','M² aplicados')+stat(fmx(u.compras_mes),'Compras del mes')+stat(fmx(com.total),'Comision estimada');
+  el('aplic-peds-rec').innerHTML=[...p].slice(0,4).map(x=>
+    `<div class="row-item"><div><div style="font-size:13px;font-weight:500">${x.cedis?.nombre||'—'}</div><div style="font-size:12px;color:#999">${fmx(x.total)} · ${fdate(x.creado_en)}</div></div>${badge(x.status,STATUS_LABELS[x.status]||x.status)}</div>`
+  ).join('')||'<div class="empty">Sin pedidos</div>';
+  el('aplic-svcs-rec').innerHTML=[...s].slice(0,4).map(x=>
     `<div class="row-item"><div><div style="font-size:13px;font-weight:500">${x.cliente}</div><div style="font-size:12px;color:#999">${x.m2} m² · ${x.productos?.nombre||''}</div></div><div style="font-size:12px;color:#999">${fdate(x.fecha)}</div></div>`
-  ).join('')||'<div class="empty">Sin servicios aun</div>';
-
-  // Progreso de nivel
-  const u2=state.user;
-  const niveles=[NIVELES.semilla,NIVELES.verde,NIVELES.master,NIVELES.socio];
-  const actual=NIVELES[u2.nivel||'semilla'];
-  const sig=niveles.find(n=>n.min>(u2.compras_mes||0));
-  const pct=sig?Math.min(100,((u2.compras_mes||0)/sig.min)*100):100;
-  el('user-progreso').innerHTML=`
+  ).join('')||'<div class="empty">Sin servicios</div>';
+  const sig=Object.values(NIVELES).find(n=>n.min>(u.compras_mes||0));
+  const pct=sig?Math.min(100,((u.compras_mes||0)/sig.min)*100):100;
+  el('aplic-progreso').innerHTML=`
     <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-      <span style="font-size:13px">Nivel actual: ${nivelBadge(u2.nivel||'semilla')}</span>
-      ${sig?`<span style="font-size:13px;color:#5d5d5d">Siguiente: <strong>${sig.label}</strong></span>`:'<span style="font-size:13px;color:#1f7344">Nivel maximo alcanzado</span>'}
+      <span style="font-size:13px">Nivel: ${nivelBadge(u.nivel||'semilla')}</span>
+      ${sig?`<span style="font-size:13px;color:#5d5d5d">Siguiente: <strong>${sig.label}</strong> en ${fmx(sig.min-(u.compras_mes||0))}</span>`:'<span style="font-size:13px;color:#1f7344">Nivel maximo</span>'}
     </div>
-    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-    <div style="font-size:12px;color:#999;margin-top:4px">${fmx(u2.compras_mes)} ${sig?'de '+fmx(sig.min)+' para nivel '+sig.label:''}</div>`;
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>`;
 }
 
-function renderUserHistorial(){
-  el('tbl-hist-svcs').innerHTML=
-    `<thead><tr><th>Fecha</th><th>Cliente</th><th>M²</th><th>Producto</th><th>Presentacion</th><th>Cantidad</th><th>Notas</th></tr></thead><tbody>`+
+function renderAplicHistorial(){
+  el('tbl-aplic-svcs').innerHTML=
+    `<thead><tr><th>Fecha</th><th>Cliente</th><th>M²</th><th>Producto</th><th>Pres.</th><th>Cant.</th></tr></thead><tbody>`+
     (state.servicios.length?state.servicios.map(s=>
-      `<tr><td>${fdate(s.fecha)}</td><td>${s.cliente}</td><td>${s.m2}</td><td>${s.productos?.nombre||'—'}</td><td>${s.presentacion||'—'}</td><td>${s.cantidad||'—'}</td><td style="font-size:12px;color:#5d5d5d">${s.notas||'—'}</td></tr>`
-    ).join(''):'<tr><td colspan="7" class="empty">Sin servicios aun</td></tr>')+
+      `<tr><td>${fdate(s.fecha)}</td><td>${s.cliente}</td><td>${s.m2}</td><td>${s.productos?.nombre||'—'}</td><td>${s.presentacion||'—'}</td><td>${s.cantidad||'—'}</td></tr>`
+    ).join(''):'<tr><td colspan="6" class="empty">Sin servicios</td></tr>')+
     '</tbody>';
-
-  el('tbl-hist-peds').innerHTML=
+  el('tbl-aplic-peds').innerHTML=
     `<thead><tr><th>Fecha</th><th>CEDIS</th><th>Total</th><th>Status</th></tr></thead><tbody>`+
     (state.pedidos.length?state.pedidos.map(p=>
-      `<tr><td>${fdate(p.creado_en)}</td><td>${p.cedis?.nombre||'—'}</td><td>${fmx(p.total)}</td><td>${badge(p.status,p.status)}</td></tr>`
-    ).join(''):'<tr><td colspan="4" class="empty">Sin pedidos aun</td></tr>')+
+      `<tr><td>${fdate(p.creado_en)}</td><td>${p.cedis?.nombre||'—'}</td><td>${fmx(p.total)}</td><td>${badge(p.status,STATUS_LABELS[p.status]||p.status)}</td></tr>`
+    ).join(''):'<tr><td colspan="4" class="empty">Sin pedidos</td></tr>')+
     '</tbody>';
 }
 
-function renderUserComision(){
-  const u=state.user,s=state.servicios;
-  const n=NIVELES[u.nivel||'semilla'];
-  const c=calcCom(u,s);
+function renderAplicComision(){
+  const u=state.user,s=state.servicios,n=NIVELES[u.nivel||'semilla'];
+  const c=calcComAplic(u,s);
   const sig=Object.values(NIVELES).find(lv=>lv.min>(u.compras_mes||0));
-  el('user-com-det').innerHTML=`
-    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-      <span style="color:#5d5d5d;font-size:14px">Nivel actual</span>${nivelBadge(u.nivel||'semilla')}
-    </div>
-    <div class="com-row"><span>Comision sobre producto</span><span style="font-weight:500">${n.pct}%</span></div>
-    <div class="com-row"><span>Bono por servicio registrado</span><span style="font-weight:500">${fmx(n.bono)}</span></div>
+  el('aplic-com-det').innerHTML=`
+    <div class="com-row"><span>Nivel actual</span>${nivelBadge(u.nivel||'semilla')}</div>
+    <div class="com-row"><span>Comision sobre compras</span><span style="font-weight:500">${n.pct}%</span></div>
+    <div class="com-row"><span>Bono por servicio</span><span style="font-weight:500">${fmx(n.bono)}</span></div>
     <div style="border-top:1px solid #e0e0e0;padding-top:12px;margin-top:4px;margin-bottom:8px">
-      <div style="font-size:11px;color:#999;font-weight:500;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Desglose del mes</div>
+      <div style="font-size:11px;color:#999;font-weight:500;margin-bottom:8px;text-transform:uppercase">Desglose</div>
       <div class="com-row"><span>${s.length} servicios × ${fmx(n.bono)}</span><span>${fmx(c.bono)}</span></div>
       <div class="com-row"><span>Comision ${n.pct}% sobre ${fmx(u.compras_mes)}</span><span>${fmx(c.pct)}</span></div>
-      <div class="com-row"><span>Margen estimado en producto</span><span>${fmx(c.margen)}</span></div>
+      <div class="com-row"><span>Margen estimado</span><span>${fmx(c.margen)}</span></div>
     </div>
     <div class="com-total"><span>Total estimado</span><span>${fmx(c.total)}</span></div>
-    <div style="margin-top:10px;font-size:12px;color:#999">${sig?'Para nivel '+sig.label+' necesitas '+fmx(sig.min-(u.compras_mes||0))+' mas en compras este mes.':'Eres Socio Grama — el nivel mas alto.'}</div>`;
+    <div style="margin-top:10px;font-size:12px;color:#999">${sig?'Para '+sig.label+' necesitas '+fmx(sig.min-(u.compras_mes||0))+' mas.':'Nivel maximo alcanzado.'}</div>`;
 }
 
-function calcCom(u,svcs){
+function calcComAplic(u,svcs){
   const n=NIVELES[u.nivel||'semilla'];
   const bono=(svcs||[]).length*n.bono;
   const pct=(u.compras_mes||0)*n.pct/100;
@@ -826,120 +1165,83 @@ function calcCom(u,svcs){
   return{bono,pct,margen,total:bono+pct+margen};
 }
 
-// PEDIDO FORM
-function renderPedidoForm(){
-  el('p-cedis').innerHTML=state.cedis.map(c=>`<option value="${c.id}">${c.nombre} — ${c.ciudad}</option>`).join('');
-  el('pedido-items').innerHTML='';
-  agregarItemPedido();
+function renderAplicPedidoForm(){
+  el('ap-cedis').innerHTML=state.cedis.map(c=>`<option value="${c.id}">${c.nombre} — ${c.ciudad}</option>`).join('');
+  el('aplic-items').innerHTML='';agregarItemAplic();
 }
 
-function agregarItemPedido(){
-  const container=el('pedido-items');
-  const idx=container.children.length;
-  const prodOpts=state.productos.map(p=>`<option value="${p.id}" data-precio="${p.precio_lista}">${p.nombre} ${p.presentacion}</option>`).join('');
+function agregarItemAplic(){
+  const container=el('aplic-items');
+  const prodOpts=state.productos.map(p=>`<option value="${p.id}" data-precio="${p.precio_lista}">${p.nombre} ${p.presentacion} — ${fmx(p.precio_lista)}</option>`).join('');
   const div=document.createElement('div');
   div.style.cssText='display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-bottom:8px;align-items:end';
-  div.innerHTML=`
-    <div><label style="margin-top:0">Producto</label><select class="item-prod" onchange="calcTotal()">${prodOpts}</select></div>
-    <div><label style="margin-top:0">Cantidad</label><input type="number" class="item-cant" value="1" min="1" style="width:70px" onchange="calcTotal()" /></div>
-    <button class="btn btn-danger btn-sm" style="margin-bottom:1px" onclick="this.parentElement.remove();calcTotal()">✕</button>`;
-  container.appendChild(div);
-  calcTotal();
+  div.innerHTML=`<div><label style="margin-top:0">Producto</label><select class="item-prod" onchange="calcTotalAplic()">${prodOpts}</select></div>
+    <div><label style="margin-top:0">Cantidad</label><input type="number" class="item-cant" value="1" min="1" style="width:70px" onchange="calcTotalAplic()" /></div>
+    <button class="btn btn-danger btn-sm" style="margin-bottom:1px" onclick="this.parentElement.remove();calcTotalAplic()">✕</button>`;
+  container.appendChild(div);calcTotalAplic();
 }
 
-function calcTotal(){
+function calcTotalAplic(){
   let total=0;
-  document.querySelectorAll('#pedido-items > div').forEach(row=>{
+  document.querySelectorAll('#aplic-items > div').forEach(row=>{
     const sel=row.querySelector('.item-prod');
     const cant=parseInt(row.querySelector('.item-cant')?.value||1);
-    const precio=parseFloat(sel?.selectedOptions[0]?.dataset.precio||0);
-    total+=precio*cant;
+    total+=parseFloat(sel?.selectedOptions[0]?.dataset.precio||0)*cant;
   });
-  el('pedido-total').textContent=fmx(total);
+  el('aplic-total').textContent=fmx(total);
 }
 
-async function enviarPedido(){
-  const cedis_id=el('p-cedis').value;
-  const notas=el('p-notas').value.trim();
+async function enviarPedidoAplic(){
+  const cedis_id=el('ap-cedis').value,notas=el('ap-notas').value.trim();
   const items=[];
-  document.querySelectorAll('#pedido-items > div').forEach(row=>{
+  document.querySelectorAll('#aplic-items > div').forEach(row=>{
     const sel=row.querySelector('.item-prod');
     const cant=parseInt(row.querySelector('.item-cant')?.value||1);
     const precio=parseFloat(sel?.selectedOptions[0]?.dataset.precio||0);
     if(sel?.value&&cant>0)items.push({producto_id:sel.value,cantidad:cant,precio_unitario:precio,subtotal:precio*cant});
   });
-  if(!cedis_id||!items.length){showAlert('pedido-alert','Selecciona CEDIS y agrega al menos un producto','err');return}
+  if(!cedis_id||!items.length){showAlert('aplic-pedido-alert','Selecciona CEDIS y agrega productos','err');return}
   loading(true,'Enviando pedido...');
   try{
     const r=await api('pedidos','POST',{usuario_id:state.user.id,cedis_id,items,notas});
-    if(r.ok){
-      showAlert('pedido-alert','Pedido enviado correctamente. Te contactaremos para confirmar.','ok');
-      state.pedidos.unshift(r.pedido);
-      renderPedidoForm();renderUserHistorial();renderUserInicio();
-    }else showAlert('pedido-alert',r.error||'Error al enviar pedido','err');
+    if(r.ok){showAlert('aplic-pedido-alert','Pedido enviado correctamente','ok');state.pedidos.unshift(r.pedido||{});renderAplicInicio();renderAplicHistorial();renderAplicPedidoForm();}
+    else showAlert('aplic-pedido-alert',r.error||'Error','err');
   }finally{loading(false)}
 }
 
-// REGISTRO SERVICIO
-function updatePresentaciones(){
+function updatePres(){
   const nombre=el('r-prod').value;
   const pres=[...new Set(state.productos.filter(p=>p.nombre===nombre).map(p=>p.presentacion))];
   el('r-pres').innerHTML='<option value="">-- Selecciona --</option>'+pres.map(p=>`<option value="${p}">${p}</option>`).join('');
 }
 
 async function registrarServicio(){
-  const fecha=el('r-fecha').value;
-  const cliente=el('r-cliente').value.trim();
-  const m2=parseFloat(el('r-m2').value);
-  const prodNombre=el('r-prod').value;
-  const presentacion=el('r-pres').value;
-  const cantidad=parseInt(el('r-cant').value||1);
+  const fecha=el('r-fecha').value,cliente=el('r-cliente').value.trim(),m2=parseFloat(el('r-m2').value);
+  const prodNombre=el('r-prod').value,presentacion=el('r-pres').value,cantidad=parseInt(el('r-cant').value||1);
   const notas=el('r-notas').value.trim();
   if(!fecha||!cliente||!m2||!prodNombre||!presentacion){showAlert('reg-alert','Completa todos los campos','err');return}
   const prod=state.productos.find(p=>p.nombre===prodNombre&&p.presentacion===presentacion);
   if(!prod){showAlert('reg-alert','Producto no encontrado','err');return}
-  loading(true,'Guardando servicio...');
+  loading(true,'Guardando...');
   try{
     const r=await api('servicios','POST',{usuario_id:state.user.id,fecha,cliente,m2,producto_id:prod.id,presentacion,cantidad,notas});
     if(r.ok){
       state.servicios.unshift(r.servicio||{fecha,cliente,m2,presentacion,cantidad,productos:{nombre:prodNombre}});
-      state.user.compras_mes=(state.user.compras_mes||0)+prod.precio_lista*cantidad*0.75;
-      state.user.nivel=getNivel(state.user.compras_mes);
-      el('user-nivel-sub').textContent=`Aplicador Certificado · ${NIVELES[state.user.nivel]?.label}`;
       ['r-cliente','r-m2','r-notas','r-cant'].forEach(id=>{const e=el(id);if(e)e.value=''});
       el('r-prod').value='';el('r-pres').innerHTML='<option>-- Selecciona producto primero --</option>';
-      showAlert('reg-alert','Servicio guardado correctamente','ok');
-      renderUserInicio();renderUserHistorial();renderUserComision();
+      showAlert('reg-alert','Servicio guardado','ok');renderAplicInicio();renderAplicHistorial();renderAplicComision();
     }else showAlert('reg-alert',r.error||'Error','err');
   }finally{loading(false)}
 }
 
 // TABS
-function adminTab(btn,target){
-  document.querySelectorAll('#s-admin .tab').forEach(t=>t.classList.remove('on'));
-  btn.classList.add('on');
-  ['at-dash','at-usuarios','at-pedidos','at-servicios','at-stock','at-config'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});
-  show(target);
-}
-function userTab(btn,target){
-  document.querySelectorAll('#s-user .tab').forEach(t=>t.classList.remove('on'));
-  btn.classList.add('on');
-  ['ut-inicio','ut-pedido','ut-registro','ut-historial','ut-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});
-  show(target);
-}
-function histTab(btn,target){
-  document.querySelectorAll('#ut-historial .tab').forEach(t=>t.classList.remove('on'));
-  btn.classList.add('on');
-  ['ht-svcs','ht-peds'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});
-  show(target);
-}
+function adminTab(btn,target){document.querySelectorAll('#s-admin .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['at-dash','at-usuarios','at-pedidos','at-clientes','at-servicios','at-stock','at-config'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
+function distTab(btn,target){document.querySelectorAll('#s-dist .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['dt-inicio','dt-precios','dt-pedido','dt-historial'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
+function vendTab(btn,target){document.querySelectorAll('#s-vend .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['vt-inicio','vt-clientes','vt-nuevo-cliente','vt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
+function aplicTab(btn,target){document.querySelectorAll('#s-aplic .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['apt-inicio','apt-pedido','apt-registro','apt-historial','apt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
+function histTab(btn,target){document.querySelectorAll('#apt-historial .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['ht-svcs','ht-peds'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 
-// INIT
-window.addEventListener('load',()=>{
-  hide('loading-overlay');
-  el('r-fecha')&&(el('r-fecha').value=new Date().toISOString().split('T')[0]);
-  show('s-login');
-});
+window.addEventListener('load',()=>{hide('loading-overlay');show('s-login')});
 </script>
 </body>
 </html>
