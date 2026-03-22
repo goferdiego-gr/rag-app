@@ -118,4 +118,3 @@ function getNivel(c) {
 
 Commit y luego en la terminal:
 ```
-git pull
