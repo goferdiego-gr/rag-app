@@ -7,15 +7,12 @@ module.exports = async (req, res) => {
     if (req.method === 'GET') {
       const { usuario_id, vendedor_id, cliente_id, all } = req.query;
       let query = supabase.from('pedidos')
-       .select('*, usuario:usuarios!usuario_id(nombre,apellidos,empresa,rol), vendedor:usuarios!vendedor_id(nombre,apellidos), cedis(nombre,ciudad), clientes(contacto,empresa,ciudad), pedido_items(*, productos(nombre,presentacion,precio_lista))')
-     if (all === '1') {
-  // admin ve todo, no filtra
-} else if (vendedor_id) {
-  // vendedor ve los suyos — tanto los que hizo él como los que le asignaron
-  query = query.or(`vendedor_id.eq.${vendedor_id},usuario_id.eq.${vendedor_id}`);
-} else if (usuario_id) {
-  query = query.or(`usuario_id.eq.${usuario_id},vendedor_id.eq.${usuario_id}`);
-}
+        .select('*, usuario:usuarios!usuario_id(nombre,apellidos,empresa,rol), vendedor:usuarios!vendedor_id(nombre,apellidos), cedis(nombre,ciudad), clientes(contacto,empresa,ciudad), pedido_items(*, productos(nombre,presentacion,precio_lista))')
+        .order('creado_en', { ascending: false });
+      if (!all) {
+        if (vendedor_id) query = query.eq('vendedor_id', vendedor_id);
+        else if (usuario_id) query = query.eq('usuario_id', usuario_id);
+      }
       if (cliente_id) query = query.eq('cliente_id', cliente_id);
       const { data, error } = await query;
       if (error) throw error;
