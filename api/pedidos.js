@@ -10,8 +10,10 @@ module.exports = async (req, res) => {
         .select('*, usuarios(nombre,apellidos,empresa,rol), cedis(nombre,ciudad), clientes(contacto,empresa,ciudad), pedido_items(*, productos(nombre,presentacion,precio_lista))')
         .order('creado_en', { ascending: false });
       if (!all) {
-        if (vendedor_id) query = query.eq('vendedor_id', vendedor_id);
-        else if (usuario_id) query = query.eq('usuario_id', usuario_id);
+       if (!all) {
+  if (vendedor_id) query = query.eq('vendedor_id', vendedor_id);
+  else if (usuario_id) query = query.eq('usuario_id', usuario_id);
+}
       }
       if (cliente_id) query = query.eq('cliente_id', cliente_id);
       const { data, error } = await query;
