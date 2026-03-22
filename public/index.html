@@ -1377,6 +1377,19 @@ function aplicTab(btn,target){document.querySelectorAll('#s-aplic .tab').forEach
 function histTab(btn,target){document.querySelectorAll('#apt-historial .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['ht-svcs','ht-peds'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 
 window.addEventListener('load',async()=>{
+  hide('loading-overlay');
+  const saved=localStorage.getItem('grama_user');
+  if(saved){
+    try{
+      state.user=JSON.parse(saved);
+      const rol=state.user.rol;
+      if(['superadmin','admin'].includes(rol)){await loadAdmin();show('s-admin')}
+      else if(rol==='distribuidor'){await loadDist();show('s-dist')}
+      else if(rol==='vendedor'){await loadVend();show('s-vend')}
+      else{await loadAplic();show('s-aplic')}
+    }catch(e){localStorage.removeItem('grama_user');show('s-login')}
+  }else{show('s-login')}
+});
 </script>
 </body>
 </html>
