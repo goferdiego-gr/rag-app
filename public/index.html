@@ -673,7 +673,7 @@ function renderPedidosAdmin(filtro=''){
   el('tbl-pedidos-admin').innerHTML=
     `<thead><tr><th>Fecha</th><th>Vendedor/Usuario</th><th>Cliente final</th><th>CEDIS</th><th>Productos</th><th>Total</th><th>Status</th></tr></thead><tbody>`+
     (peds.length?peds.map(p=>{
-      const usr=state.usuarios.find(u=>u.id===(p.vendedor_id||p.usuario_id))||p.usuarios||{nombre:'—'};
+      const usr=p.vendedor||p.usuario||state.usuarios.find(u=>u.id===(p.vendedor_id||p.usuario_id))||{nombre:'—'};
       const items=(p.pedido_items||[]).map(i=>`${i.productos?.nombre||''} ${i.productos?.presentacion||''} x${i.cantidad}`).join(', ');
       const clienteNombre=p.clientes?.empresa||p.clientes?.contacto||'—';
       return`<tr>
