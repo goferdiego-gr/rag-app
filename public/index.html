@@ -581,6 +581,7 @@ async function doLogin(){
     const r=await api('login','POST',{usuario,password});
     if(!r.ok){showAlert('l-alert',r.error||'Error','err');return}
     state.user=r.user;hide('s-login');
+localStorage.setItem('grama_user', JSON.stringify(r.user));
     const rol=r.user.rol;
     if(['superadmin','admin'].includes(rol)){await loadAdmin();show('s-admin')}
     else if(rol==='distribuidor'){await loadDist();show('s-dist')}
@@ -591,6 +592,7 @@ async function doLogin(){
 }
 
 function doLogout(){
+localStorage.removeItem('grama_user');
   state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],clientes:[],preciosDist:[]};
   ['s-admin','s-dist','s-vend','s-aplic'].forEach(hide);
   el('l-user').value='';el('l-pass').value='';show('s-login');
@@ -1374,7 +1376,7 @@ function vendTab(btn,target){document.querySelectorAll('#s-vend .tab').forEach(t
 function aplicTab(btn,target){document.querySelectorAll('#s-aplic .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['apt-inicio','apt-pedido','apt-registro','apt-historial','apt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 function histTab(btn,target){document.querySelectorAll('#apt-historial .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['ht-svcs','ht-peds'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 
-window.addEventListener('load',()=>{hide('loading-overlay');show('s-login')});
+window.addEventListener('load',async()=>{
 </script>
 </body>
 </html>
