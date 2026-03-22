@@ -111,7 +111,7 @@ tr:hover td{background:#f9fdf9}
     <div><img src="/Logo_Grama.png" alt="Grama" class="logo-img" /><div style="font-size:12px;color:#999;margin-top:2px" id="admin-sub"></div></div>
     <div style="display:flex;gap:8px;align-items:center">
       <span style="font-size:13px;color:#5d5d5d" id="admin-name"></span>
-      <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
+      <button class="btn btn-sm" onclick="loadVend()">↻ Actualizar</button>
       <button class="btn btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
@@ -221,7 +221,7 @@ tr:hover td{background:#f9fdf9}
     <div><img src="/Logo_Grama.png" alt="Grama" class="logo-img" /><div style="font-size:12px;color:#999;margin-top:2px">Distribuidor Grama</div></div>
     <div style="display:flex;gap:8px;align-items:center">
       <span style="font-size:13px;color:#5d5d5d" id="dist-name"></span>
-      <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
+      <button class="btn btn-sm" onclick="loadVend()">↻ Actualizar</button>
       <button class="btn btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
@@ -274,7 +274,7 @@ tr:hover td{background:#f9fdf9}
     <div><img src="/Logo_Grama.png" alt="Grama" class="logo-img" /><div style="font-size:12px;color:#999;margin-top:2px">Vendedor Grama</div></div>
     <div style="display:flex;gap:8px;align-items:center">
       <span style="font-size:13px;color:#5d5d5d" id="vend-name"></span>
-      <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
+      <button class="btn btn-sm" onclick="loadVend()">↻ Actualizar</button>
       <button class="btn btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
@@ -363,7 +363,7 @@ tr:hover td{background:#f9fdf9}
     <div><img src="/Logo_Grama.png" alt="Grama" class="logo-img" /><div style="font-size:12px;color:#999;margin-top:2px" id="aplic-nivel-sub"></div></div>
     <div style="display:flex;gap:8px;align-items:center">
       <span style="font-size:13px;color:#5d5d5d" id="aplic-name"></span>
-      <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
+      <button class="btn btn-sm" onclick="loadVend()">↻ Actualizar</button>
       <button class="btn btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
@@ -1389,6 +1389,14 @@ window.addEventListener('load',async()=>{
       else{await loadAplic();show('s-aplic')}
     }catch(e){localStorage.removeItem('grama_user');show('s-login')}
   }else{show('s-login')}
+  // Auto-refresh cada 30 segundos
+  setInterval(async()=>{
+    if(!state.user)return;
+    const rol=sta
+  // Auto-refresh cada 30 segundos
+  setInterval(async()=>{
+    if(!state.user)return;
+    const rol=sta
 });
 </script>
 </body>
