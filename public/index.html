@@ -282,6 +282,7 @@ tr:hover td{background:#f9fdf9}
     <button class="tab on" onclick="vendTab(this,'vt-inicio')">Inicio</button>
     <button class="tab" onclick="vendTab(this,'vt-clientes')">Mis clientes</button>
     <button class="tab" onclick="vendTab(this,'vt-nuevo-cliente')">+ Nuevo cliente</button>
+    <button class="tab" onclick="vendTab(this,'vt-pedido')">Nuevo pedido</button>
     <button class="tab" onclick="vendTab(this,'vt-comision')">Mi comision</button>
   </div>
 
@@ -317,6 +318,34 @@ tr:hover td{background:#f9fdf9}
       <label>RFC</label><input type="text" id="nc-rfc" placeholder="XAXX010101000" />
       <label>Notas</label><textarea id="nc-notas" rows="2" placeholder="Comentarios, tipo de propiedad, etc."></textarea>
       <button class="btn btn-primary" style="margin-top:18px" onclick="guardarCliente()">Guardar cliente</button>
+    </div>
+  </div>
+
+  <div id="vt-pedido" class="hidden">
+    <div class="card" style="max-width:580px">
+      <div class="section-title">Nuevo pedido para cliente</div>
+      <div id="vp-alert" class="hidden"></div>
+      <label>Cliente *</label>
+      <select id="vp-cliente" onchange="onClienteChange()">
+        <option value="">-- Selecciona cliente --</option>
+      </select>
+      <div id="vp-cliente-info" class="hidden" style="margin-top:8px;padding:10px;background:#f9fdf9;border-radius:8px;font-size:13px;color:#5d5d5d"></div>
+      <label>CEDIS de entrega *</label>
+      <select id="vp-cedis"></select>
+      <label>Direccion de entrega del cliente</label>
+      <input type="text" id="vp-dir" placeholder="Calle, numero, colonia, ciudad" />
+      <div style="margin-top:1rem">
+        <div style="font-size:14px;font-weight:500;margin-bottom:8px">Productos *</div>
+        <div id="vp-items"></div>
+        <button class="btn btn-sm" style="margin-top:8px" onclick="agregarItemVend()">+ Agregar producto</button>
+      </div>
+      <label>Notas</label>
+      <textarea id="vp-notas" rows="2" placeholder="Instrucciones especiales..."></textarea>
+      <div style="margin-top:14px;padding:12px;background:#f4f4f4;border-radius:8px;display:flex;justify-content:space-between">
+        <span style="font-size:14px;font-weight:500">Total del pedido</span>
+        <span style="font-size:18px;font-weight:700;color:#1f7344" id="vp-total">$0 MXN</span>
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-top:14px" onclick="enviarPedidoVend()">Enviar pedido</button>
     </div>
   </div>
 
@@ -642,21 +671,23 @@ function renderPedidosAdmin(filtro=''){
   let peds=[...state.pedidos];
   if(filtro)peds=peds.filter(p=>p.status===filtro);
   el('tbl-pedidos-admin').innerHTML=
-    `<thead><tr><th>Fecha</th><th>Usuario</th><th>CEDIS</th><th>Productos</th><th>Total</th><th>Status</th></tr></thead><tbody>`+
+    `<thead><tr><th>Fecha</th><th>Vendedor/Usuario</th><th>Cliente final</th><th>CEDIS</th><th>Productos</th><th>Total</th><th>Status</th></tr></thead><tbody>`+
     (peds.length?peds.map(p=>{
-      const usr=state.usuarios.find(u=>u.id===p.usuario_id)||p.usuarios||{nombre:'—'};
+      const usr=state.usuarios.find(u=>u.id===(p.vendedor_id||p.usuario_id))||p.usuarios||{nombre:'—'};
       const items=(p.pedido_items||[]).map(i=>`${i.productos?.nombre||''} ${i.productos?.presentacion||''} x${i.cantidad}`).join(', ');
+      const clienteNombre=p.clientes?.empresa||p.clientes?.contacto||'—';
       return`<tr>
         <td>${fdate(p.creado_en)}</td>
-        <td>${usr.nombre||usr.usuario||'—'}</td>
+        <td style="font-size:12px">${usr.nombre||usr.usuario||'—'} ${rolBadge(usr.rol||'')}</td>
+        <td style="font-size:12px">${clienteNombre}</td>
         <td style="font-size:12px">${p.cedis?.nombre||'—'}</td>
-        <td style="font-size:12px;max-width:200px">${items||'—'}</td>
+        <td style="font-size:12px;max-width:180px">${items||'—'}</td>
         <td>${fmx(p.total)}</td>
         <td><select onchange="cambiarStatusPedido('${p.id}',this.value)" style="width:auto;padding:4px 8px;font-size:12px">
           ${['pendiente','confirmado','enviado','entregado','pagado','cancelado'].map(s=>`<option value="${s}"${s===p.status?' selected':''}>${STATUS_LABELS[s]||s}</option>`).join('')}
         </select></td>
       </tr>`;
-    }).join(''):'<tr><td colspan="6" class="empty">Sin pedidos</td></tr>')+
+    }).join(''):'<tr><td colspan="7" class="empty">Sin pedidos</td></tr>')+
     '</tbody>';
 }
 
@@ -967,57 +998,146 @@ async function enviarPedidoDist(){
 async function loadVend(){
   loading(true,'Cargando...');
   try{
-    const[clientes]=await Promise.all([api('clientes?vendedor_id='+state.user.id)]);
+    const[clientes,pedidos,prods,cedis]=await Promise.all([
+      api('clientes?vendedor_id='+state.user.id),
+      api('pedidos?vendedor_id='+state.user.id),
+      api('data?resource=productos'),
+      api('data?resource=cedis')
+    ]);
     state.clientes=Array.isArray(clientes)?clientes:[];
+    state.pedidos=Array.isArray(pedidos)?pedidos:[];
+    state.productos=Array.isArray(prods)?prods:[];
+    state.cedis=Array.isArray(cedis)?cedis:[];
     const u=state.user;
     el('vend-name').textContent=u.nombre||u.usuario;
-    renderVendInicio();renderVendClientes();renderVendComision();
+    renderVendInicio();renderVendClientes();renderVendComision();renderVendPedidoForm();
   }finally{loading(false)}
 }
 
 function renderVendInicio(){
-  const c=state.clientes;
-  const pagados=c.filter(x=>x.status==='pagado');
-  const comisionTotal=pagados.reduce((a,x)=>a+(x.comision_ganada||0),0);
-  el('vend-stats').innerHTML=stat(c.length,'Clientes registrados')+stat(c.filter(x=>x.status==='en_espera').length,'En espera')+stat(pagados.length,'Pagados')+stat(fmx(comisionTotal),'Comision ganada');
-  el('vend-clientes-rec').innerHTML=[...c].slice(0,5).map(x=>
-    `<div class="row-item" onclick="showDetalleCliente('${x.id}')" style="cursor:pointer">
-      <div><div style="font-size:13px;font-weight:500">${x.empresa||x.contacto}</div><div style="font-size:12px;color:#999">${x.ciudad||''} · ${x.contacto}</div></div>
+  const c=state.clientes,p=state.pedidos;
+  const pagados=p.filter(x=>x.status==='pagado');
+  const comisionTotal=pagados.reduce((a,x)=>a+(x.total||0)*(state.user.comision_pct||0)/100,0);
+  const totalVentas=pagados.reduce((a,x)=>a+(x.total||0),0);
+  el('vend-stats').innerHTML=stat(c.length,'Clientes')+stat(p.length,'Pedidos totales')+stat(fmx(totalVentas),'Ventas pagadas')+stat(fmx(comisionTotal),'Mi comision');
+  el('vend-clientes-rec').innerHTML=[...c].slice(0,5).map(x=>{
+    const pedsCli=state.pedidos.filter(p=>p.cliente_id===x.id);
+    const ultimoPed=pedsCli[0];
+    return`<div class="row-item" onclick="showDetalleCliente('${x.id}')" style="cursor:pointer">
+      <div><div style="font-size:13px;font-weight:500">${x.empresa||x.contacto}</div>
+      <div style="font-size:12px;color:#999">${pedsCli.length} pedido(s)${ultimoPed?' · Ultimo: '+fdate(ultimoPed.creado_en):''}</div></div>
       ${badge(x.status,statusClienteLabel(x.status))}
-    </div>`
-  ).join('')||'<div class="empty">Sin clientes registrados</div>';
+    </div>`;
+  }).join('')||'<div class="empty">Sin clientes registrados</div>';
 }
 
 function renderVendClientes(){
   el('tbl-vend-clientes').innerHTML=
-    `<thead><tr><th>Empresa</th><th>Contacto</th><th>Ciudad</th><th>Tel</th><th>Status</th><th>Monto</th><th>Comision</th><th></th></tr></thead><tbody>`+
-    (state.clientes.length?state.clientes.map(c=>
-      `<tr>
+    `<thead><tr><th>Empresa</th><th>Contacto</th><th>Ciudad</th><th>Pedidos</th><th>Total ventas</th><th>Ultimo pedido</th><th>Status</th><th></th></tr></thead><tbody>`+
+    (state.clientes.length?state.clientes.map(c=>{
+      const pedsCli=state.pedidos.filter(p=>p.cliente_id===c.id);
+      const totalCli=pedsCli.filter(p=>p.status==='pagado').reduce((a,p)=>a+(p.total||0),0);
+      const ultimo=pedsCli[0];
+      return`<tr>
         <td>${c.empresa||'—'}</td><td>${c.contacto}</td><td style="font-size:12px">${c.ciudad||'—'}</td>
-        <td style="font-size:12px">${c.telefono||'—'}</td>
+        <td>${pedsCli.length}</td><td>${fmx(totalCli)}</td>
+        <td style="font-size:12px">${ultimo?fdate(ultimo.creado_en)+'  '+badge(ultimo.status,STATUS_LABELS[ultimo.status]||ultimo.status):'—'}</td>
         <td>${badge(c.status,statusClienteLabel(c.status))}</td>
-        <td>${fmx(c.monto_vendido)}</td><td>${fmx(c.comision_ganada)}</td>
         <td><button class="btn btn-sm" onclick="showDetalleCliente('${c.id}')">Ver</button></td>
-      </tr>`
-    ).join(''):'<tr><td colspan="8" class="empty">Sin clientes</td></tr>')+
+      </tr>`;
+    }).join(''):'<tr><td colspan="8" class="empty">Sin clientes</td></tr>')+
     '</tbody>';
 }
 
 function renderVendComision(){
-  const c=state.clientes;
-  const pagados=c.filter(x=>x.status==='pagado');
-  const comisionTotal=pagados.reduce((a,x)=>a+(x.comision_ganada||0),0);
-  const montoTotal=pagados.reduce((a,x)=>a+(x.monto_vendido||0),0);
+  const p=state.pedidos;
+  const pagados=p.filter(x=>x.status==='pagado');
+  const totalVentas=pagados.reduce((a,x)=>a+(x.total||0),0);
   const pct=state.user.comision_pct||0;
+  const comisionTotal=totalVentas*pct/100;
   el('vend-com-det').innerHTML=`
     <div class="com-row"><span>Tu comision base</span><span style="font-weight:500">${pct}%</span></div>
-    <div class="com-row"><span>Clientes pagados este mes</span><span style="font-weight:500">${pagados.length}</span></div>
-    <div class="com-row"><span>Monto total de ventas pagadas</span><span style="font-weight:500">${fmx(montoTotal)}</span></div>
+    <div class="com-row"><span>Pedidos totales</span><span style="font-weight:500">${p.length}</span></div>
+    <div class="com-row"><span>Pedidos pagados</span><span style="font-weight:500">${pagados.length}</span></div>
+    <div class="com-row"><span>Total ventas pagadas</span><span style="font-weight:500">${fmx(totalVentas)}</span></div>
     <div class="com-total"><span>Tu comision ganada</span><span>${fmx(comisionTotal)}</span></div>
-    <div style="margin-top:10px;font-size:12px;color:#999">La comision se acumula cuando el cliente llega a status "Pagado".</div>`;
+    <div style="margin-top:10px;font-size:12px;color:#999">La comision se acumula cuando el pedido llega a status "Pagado".</div>
+    <div style="margin-top:1rem"><div class="section-title" style="font-size:13px">Detalle por pedido pagado</div>
+    <table style="width:100%;margin-top:8px"><thead><tr><th>Cliente</th><th>Fecha</th><th>Monto</th><th>Tu comision</th></tr></thead><tbody>
+    ${pagados.length?pagados.map(x=>`<tr><td style="font-size:12px">${x.clientes?.empresa||x.clientes?.contacto||'—'}</td><td style="font-size:12px">${fdate(x.creado_en)}</td><td>${fmx(x.total)}</td><td style="color:#1f7344;font-weight:500">${fmx((x.total||0)*pct/100)}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">Sin pedidos pagados aun</td></tr>'}
+    </tbody></table></div>`;
 }
 
-async function guardarCliente(){
+function renderVendPedidoForm(){
+  el('vp-cedis').innerHTML=state.cedis.map(c=>`<option value="${c.id}">${c.nombre} — ${c.ciudad}</option>`).join('');
+  el('vp-cliente').innerHTML='<option value="">-- Selecciona cliente --</option>'+
+    state.clientes.map(c=>`<option value="${c.id}">${c.empresa||c.contacto}${c.ciudad?' — '+c.ciudad:''}</option>`).join('');
+  el('vp-items').innerHTML='';
+  agregarItemVend();
+}
+
+function onClienteChange(){
+  const id=el('vp-cliente').value;
+  const c=state.clientes.find(x=>x.id===id);
+  const info=el('vp-cliente-info');
+  if(c){
+    info.innerHTML=`<strong>${c.empresa||c.contacto}</strong> · ${c.telefono||''} · ${c.email||''}<br>${c.direccion||''} ${c.ciudad||''} ${c.estado||''}`;
+    info.classList.remove('hidden');
+    if(c.direccion)el('vp-dir').value=c.direccion+', '+c.ciudad+', '+c.estado;
+  }else{info.classList.add('hidden')}
+}
+
+function agregarItemVend(){
+  const container=el('vp-items');
+  const prodOpts=state.productos.map(p=>`<option value="${p.id}" data-precio="${p.precio_lista}">${p.nombre} ${p.presentacion} — ${fmx(p.precio_lista)}</option>`).join('');
+  const div=document.createElement('div');
+  div.style.cssText='display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-bottom:8px;align-items:end';
+  div.innerHTML=`<div><label style="margin-top:0">Producto</label><select class="item-prod" onchange="calcTotalVend()">${prodOpts}</select></div>
+    <div><label style="margin-top:0">Cantidad</label><input type="number" class="item-cant" value="1" min="1" style="width:70px" onchange="calcTotalVend()" /></div>
+    <button class="btn btn-danger btn-sm" style="margin-bottom:1px" onclick="this.parentElement.remove();calcTotalVend()">✕</button>`;
+  container.appendChild(div);calcTotalVend();
+}
+
+function calcTotalVend(){
+  let total=0;
+  document.querySelectorAll('#vp-items > div').forEach(row=>{
+    const sel=row.querySelector('.item-prod');
+    const cant=parseInt(row.querySelector('.item-cant')?.value||1);
+    total+=parseFloat(sel?.selectedOptions[0]?.dataset.precio||0)*cant;
+  });
+  el('vp-total').textContent=fmx(total);
+}
+
+async function enviarPedidoVend(){
+  const cliente_id=el('vp-cliente').value;
+  const cedis_id=el('vp-cedis').value;
+  const direccion_entrega=el('vp-dir').value.trim();
+  const notas=el('vp-notas').value.trim();
+  if(!cliente_id){showAlert('vp-alert','Selecciona un cliente','err');return}
+  const items=[];
+  document.querySelectorAll('#vp-items > div').forEach(row=>{
+    const sel=row.querySelector('.item-prod');
+    const cant=parseInt(row.querySelector('.item-cant')?.value||1);
+    const precio=parseFloat(sel?.selectedOptions[0]?.dataset.precio||0);
+    if(sel?.value&&cant>0)items.push({producto_id:sel.value,cantidad:cant,precio_unitario:precio,subtotal:precio*cant});
+  });
+  if(!items.length){showAlert('vp-alert','Agrega al menos un producto','err');return}
+  loading(true,'Enviando pedido...');
+  try{
+    const r=await api('pedidos','POST',{
+      usuario_id:state.user.id,vendedor_id:state.user.id,
+      cliente_id,cedis_id,items,notas,direccion_entrega
+    });
+    if(r.ok){
+      showAlert('vp-alert','Pedido enviado correctamente','ok');
+      state.pedidos.unshift(r.pedido||{});
+      // Update client status
+      const c=state.clientes.find(x=>x.id===cliente_id);
+      if(c&&c.status==='en_espera')c.status='pedido_confirmado';
+      renderVendInicio();renderVendClientes();renderVendPedidoForm();
+    }else showAlert('vp-alert',r.error||'Error al enviar pedido','err');
+  }finally{loading(false)}
+}
   const contacto=el('nc-contacto').value.trim();
   if(!contacto){showAlert('nc-alert','El nombre de contacto es requerido','err');return}
   loading(true,'Guardando cliente...');
@@ -1041,6 +1161,9 @@ async function guardarCliente(){
 function showDetalleCliente(id){
   const c=state.clientes.find(x=>x.id===id);if(!c)return;
   editClienteId=id;
+  const pedsCli=state.pedidos.filter(p=>p.cliente_id===id);
+  const totalPagado=pedsCli.filter(p=>p.status==='pagado').reduce((a,p)=>a+(p.total||0),0);
+  const pct=state.user.comision_pct||0;
   el('modal-cliente-body').innerHTML=`
     <div class="grid2" style="margin-bottom:1rem">
       <div><div style="font-size:12px;color:#999">Empresa</div><div style="font-weight:500">${c.empresa||'—'}</div></div>
@@ -1050,13 +1173,23 @@ function showDetalleCliente(id){
       <div><div style="font-size:12px;color:#999">Ciudad</div><div>${c.ciudad||'—'}, ${c.estado||''}</div></div>
       <div><div style="font-size:12px;color:#999">RFC</div><div>${c.rfc||'—'}</div></div>
     </div>
+    <div style="padding:10px;background:#f4f4f4;border-radius:8px;margin-bottom:1rem;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><div style="font-size:12px;color:#999">Total pedidos</div><div style="font-weight:500">${pedsCli.length}</div></div>
+      <div><div style="font-size:12px;color:#999">Total pagado</div><div style="font-weight:500;color:#1f7344">${fmx(totalPagado)}</div></div>
+      <div><div style="font-size:12px;color:#999">Tu comision de este cliente</div><div style="font-weight:500;color:#1f7344">${fmx(totalPagado*pct/100)}</div></div>
+      <div><div style="font-size:12px;color:#999">Status</div>${badge(c.status,statusClienteLabel(c.status))}</div>
+    </div>
+    <div style="margin-bottom:1rem">
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">Historial de pedidos</div>
+      <table style="width:100%"><thead><tr><th>Fecha</th><th>CEDIS</th><th>Total</th><th>Status</th></tr></thead>
+      <tbody>${pedsCli.length?pedsCli.map(p=>`<tr><td>${fdate(p.creado_en)}</td><td style="font-size:12px">${p.cedis?.nombre||'—'}</td><td>${fmx(p.total)}</td><td>${badge(p.status,STATUS_LABELS[p.status]||p.status)}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">Sin pedidos</td></tr>'}</tbody>
+      </table>
+    </div>
     <div style="border-top:1px solid #e0e0e0;padding-top:1rem">
       <label>Status del cliente</label>
       <select id="dc-status">
         ${STATUS_CLIENTE.map(s=>`<option value="${s}"${s===c.status?' selected':''}>${statusClienteLabel(s)}</option>`).join('')}
       </select>
-      <label>Monto de venta (cuando este confirmado el pedido)</label>
-      <input type="number" id="dc-monto" value="${c.monto_vendido||0}" placeholder="0" />
       <label>Notas</label>
       <textarea id="dc-notas" rows="2">${c.notas||''}</textarea>
     </div>`;
@@ -1066,16 +1199,14 @@ function showDetalleCliente(id){
 async function guardarStatusCliente(){
   if(!editClienteId)return;
   const status=el('dc-status').value;
-  const monto_vendido=parseFloat(el('dc-monto').value||0);
   const notas=el('dc-notas').value.trim();
   loading(true);
   try{
-    const r=await api('clientes','PUT',{id:editClienteId,status,monto_vendido,notas});
+    const r=await api('clientes','PUT',{id:editClienteId,status,notas});
     if(r.ok){
       const c=state.clientes.find(x=>x.id===editClienteId);
-      if(c){c.status=status;c.monto_vendido=monto_vendido;c.notas=notas;
-        if(status==='pagado')c.comision_ganada=(monto_vendido*(state.user.comision_pct||0))/100;}
-      hide('modal-cliente');renderVendInicio();renderVendClientes();renderVendComision();
+      if(c){c.status=status;c.notas=notas;}
+      hide('modal-cliente');renderVendInicio();renderVendClientes();
     }else alert(r.error||'Error');
   }finally{loading(false)}
 }
@@ -1237,7 +1368,7 @@ async function registrarServicio(){
 // TABS
 function adminTab(btn,target){document.querySelectorAll('#s-admin .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['at-dash','at-usuarios','at-pedidos','at-clientes','at-servicios','at-stock','at-config'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 function distTab(btn,target){document.querySelectorAll('#s-dist .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['dt-inicio','dt-precios','dt-pedido','dt-historial'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
-function vendTab(btn,target){document.querySelectorAll('#s-vend .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['vt-inicio','vt-clientes','vt-nuevo-cliente','vt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
+function vendTab(btn,target){document.querySelectorAll('#s-vend .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['vt-inicio','vt-clientes','vt-nuevo-cliente','vt-pedido','vt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 function aplicTab(btn,target){document.querySelectorAll('#s-aplic .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['apt-inicio','apt-pedido','apt-registro','apt-historial','apt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 function histTab(btn,target){document.querySelectorAll('#apt-historial .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['ht-svcs','ht-peds'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 

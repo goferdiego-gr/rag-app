@@ -5,61 +5,69 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   try {
     if (req.method === 'GET') {
-      const { usuario_id, all } = req.query;
+      const { usuario_id, vendedor_id, cliente_id, all } = req.query;
       let query = supabase.from('pedidos')
-        .select('*, usuarios(nombre,apellidos,empresa,rol), cedis(nombre,ciudad), pedido_items(*, productos(nombre,presentacion))')
+        .select('*, usuarios(nombre,apellidos,empresa,rol), cedis(nombre,ciudad), clientes(contacto,empresa,ciudad), pedido_items(*, productos(nombre,presentacion,precio_lista))')
         .order('creado_en', { ascending: false });
-      if (usuario_id && !all) query = query.eq('usuario_id', usuario_id);
+      if (!all) {
+        if (vendedor_id) query = query.eq('vendedor_id', vendedor_id);
+        else if (usuario_id) query = query.eq('usuario_id', usuario_id);
+      }
+      if (cliente_id) query = query.eq('cliente_id', cliente_id);
       const { data, error } = await query;
       if (error) throw error;
       return res.status(200).json(data);
     }
 
     if (req.method === 'POST') {
-      const { usuario_id, cedis_id, items, notas } = req.body;
+      const { usuario_id, vendedor_id, cliente_id, cedis_id, items, notas, direccion_entrega } = req.body;
       if (!usuario_id || !cedis_id || !items?.length) return res.status(400).json({ error: 'Faltan campos requeridos' });
       const total = items.reduce((a, i) => a + i.subtotal, 0);
       const { data: pedido, error } = await supabase.from('pedidos')
-        .insert([{ usuario_id, cedis_id, total, notas }]).select().single();
+        .insert([{ usuario_id, vendedor_id: vendedor_id || null, cliente_id: cliente_id || null, cedis_id, total, notas, direccion_entrega: direccion_entrega || null }])
+        .select().single();
       if (error) throw error;
-      const itemsConPedido = items.map(i => ({ ...i, pedido_id: pedido.id }));
-      await supabase.from('pedido_items').insert(itemsConPedido);
+      await supabase.from('pedido_items').insert(items.map(i => ({ ...i, pedido_id: pedido.id })));
       return res.status(200).json({ ok: true, pedido });
     }
 
     if (req.method === 'PUT') {
       const { id, status } = req.body;
       if (!id || !status) return res.status(400).json({ error: 'Faltan campos' });
-
-      // Update pedido status
       const { error } = await supabase.from('pedidos').update({ status, actualizado_en: new Date() }).eq('id', id);
       if (error) throw error;
 
-      // Si es enviado o entregado, descontar stock
       if (status === 'enviado' || status === 'entregado') {
-        const { data: pedido } = await supabase.from('pedidos')
-          .select('cedis_id, pedido_items(producto_id, cantidad)').eq('id', id).single();
-        if (pedido?.pedido_items) {
-          for (const item of pedido.pedido_items) {
-            const { data: stockRow } = await supabase.from('stock')
-              .select('cantidad').eq('cedis_id', pedido.cedis_id).eq('producto_id', item.producto_id).single();
-            if (stockRow) {
-              const nuevaCant = Math.max(0, (stockRow.cantidad || 0) - item.cantidad);
-              await supabase.from('stock').update({ cantidad: nuevaCant, actualizado_en: new Date() })
-                .eq('cedis_id', pedido.cedis_id).eq('producto_id', item.producto_id);
-            }
+        const { data: p } = await supabase.from('pedidos').select('cedis_id, pedido_items(producto_id, cantidad)').eq('id', id).single();
+        if (p?.pedido_items) {
+          for (const item of p.pedido_items) {
+            const { data: s } = await supabase.from('stock').select('cantidad').eq('cedis_id', p.cedis_id).eq('producto_id', item.producto_id).single();
+            if (s) await supabase.from('stock').update({ cantidad: Math.max(0, (s.cantidad || 0) - item.cantidad), actualizado_en: new Date() }).eq('cedis_id', p.cedis_id).eq('producto_id', item.producto_id);
           }
         }
       }
 
-      // Si es pagado, actualizar compras del usuario y comision vendedor si aplica
       if (status === 'pagado') {
-        const { data: pedido } = await supabase.from('pedidos')
-          .select('usuario_id, total, usuarios(rol, compras_mes, comision_pct)').eq('id', id).single();
-        if (pedido) {
-          const nuevasCompras = (pedido.usuarios?.compras_mes || 0) + pedido.total;
-          const nuevoNivel = getNivel(nuevasCompras);
-          await supabase.from('usuarios').update({ compras_mes: nuevasCompras, nivel: nuevoNivel }).eq('id', pedido.usuario_id);
+        const { data: p } = await supabase.from('pedidos').select('vendedor_id, usuario_id, cliente_id, total').eq('id', id).single();
+        const vendId = p?.vendedor_id || p?.usuario_id;
+        if (vendId) {
+          const { data: usr } = await supabase.from('usuarios').select('ventas_pagadas, compras_mes, comision_pct, rol, nivel').eq('id', vendId).single();
+          if (usr?.rol === 'vendedor') {
+            const nuevasVentas = (usr.ventas_pagadas || 0) + (p.total || 0);
+            const comisionGanada = (p.total || 0) * (usr.comision_pct || 0) / 100;
+            await supabase.from('usuarios').update({ ventas_pagadas: nuevasVentas }).eq('id', vendId);
+            if (p.cliente_id) {
+              const { data: cli } = await supabase.from('clientes').select('comision_ganada, monto_vendido').eq('id', p.cliente_id).single();
+              await supabase.from('clientes').update({
+                comision_ganada: (cli?.comision_ganada || 0) + comisionGanada,
+                monto_vendido: (cli?.monto_vendido || 0) + (p.total || 0),
+                status: 'pagado'
+              }).eq('id', p.cliente_id);
+            }
+          } else if (usr?.rol === 'aplicador' || usr?.rol === 'distribuidor') {
+            const nuevasCompras = (usr.compras_mes || 0) + (p.total || 0);
+            await supabase.from('usuarios').update({ compras_mes: nuevasCompras, nivel: getNivel(nuevasCompras) }).eq('id', vendId);
+          }
         }
       }
 
