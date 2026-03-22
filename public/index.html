@@ -1138,6 +1138,8 @@ async function enviarPedidoVend(){
     }else showAlert('vp-alert',r.error||'Error al enviar pedido','err');
   }finally{loading(false)}
 }
+
+async function guardarCliente(){
   const contacto=el('nc-contacto').value.trim();
   if(!contacto){showAlert('nc-alert','El nombre de contacto es requerido','err');return}
   loading(true,'Guardando cliente...');
