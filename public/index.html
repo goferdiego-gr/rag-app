@@ -1002,7 +1002,7 @@ async function loadVend(){
   try{
     const[clientes,pedidos,prods,cedis]=await Promise.all([
       api('clientes?vendedor_id='+state.user.id),
-      api('pedidos?vendedor_id='+state.user.id),
+      api('pedidos?usuario_id='+state.user.id+'&vendedor_id='+state.user.id),
       api('data?resource=productos'),
       api('data?resource=cedis')
     ]);
@@ -1389,14 +1389,14 @@ window.addEventListener('load',async()=>{
       else{await loadAplic();show('s-aplic')}
     }catch(e){localStorage.removeItem('grama_user');show('s-login')}
   }else{show('s-login')}
+  // Auto-refresh cada 30 segundos
   setInterval(async()=>{
     if(!state.user)return;
-    const rol=state.user.rol;
-    if(['superadmin','admin'].includes(rol))await loadAdmin();
-    else if(rol==='vendedor')await loadVend();
-    else if(rol==='distribuidor')await loadDist();
-    else await loadAplic();
-  },30000);
+    const rol=sta
+  // Auto-refresh cada 30 segundos
+  setInterval(async()=>{
+    if(!state.user)return;
+    const rol=sta
 });
 </script>
 </body>
