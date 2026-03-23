@@ -155,7 +155,7 @@ tr:hover td{background:#f9fdf9}
           <option value="socio">Socio</option>
         </select>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="showModalUsuario()">+ Nuevo usuario</button>
+      ${state.user?.rol==='superadmin'?'<button class="btn btn-primary btn-sm" onclick="showModalUsuario()">+ Nuevo usuario</button>'
     </div>
     <div class="card tbl-wrap"><table id="tbl-usuarios"></table></div>
   </div>
@@ -657,7 +657,7 @@ function renderUsuarios(filtro={}){
   if(filtro.rol)users=users.filter(u=>u.rol===filtro.rol);
   if(filtro.nivel)users=users.filter(u=>u.nivel===filtro.nivel);
   el('tbl-usuarios').innerHTML=
-    `<thead><tr><th>Usuario</th><th>Nombre</th><th>Empresa</th><th>Tipo</th><th>Nivel</th><th>Compras mes</th><th>Comision%</th><th>Integrado por</th><th>Acciones</th></tr></thead><tbody>`+
+    `<thead><tr><th>Usuario</th><th>Nombre</th><th>Empresa</th><th>Tipo</th><th>Nivel</th><th>Compras mes</th><th>Comision%</th><th>Integrado por</th>${state.user?.rol==='superadmin'?'<th>Acciones</th>':''}</tr></thead><tbody>`+
     (users.length?users.map(u=>`<tr>
       <td><strong>${u.usuario}</strong></td>
       <td>${(u.nombre||'')+' '+(u.apellidos||'')}</td>
@@ -667,9 +667,7 @@ function renderUsuarios(filtro={}){
       <td>${fmx(u.compras_mes)}</td>
       <td>${u.comision_pct||0}%</td>
       <td style="font-size:12px;color:#5d5d5d">${state.usuarios.find(x=>x.id===u.integrado_por)?.nombre||'—'}</td>
-      <td style="display:flex;gap:4px">
-        <button class="btn btn-sm" onclick="editarUsuario('${u.id}')">Editar</button>
-        ${u.rol==='distribuidor'?`<button class="btn btn-sm" onclick="editarPreciosDist('${u.id}','${u.nombre||u.usuario}')">Precios</button>`:''}
+      ${state.user?.rol==='superadmin'?`<td style="display:flex;gap:4px"><button class="btn btn-sm" onclick="editarUsuario('${u.id}') ${u.rol==='distribuidor'?`<button class="btn btn-sm" onclick="editarPreciosDist('${u.id}','${u.nombre||u.usuario}')">Precios</button>`:''}
       </td>
     </tr>`).join(''):'<tr><td colspan="8" class="empty">Sin usuarios</td></tr>')+
     '</tbody>';
