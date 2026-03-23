@@ -1390,15 +1390,14 @@ window.addEventListener('load',async()=>{
     }catch(e){localStorage.removeItem('grama_user');show('s-login')}
   }else{show('s-login')}
   // Auto-refresh cada 30 segundos
-setInterval(async () => {
-  if (!state.user) return;
-  const rol = state.user.rol;
-
-  if (['superadmin','admin'].includes(rol)) await loadAdmin();
-  else if (rol === 'distribuidor') await loadDist();
-  else if (rol === 'vendedor') await loadVend();
-  else await loadAplic();
-}, 30000);
+//setInterval(async () => {
+  //if (!state.user) return;
+  //const rol = state.user.rol;
+  //if (['superadmin','admin'].includes(rol)) await loadAdmin();
+  //else if (rol === 'distribuidor') await loadDist();
+  //else if (rol === 'vendedor') await loadVend();
+  //else await loadAplic();
+//}, 30000);
 
 });
 </script>
