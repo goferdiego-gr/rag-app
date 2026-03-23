@@ -76,14 +76,8 @@ module.exports = async (req, res) => {
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (e) {
-    console.error('PEDIDOS ERROR:', e);
-    return res.status(500).json({ error: e.message, stack: e.stack });
+    return res.status(500).json({ error: e.message });
   }
-```
-
-Commit en GitHub y luego cambia el status de un pedido. Abre la URL directamente:
-```
-https://rag-app-delta.vercel.app/api/pedidos
 };
 
 function getNivel(c) { return c >= 30000 ? 'socio' : c >= 15000 ? 'master' : c >= 5000 ? 'verde' : 'semilla'; }
