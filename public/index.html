@@ -667,7 +667,7 @@ function renderUsuarios(filtro={}){
       <td>${fmx(u.compras_mes)}</td>
       <td>${u.comision_pct||0}%</td>
       <td style="font-size:12px;color:#5d5d5d">${state.usuarios.find(x=>x.id===u.integrado_por)?.nombre||'—'}</td>
-      ${state.user?.rol==='superadmin'?`<td style="display:flex;gap:4px"><button class="btn btn-sm" onclick="editarUsuario('${u.id}') ${u.rol==='distribuidor'?`<button class="btn btn-sm" onclick="editarPreciosDist('${u.id}','${u.nombre||u.usuario}')">Precios</button>`:''}
+      ${state.user?.rol==='superadmin'?`<td style="display:flex;gap:4px"><button class="btn btn-sm" onclick="editarUsuario('${u.id}')">Editar</button>${u.rol==='distribuidor'?`<button class="btn btn-sm" onclick="editarPreciosDist('${u.id}','${u.nombre||u.usuario}')">Precios</button>`:''}
       </td>
     </tr>`).join(''):'<tr><td colspan="8" class="empty">Sin usuarios</td></tr>')+
     '</tbody>';
