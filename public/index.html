@@ -111,7 +111,7 @@ tr:hover td{background:#f9fdf9}
     <div><img src="/Logo_Grama.png" alt="Grama" class="logo-img" /><div style="font-size:12px;color:#999;margin-top:2px" id="admin-sub"></div></div>
     <div style="display:flex;gap:8px;align-items:center">
       <span style="font-size:13px;color:#5d5d5d" id="admin-name"></span>
-      <button class="btn btn-sm" onclick="loadVend()">↻ Actualizar</button>
+      <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
       <button class="btn btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
@@ -221,7 +221,7 @@ tr:hover td{background:#f9fdf9}
     <div><img src="/Logo_Grama.png" alt="Grama" class="logo-img" /><div style="font-size:12px;color:#999;margin-top:2px">Distribuidor Grama</div></div>
     <div style="display:flex;gap:8px;align-items:center">
       <span style="font-size:13px;color:#5d5d5d" id="dist-name"></span>
-      <button class="btn btn-sm" onclick="loadVend()">↻ Actualizar</button>
+      <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
       <button class="btn btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
@@ -274,7 +274,8 @@ tr:hover td{background:#f9fdf9}
     <div><img src="/Logo_Grama.png" alt="Grama" class="logo-img" /><div style="font-size:12px;color:#999;margin-top:2px">Vendedor Grama</div></div>
     <div style="display:flex;gap:8px;align-items:center">
       <span style="font-size:13px;color:#5d5d5d" id="vend-name"></span>
-      <button class="btn btn-sm" onclick="loadVend()">↻ Actualizar</button>
+      <button class="btn btn-sm" onclick="loadVend()">↻</button>
+      <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
       <button class="btn btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
@@ -282,6 +283,7 @@ tr:hover td{background:#f9fdf9}
     <button class="tab on" onclick="vendTab(this,'vt-inicio')">Inicio</button>
     <button class="tab" onclick="vendTab(this,'vt-clientes')">Mis clientes</button>
     <button class="tab" onclick="vendTab(this,'vt-nuevo-cliente')">+ Nuevo cliente</button>
+    <button class="tab" onclick="vendTab(this,'vt-mis-pedidos')">Mis pedidos</button>
     <button class="tab" onclick="vendTab(this,'vt-pedido')">Nuevo pedido</button>
     <button class="tab" onclick="vendTab(this,'vt-comision')">Mi comision</button>
   </div>
@@ -289,6 +291,13 @@ tr:hover td{background:#f9fdf9}
   <div id="vt-inicio">
     <div class="grid4" id="vend-stats" style="margin-bottom:1.25rem"></div>
     <div class="card"><div class="section-title">Clientes recientes</div><div id="vend-clientes-rec"></div></div>
+  </div>
+
+  <div id="vt-mis-pedidos" class="hidden">
+    <div class="card tbl-wrap">
+      <div class="section-title">Mis pedidos</div>
+      <table id="tbl-vend-pedidos"></table>
+    </div>
   </div>
 
   <div id="vt-clientes" class="hidden">
@@ -363,7 +372,7 @@ tr:hover td{background:#f9fdf9}
     <div><img src="/Logo_Grama.png" alt="Grama" class="logo-img" /><div style="font-size:12px;color:#999;margin-top:2px" id="aplic-nivel-sub"></div></div>
     <div style="display:flex;gap:8px;align-items:center">
       <span style="font-size:13px;color:#5d5d5d" id="aplic-name"></span>
-      <button class="btn btn-sm" onclick="loadVend()">↻ Actualizar</button>
+      <button class="btn btn-sm" onclick="showPerfil()">Mi perfil</button>
       <button class="btn btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
@@ -547,7 +556,7 @@ tr:hover td{background:#f9fdf9}
 const NIVELES={semilla:{label:'Semilla',pct:12,bono:80,min:0},verde:{label:'Verde',pct:15,bono:100,min:5000},master:{label:'Master',pct:18,bono:130,min:15000},socio:{label:'Socio',pct:22,bono:160,min:30000}};
 const STATUS_CLIENTE=['en_espera','propuesta_enviada','pedido_confirmado','pedido_enviado','entregado','pagado','cancelado'];
 const STATUS_LABELS={'en_espera':'En espera','propuesta_enviada':'Propuesta enviada','pedido_confirmado':'Pedido confirmado','pedido_enviado':'Pedido enviado','entregado':'Entregado','pagado':'Pagado','cancelado':'Cancelado'};
-let state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],clientes:[],preciosDist:[]};
+let state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],clientes:[],preciosDist:[]};localStorage.removeItem('grama_user');
 let editClienteId=null;
 
 const show=id=>document.getElementById(id)?.classList.remove('hidden');
@@ -580,8 +589,7 @@ async function doLogin(){
   try{
     const r=await api('login','POST',{usuario,password});
     if(!r.ok){showAlert('l-alert',r.error||'Error','err');return}
-    state.user=r.user;hide('s-login');
-localStorage.setItem('grama_user', JSON.stringify(r.user));
+    state.user=r.user;localStorage.setItem('grama_user',JSON.stringify(r.user));hide('s-login');
     const rol=r.user.rol;
     if(['superadmin','admin'].includes(rol)){await loadAdmin();show('s-admin')}
     else if(rol==='distribuidor'){await loadDist();show('s-dist')}
@@ -592,8 +600,7 @@ localStorage.setItem('grama_user', JSON.stringify(r.user));
 }
 
 function doLogout(){
-localStorage.removeItem('grama_user');
-  state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],clientes:[],preciosDist:[]};
+  state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],clientes:[],preciosDist:[]};localStorage.removeItem('grama_user');
   ['s-admin','s-dist','s-vend','s-aplic'].forEach(hide);
   el('l-user').value='';el('l-pass').value='';show('s-login');
 }
@@ -650,7 +657,7 @@ function renderUsuarios(filtro={}){
   if(filtro.rol)users=users.filter(u=>u.rol===filtro.rol);
   if(filtro.nivel)users=users.filter(u=>u.nivel===filtro.nivel);
   el('tbl-usuarios').innerHTML=
-    `<thead><tr><th>Usuario</th><th>Nombre</th><th>Empresa</th><th>Tipo</th><th>Nivel</th><th>Compras mes</th><th>Comision%</th><th>Acciones</th></tr></thead><tbody>`+
+    `<thead><tr><th>Usuario</th><th>Nombre</th><th>Empresa</th><th>Tipo</th><th>Nivel</th><th>Compras mes</th><th>Comision%</th><th>Integrado por</th><th>Acciones</th></tr></thead><tbody>`+
     (users.length?users.map(u=>`<tr>
       <td><strong>${u.usuario}</strong></td>
       <td>${(u.nombre||'')+' '+(u.apellidos||'')}</td>
@@ -659,6 +666,7 @@ function renderUsuarios(filtro={}){
       <td>${u.rol==='distribuidor'?'—':nivelBadge(u.nivel||'semilla')}</td>
       <td>${fmx(u.compras_mes)}</td>
       <td>${u.comision_pct||0}%</td>
+      <td style="font-size:12px;color:#5d5d5d">${state.usuarios.find(x=>x.id===u.integrado_por)?.nombre||'—'}</td>
       <td style="display:flex;gap:4px">
         <button class="btn btn-sm" onclick="editarUsuario('${u.id}')">Editar</button>
         ${u.rol==='distribuidor'?`<button class="btn btn-sm" onclick="editarPreciosDist('${u.id}','${u.nombre||u.usuario}')">Precios</button>`:''}
@@ -675,7 +683,7 @@ function renderPedidosAdmin(filtro=''){
   el('tbl-pedidos-admin').innerHTML=
     `<thead><tr><th>Fecha</th><th>Vendedor/Usuario</th><th>Cliente final</th><th>CEDIS</th><th>Productos</th><th>Total</th><th>Status</th></tr></thead><tbody>`+
     (peds.length?peds.map(p=>{
-      const usr=p.vendedor||p.usuario||state.usuarios.find(u=>u.id===(p.vendedor_id||p.usuario_id))||{nombre:'—'};
+      const usr=state.usuarios.find(u=>u.id===(p.vendedor_id||p.usuario_id))||p.usuarios||{nombre:'—'};
       const items=(p.pedido_items||[]).map(i=>`${i.productos?.nombre||''} ${i.productos?.presentacion||''} x${i.cantidad}`).join(', ');
       const clienteNombre=p.clientes?.empresa||p.clientes?.contacto||'—';
       return`<tr>
@@ -785,11 +793,17 @@ function toggleComisionField(){
 }
 
 function showModalUsuario(){
+  if(state.user?.rol==='admin'){alert('Solo el superadmin puede crear usuarios');return;}
   ['u-nombre','u-apellidos','u-empresa','u-email','u-tel','u-ciudad','u-usuario','u-pass'].forEach(id=>{const e=el(id);if(e)e.value=''});
   el('u-comision').value='';
   el('modal-usr-title').textContent='Nuevo usuario';
   el('modal-usuario').dataset.editId='';
   hide('campo-comision');
+  const intSel=el('u-integrado');
+  if(intSel){
+    const admins=state.usuarios.filter(u=>['superadmin','admin'].includes(u.rol));
+    intSel.innerHTML='<option value="">-- Sin asignar --</option>'+admins.map(u=>`<option value="${u.id}">${u.nombre||u.usuario}</option>`).join('');
+  }
   show('modal-usuario');
 }
 
@@ -809,14 +823,14 @@ async function guardarUsuario(){
   const editId=el('modal-usuario').dataset.editId;
   const data={nombre:el('u-nombre').value.trim(),apellidos:el('u-apellidos').value.trim(),empresa:el('u-empresa').value.trim(),
     email:el('u-email').value.trim(),telefono:el('u-tel').value.trim(),ciudad:el('u-ciudad').value.trim(),
-    rol:el('u-rol').value,usuario:el('u-usuario').value.trim(),password:el('u-pass').value.trim(),
+    rol:el('u-rol').value,usuario:el('u-usuario').value.trim(),password:el('u-pass').value.trim(),integrado_por:el('u-integrado')?.value||null,
     comision_pct:parseFloat(el('u-comision').value||0)};
   if(!data.nombre||!data.usuario){showAlert('usr-alert','Nombre y usuario son requeridos','err');return}
   loading(true);
   try{
     let r;
-    if(editId){r=await api('usuarios','PUT',{id:editId,...data})}
-    else{if(!data.password){showAlert('usr-alert','La contrasena es requerida','err');return}r=await api('usuarios','POST',data)}
+    if(editId){r=await api('usuarios','PUT',{id:editId,rol_solicitante:state.user.rol,...data})}
+    else{if(!data.password){showAlert('usr-alert','La contrasena es requerida','err');return}r=await api('usuarios','POST',{...data,rol_solicitante:state.user.rol})}
     if(r.ok||r.user){hide('modal-usuario');await loadAdmin()}
     else showAlert('usr-alert',r.error||'Error','err');
   }finally{loading(false)}
@@ -1002,7 +1016,7 @@ async function loadVend(){
   try{
     const[clientes,pedidos,prods,cedis]=await Promise.all([
       api('clientes?vendedor_id='+state.user.id),
-      api('pedidos?usuario_id='+state.user.id+'&vendedor_id='+state.user.id),
+      api('pedidos?vendedor_id='+state.user.id),
       api('data?resource=productos'),
       api('data?resource=cedis')
     ]);
@@ -1012,7 +1026,7 @@ async function loadVend(){
     state.cedis=Array.isArray(cedis)?cedis:[];
     const u=state.user;
     el('vend-name').textContent=u.nombre||u.usuario;
-    renderVendInicio();renderVendClientes();renderVendComision();renderVendPedidoForm();
+    renderVendInicio();renderVendClientes();renderVendComision();renderVendPedidos();renderVendPedidoForm();
   }finally{loading(false)}
 }
 
@@ -1048,6 +1062,25 @@ function renderVendClientes(){
         <td><button class="btn btn-sm" onclick="showDetalleCliente('${c.id}')">Ver</button></td>
       </tr>`;
     }).join(''):'<tr><td colspan="8" class="empty">Sin clientes</td></tr>')+
+    '</tbody>';
+}
+
+
+function renderVendPedidos(){
+  const p=state.pedidos;
+  el('tbl-vend-pedidos').innerHTML=
+    `<thead><tr><th>Fecha</th><th>Cliente</th><th>CEDIS</th><th>Productos</th><th>Total</th><th>Status</th></tr></thead><tbody>`+
+    (p.length?p.map(x=>{
+      const items=(x.pedido_items||[]).map(i=>`${i.productos?.nombre||''} ${i.productos?.presentacion||''} x${i.cantidad}`).join(', ');
+      return`<tr>
+        <td>${fdate(x.creado_en)}</td>
+        <td style="font-size:12px">${x.clientes?.empresa||x.clientes?.contacto||'—'}</td>
+        <td style="font-size:12px">${x.cedis?.nombre||'—'}</td>
+        <td style="font-size:12px;max-width:200px">${items||'—'}</td>
+        <td>${fmx(x.total)}</td>
+        <td>${badge(x.status,STATUS_LABELS[x.status]||x.status)}</td>
+      </tr>`;
+    }).join(''):'<tr><td colspan="6" class="empty">Sin pedidos aun</td></tr>')+
     '</tbody>';
 }
 
@@ -1190,10 +1223,6 @@ function showDetalleCliente(id){
       </table>
     </div>
     <div style="border-top:1px solid #e0e0e0;padding-top:1rem">
-      <label>Status del cliente</label>
-      <select id="dc-status">
-        ${STATUS_CLIENTE.map(s=>`<option value="${s}"${s===c.status?' selected':''}>${statusClienteLabel(s)}</option>`).join('')}
-      </select>
       <label>Notas</label>
       <textarea id="dc-notas" rows="2">${c.notas||''}</textarea>
     </div>`;
@@ -1202,7 +1231,8 @@ function showDetalleCliente(id){
 
 async function guardarStatusCliente(){
   if(!editClienteId)return;
-  const status=el('dc-status').value;
+  const c=state.clientes.find(x=>x.id===editClienteId);
+  const status=c?.status||'en_espera';
   const notas=el('dc-notas').value.trim();
   loading(true);
   try{
@@ -1372,7 +1402,7 @@ async function registrarServicio(){
 // TABS
 function adminTab(btn,target){document.querySelectorAll('#s-admin .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['at-dash','at-usuarios','at-pedidos','at-clientes','at-servicios','at-stock','at-config'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 function distTab(btn,target){document.querySelectorAll('#s-dist .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['dt-inicio','dt-precios','dt-pedido','dt-historial'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
-function vendTab(btn,target){document.querySelectorAll('#s-vend .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['vt-inicio','vt-clientes','vt-nuevo-cliente','vt-pedido','vt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
+function vendTab(btn,target){document.querySelectorAll('#s-vend .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['vt-inicio','vt-clientes','vt-nuevo-cliente','vt-mis-pedidos','vt-pedido','vt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 function aplicTab(btn,target){document.querySelectorAll('#s-aplic .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['apt-inicio','apt-pedido','apt-registro','apt-historial','apt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 function histTab(btn,target){document.querySelectorAll('#apt-historial .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['ht-svcs','ht-peds'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 
@@ -1389,16 +1419,14 @@ window.addEventListener('load',async()=>{
       else{await loadAplic();show('s-aplic')}
     }catch(e){localStorage.removeItem('grama_user');show('s-login')}
   }else{show('s-login')}
-  // Auto-refresh cada 30 segundos
-setInterval(async () => {
-  if (!state.user) return;
-  const rol = state.user.rol;
-  if (['superadmin','admin'].includes(rol)) await loadAdmin();
-  else if (rol === 'distribuidor') await loadDist();
-  else if (rol === 'vendedor') await loadVend();
-  else await loadAplic();
-}, 30000);
-
+  setInterval(async()=>{
+    if(!state.user)return;
+    const rol=state.user.rol;
+    if(['superadmin','admin'].includes(rol))await loadAdmin();
+    else if(rol==='vendedor')await loadVend();
+    else if(rol==='distribuidor')await loadDist();
+    else await loadAplic();
+  },30000);
 });
 </script>
 </body>
