@@ -120,6 +120,7 @@ tr:hover td{background:#f9fdf9}
     <button class="tab" onclick="adminTab(this,'at-usuarios')">Usuarios</button>
     <button class="tab" onclick="adminTab(this,'at-pedidos')">Pedidos</button>
     <button class="tab" onclick="adminTab(this,'at-clientes')">Clientes</button>
+    <button class="tab" onclick="adminTab(this,'at-cotizaciones')">Cotizaciones</button>
     <button class="tab" onclick="adminTab(this,'at-servicios')">Servicios</button>
     <button class="tab" onclick="adminTab(this,'at-stock')" id="tab-stock">Stock</button>
     <button class="tab" onclick="adminTab(this,'at-config')" id="tab-config">Configuracion</button>
@@ -180,6 +181,13 @@ tr:hover td{background:#f9fdf9}
       <div style="font-size:15px;font-weight:500">Todos los clientes</div>
     </div>
     <div class="card tbl-wrap"><table id="tbl-clientes-admin"></table></div>
+  </div>
+
+  <div id="at-cotizaciones" class="hidden">
+    <div class="card">
+      <div class="section-title">Solicitudes de cotizacion</div>
+      <div id="list-cot-admin"></div>
+    </div>
   </div>
 
   <div id="at-servicios" class="hidden">
@@ -285,6 +293,7 @@ tr:hover td{background:#f9fdf9}
     <button class="tab" onclick="vendTab(this,'vt-nuevo-cliente')">+ Nuevo cliente</button>
     <button class="tab" onclick="vendTab(this,'vt-mis-pedidos')">Mis pedidos</button>
     <button class="tab" onclick="vendTab(this,'vt-pedido')">Nuevo pedido</button>
+    <button class="tab" onclick="vendTab(this,'vt-cotizar')">Cotizar</button>
     <button class="tab" onclick="vendTab(this,'vt-comision')">Mi comision</button>
   </div>
 
@@ -358,6 +367,21 @@ tr:hover td{background:#f9fdf9}
     </div>
   </div>
 
+  <div id="vt-cotizar" class="hidden">
+    <div class="card" style="max-width:500px">
+      <div class="section-title">Solicitar cotizacion</div>
+      <div id="cot-alert" class="hidden"></div>
+      <label>Cliente *</label>
+      <select id="cot-cliente"><option value="">-- Selecciona cliente --</option></select>
+      <label>Notas / detalles</label>
+      <textarea id="cot-notas" rows="3" placeholder="Productos de interes, cantidades, fecha requerida..."></textarea>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="solicitarCotizacion()">Enviar solicitud</button>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <div class="section-title">Mis solicitudes de cotizacion</div>
+      <div id="list-cotizaciones"></div>
+    </div>
+  </div>
   <div id="vt-comision" class="hidden">
     <div class="card" style="max-width:480px">
       <div class="section-title">Mi comision del mes</div>
@@ -553,7 +577,9 @@ tr:hover td{background:#f9fdf9}
 
 </div>
 <script>
-const NIVELES={semilla:{label:'Semilla',pct:12,bono:80,min:0,min_litros:0},verde:{label:'Verde',pct:15,bono:100,min:5000,min_litros:20},master:{label:'Master',pct:18,bono:130,min:15000,min_litros:50},socio:{label:'Socio',pct:22,bono:160,min:30000,min_litros:100}};
+const NIVELES={semilla:{label:'Semilla',pct:10,bono:80,min:0,min_litros:0},verde:{label:'Verde',pct:15,bono:100,min:5000,min_litros:100},master:{label:'Master',pct:18,bono:130,min:15000,min_litros:500},socio:{label:'Socio',pct:20,bono:160,min:30000,min_litros:1000}};
+const IVA=0.16;
+const precioConIva=p=>Math.round(p*(1+IVA));
 const STATUS_CLIENTE=['en_espera','propuesta_enviada','pedido_confirmado','pedido_enviado','entregado','pagado','cancelado'];
 const STATUS_LABELS={'en_espera':'En espera','propuesta_enviada':'Propuesta enviada','pedido_confirmado':'Pedido confirmado','pedido_enviado':'Pedido enviado','entregado':'Entregado','pagado':'Pagado','cancelado':'Cancelado'};
 let state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],clientes:[],preciosDist:[]};localStorage.removeItem('grama_user');
@@ -630,7 +656,7 @@ async function loadAdmin(){
     el('admin-name').textContent=u.nombre||u.usuario;
     el('admin-sub').textContent=u.rol==='superadmin'?'Super Administrador':'Administrador';
     if(u.rol!=='superadmin'){hide('tab-config')}
-    renderDash();renderUsuarios();renderPedidosAdmin();renderSvcsAdmin();renderStock();renderClientesAdmin();
+    renderDash();renderUsuarios();renderPedidosAdmin();renderSvcsAdmin();renderStock();renderClientesAdmin();await loadCotizacionesAdmin();
     const btnNuevo=el('btn-nuevo-usuario');
     if(btnNuevo)btnNuevo.innerHTML=u.rol==='superadmin'?'<button class="btn btn-primary btn-sm" onclick="showModalUsuario()">+ Nuevo usuario</button>':'';
     if(u.rol==='superadmin')renderConfig();
@@ -766,10 +792,13 @@ function renderConfig(){
       <div><label style="margin-top:0">Comision %</label><input type="number" id="cfg_c_pct_${k}" value="${n.pct}" style="padding:6px" /></div>
       <div><label style="margin-top:0">Bono x servicio</label><input type="number" id="cfg_c_bono_${k}" value="${n.bono}" style="padding:6px" /></div>
     </div></div>`).join('');
-  el('config-precios').innerHTML=state.productos.map(p=>
-    `<div class="precio-row"><div><div style="font-size:13px;font-weight:500">${p.nombre}</div><div style="font-size:12px;color:#999">${p.presentacion}</div></div>
-    <div style="display:flex;align-items:center;gap:6px"><input type="number" id="precio_${p.id}" value="${p.precio_lista}" style="width:100px;padding:5px" /><span style="font-size:12px;color:#999">MXN</span></div></div>`
-  ).join('');
+  el('config-precios').innerHTML=state.productos.map(p=>{
+    const sinIva=p.precio_sin_iva||Math.round(p.precio_lista/1.16*100)/100;
+    const conIva=Math.round(sinIva*1.16);
+    return '<div class="precio-row"><div><div style="font-size:13px;font-weight:500">'+p.nombre+'</div><div style="font-size:12px;color:#999">'+p.presentacion+'</div></div>'
+    +'<div style="display:flex;align-items:center;gap:8px"><div><div style="font-size:11px;color:#999">Sin IVA</div><input type="number" id="precio_sin_iva_'+p.id+'" value="'+sinIva+'" style="width:90px;padding:5px" onchange="actualizarPrecioLive(this.dataset.pid,this.value)" data-pid="'+p.id+'" /></div>'
+    +'<div style="font-size:12px;color:#1f7344" id="precio_iva_'+p.id+'">+ IVA = '+fmx(conIva)+'</div></div></div>';
+  }).join('');
 }
 
 async function guardarConfig(tipo){
@@ -783,8 +812,21 @@ async function guardarConfig(tipo){
   alert('Guardado correctamente');
 }
 
+function actualizarPrecioLive(id,val){
+  const sinIva=parseFloat(val||0);
+  const conIva=Math.round(sinIva*1.16);
+  const el2=document.getElementById('precio_iva_'+id);
+  if(el2)el2.textContent='+ IVA = '+fmx(conIva);
+}
 async function guardarPrecios(){
-  for(const p of state.productos){const v=parseFloat(el(`precio_${p.id}`)?.value||0);if(v!==p.precio_lista){await api('data?resource=productos','PUT',{id:p.id,precio_lista:v});p.precio_lista=v}}
+  for(const p of state.productos){
+    const sinIva=parseFloat(document.getElementById('precio_sin_iva_'+p.id)?.value||0);
+    const conIva=Math.round(sinIva*1.16);
+    if(sinIva!==p.precio_sin_iva||conIva!==p.precio_lista){
+      await api('data?resource=productos','PUT',{id:p.id,precio_lista:conIva,precio_sin_iva:sinIva});
+      p.precio_sin_iva=sinIva;p.precio_lista=conIva;
+    }
+  }
   alert('Precios guardados');
 }
 
@@ -1033,15 +1075,17 @@ async function loadVend(){
     const u=state.user;
     el('vend-name').textContent=u.nombre||u.usuario;
     renderVendInicio();renderVendClientes();renderVendComision();renderVendPedidos();renderVendPedidoForm();
+    const cotSel=el('cot-cliente');if(cotSel)cotSel.innerHTML='<option value="">-- Selecciona cliente --</option>'+state.clientes.map(c=>'<option value="'+c.id+'">'+(c.empresa||c.contacto)+'</option>').join('');
+    await loadCotizaciones();
   }finally{loading(false)}
 }
 
 function renderVendInicio(){
   const c=state.clientes,p=state.pedidos;
   const pagados=p.filter(x=>x.status==='pagado');
-  const comisionTotal=pagados.reduce((a,x)=>a+(x.total||0)*(state.user.comision_pct||0)/100,0);
+  const comisionEstimada=pagados.reduce((a,x)=>a+(x.total||0)/1.16*(state.user.comision_pct||NIVELES[state.user.nivel||'semilla']?.pct||10)/100,0);
   const totalVentas=pagados.reduce((a,x)=>a+(x.total||0),0);
-  el('vend-stats').innerHTML=stat(c.length,'Clientes')+stat(p.length,'Pedidos totales')+stat(fmx(totalVentas),'Ventas pagadas')+stat(fmx(comisionTotal),'Mi comision');
+  el('vend-stats').innerHTML=stat(c.length,'Clientes')+stat(p.length,'Pedidos totales')+stat(fmx(totalVentas),'Ventas pagadas')+stat(fmx(comisionEstimada),'Mi comision');
   el('vend-clientes-rec').innerHTML=[...c].slice(0,5).map(x=>{
     const pedsCli=state.pedidos.filter(p=>p.cliente_id===x.id);
     const ultimoPed=pedsCli[0];
@@ -1094,8 +1138,12 @@ function renderVendComision(){
   const p=state.pedidos;
   const pagados=p.filter(x=>x.status==='pagado');
   const totalVentas=pagados.reduce((a,x)=>a+(x.total||0),0);
-  const pct=state.user.comision_pct||0;
-  const comisionTotal=totalVentas*pct/100;
+  const totalSinIva=totalVentas/1.16;
+  const pct=state.user.comision_pct||NIVELES[state.user.nivel||'semilla']?.pct||10;
+  const pctInm=10;
+  const comisionTotal=totalSinIva*pct/100;
+  const comisionInm=totalSinIva*pctInm/100;
+  const comisionBono=comisionTotal-comisionInm;
   el('vend-com-det').innerHTML=`
     <div class="com-row"><span>Tu comision actual</span><span style="font-weight:500">${pct}%</span></div>
     <div class="com-row"><span>Tu nivel</span>${nivelBadge(state.user.nivel||'semilla')}</div>
@@ -1407,12 +1455,55 @@ async function registrarServicio(){
 }
 
 // TABS
-function adminTab(btn,target){document.querySelectorAll('#s-admin .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['at-dash','at-usuarios','at-pedidos','at-clientes','at-servicios','at-stock','at-config'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
+function adminTab(btn,target){document.querySelectorAll('#s-admin .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['at-dash','at-usuarios','at-pedidos','at-clientes','at-cotizaciones','at-servicios','at-stock','at-config'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 function distTab(btn,target){document.querySelectorAll('#s-dist .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['dt-inicio','dt-precios','dt-pedido','dt-historial'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
-function vendTab(btn,target){document.querySelectorAll('#s-vend .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['vt-inicio','vt-clientes','vt-nuevo-cliente','vt-mis-pedidos','vt-pedido','vt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
+function vendTab(btn,target){document.querySelectorAll('#s-vend .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['vt-inicio','vt-clientes','vt-nuevo-cliente','vt-mis-pedidos','vt-pedido','vt-cotizar','vt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 function aplicTab(btn,target){document.querySelectorAll('#s-aplic .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['apt-inicio','apt-pedido','apt-registro','apt-historial','apt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 function histTab(btn,target){document.querySelectorAll('#apt-historial .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['ht-svcs','ht-peds'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 
+
+
+async function solicitarCotizacion(){
+  const cliente_id=el('cot-cliente').value;
+  const notas=el('cot-notas').value.trim();
+  if(!cliente_id){showAlert('cot-alert','Selecciona un cliente','err');return}
+  loading(true,'Enviando...');
+  try{
+    const r=await api('cotizaciones','POST',{vendedor_id:state.user.id,cliente_id,notas});
+    if(r.ok){
+      showAlert('cot-alert','Solicitud enviada correctamente. El administrador la procesara pronto.','ok');
+      el('cot-notas').value='';
+      await loadCotizaciones();
+    }else showAlert('cot-alert',r.error||'Error','err');
+  }finally{loading(false)}
+}
+
+
+async function loadCotizacionesAdmin(){
+  try{
+    const data=await api('cotizaciones?all=1');
+    const list=el('list-cot-admin');
+    if(!list)return;
+    const STATUS_COT={pendiente:'Pendiente',en_proceso:'En proceso',completado:'Completado',cancelado:'Cancelado'};
+    list.innerHTML=(Array.isArray(data)&&data.length)?'<table class="tbl-wrap" style="width:100%"><thead><tr><th>Vendedor</th><th>Cliente</th><th>Notas</th><th>Fecha</th><th>Status</th></tr></thead><tbody>'+data.map(c=>
+      '<tr><td>'+(c.vendedor?.nombre||'—')+'</td><td>'+(c.clientes?.empresa||c.clientes?.contacto||'—')+'</td><td style="font-size:12px">'+(c.notas||'—').substring(0,60)+'</td><td>'+fdate(c.creado_en)+'</td><td><select data-cid="'+c.id+'" onchange="cambiarStatusCot(this.dataset.cid,this.value)" style="width:auto;padding:4px;font-size:12px">'+Object.entries(STATUS_COT).map(([k,v])=>'<option value="'+k+'"'+(k===c.status?' selected':'')+'>'+v+'</option>').join('')+'</select></td></tr>'
+    ).join('')+'</tbody></table>':'<div class="empty">Sin solicitudes de cotizacion</div>';
+  }catch(e){console.error(e)}
+}
+
+async function cambiarStatusCot(id,status){
+  await api('cotizaciones','PUT',{id,status});
+}
+
+async function loadCotizaciones(){
+  const data=await api('cotizaciones?vendedor_id='+state.user.id);
+  const list=el('list-cotizaciones');
+  if(!list)return;
+  const STATUS_COT={pendiente:'Pendiente',en_proceso:'En proceso',completado:'Completado',cancelado:'Cancelado'};
+  list.innerHTML=(Array.isArray(data)&&data.length)?data.map(c=>
+    '<div class="row-item"><div><div style="font-size:13px;font-weight:500">'+(c.clientes?.empresa||c.clientes?.contacto||'—')+'</div><div style="font-size:12px;color:#999">'+fdate(c.creado_en)+(c.notas?' · '+c.notas.substring(0,40):'')+' </div></div>'+badge(c.status,STATUS_COT[c.status]||c.status)+'</div>'
+  ).join(''):'<div class="empty">Sin solicitudes</div>';
+}
 
 async function actualizarStock(cedis_id,producto_id,cantidad){
   try{

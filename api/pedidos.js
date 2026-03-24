@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
     if (req.method === 'GET') {
       const { usuario_id, vendedor_id, cliente_id, all } = req.query;
       let query = supabase.from('pedidos')
-        .select('*, usuario:usuarios!usuario_id(nombre,apellidos,empresa,rol), vendedor:usuarios!vendedor_id(nombre,apellidos), cedis(nombre,ciudad), clientes(contacto,empresa,ciudad), pedido_items(*, productos(nombre,presentacion,precio_lista))')
+        .select('*, usuario:usuarios!usuario_id(nombre,apellidos,empresa,rol), vendedor:usuarios!vendedor_id(nombre,apellidos), cedis(nombre,ciudad), clientes(contacto,empresa,ciudad), pedido_items(*, productos(nombre,presentacion,precio_lista,precio_sin_iva,iva_pct))')
         .order('creado_en', { ascending: false });
       if (all !== '1') {
         if (vendedor_id || usuario_id) {
@@ -64,17 +64,72 @@ module.exports = async (req, res) => {
       }
 
       if (status === 'pagado') {
-        const { data: p } = await supabase.from('pedidos').select('vendedor_id, usuario_id, cliente_id, total').eq('id', id).single();
+        const { data: p } = await supabase.from('pedidos').select('vendedor_id, usuario_id, cliente_id, total, pedido_items(cantidad, productos(presentacion))').eq('id', id).single();
         const vendId = p?.vendedor_id || p?.usuario_id;
         if (vendId) {
-          const { data: usr } = await supabase.from('usuarios').select('ventas_pagadas, compras_mes, comision_pct, rol, nivel').eq('id', vendId).single();
+          const { data: usr } = await supabase.from('usuarios').select('ventas_pagadas, compras_mes, comision_pct, rol, nivel, litros_mes').eq('id', vendId).single();
+
           if (usr?.rol === 'vendedor') {
-            const nuevasVentas = (usr.ventas_pagadas||0) + (p.total||0);
-            const comisionGanada = (p.total||0) * (usr.comision_pct||0) / 100;
-            await supabase.from('usuarios').update({ ventas_pagadas: nuevasVentas }).eq('id', vendId);
+            // Calculate litros from items (estimate 1L per unit for 1L, 4L for 4L, etc)
+            const litrosVendidos = (p.pedido_items||[]).reduce((a, item) => {
+              const pres = item.productos?.presentacion || '1L';
+              const liters = parseFloat(pres.replace('L','').replace('l','')) || 1;
+              return a + (item.cantidad * liters);
+            }, 0);
+
+            const nuevosLitros = (usr.litros_mes || 0) + litrosVendidos;
+            const nuevasVentas = (usr.ventas_pagadas || 0) + (p.total || 0);
+
+            // Get nivel config
+            const { data: cfgRow } = await supabase.from('configuracion').select('valor').eq('clave', 'niveles_vendedor').single();
+            const { data: cfgInm } = await supabase.from('configuracion').select('valor').eq('clave', 'comision_inmediata_pct').single();
+            const nivelesVend = cfgRow ? JSON.parse(cfgRow.valor) : { semilla:{min_litros:0,pct:10}, verde:{min_litros:100,pct:15}, master:{min_litros:500,pct:18}, socio:{min_litros:1000,pct:20} };
+            const pctInmediata = cfgInm ? parseFloat(cfgInm.valor) : 10;
+
+            // Determine new nivel
+            const nivelKeys = Object.entries(nivelesVend).sort((a,b)=>b[1].min_litros - a[1].min_litros);
+            let nuevoNivel = 'semilla';
+            for (const [k, n] of nivelKeys) { if (nuevosLitros >= n.min_litros) { nuevoNivel = k; break; } }
+
+            // Use individual pct if set, else use nivel pct
+            const pctVendedor = usr.comision_pct > 0 ? usr.comision_pct : (nivelesVend[nuevoNivel]?.pct || 10);
+
+            // Comision sobre precio sin IVA
+            const totalSinIva = (p.total || 0) / 1.16;
+            const comisionInmediata = totalSinIva * pctInmediata / 100;
+            const comisionTotal = totalSinIva * pctVendedor / 100;
+            const comisionBono = comisionTotal - comisionInmediata;
+
+            // Next Thursday
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const daysUntilThursday = dayOfWeek <= 4 ? 4 - dayOfWeek : 7 - dayOfWeek + 4;
+            const nextThursday = new Date(today);
+            nextThursday.setDate(today.getDate() + (daysUntilThursday === 0 ? 7 : daysUntilThursday));
+
+            await supabase.from('usuarios').update({ ventas_pagadas: nuevasVentas, litros_mes: nuevosLitros, nivel: nuevoNivel }).eq('id', vendId);
+
+            // Register immediate commission
+            await supabase.from('comision_pagos').insert([{
+              vendedor_id: vendId, pedido_id: id, monto_venta: totalSinIva,
+              pct_aplicado: pctInmediata, monto_comision: comisionInmediata,
+              tipo: 'inmediata', status: 'pendiente',
+              fecha_pago_esperada: nextThursday.toISOString().split('T')[0]
+            }]);
+
+            // Register bono if any
+            if (comisionBono > 0) {
+              await supabase.from('comision_pagos').insert([{
+                vendedor_id: vendId, pedido_id: id, monto_venta: totalSinIva,
+                pct_aplicado: pctVendedor - pctInmediata, monto_comision: comisionBono,
+                tipo: 'bono_mensual', status: 'pendiente',
+                fecha_pago_esperada: null
+              }]);
+            }
+
             if (p.cliente_id) {
               const { data: cli } = await supabase.from('clientes').select('comision_ganada,monto_vendido').eq('id', p.cliente_id).single();
-              await supabase.from('clientes').update({ comision_ganada: (cli?.comision_ganada||0)+comisionGanada, monto_vendido: (cli?.monto_vendido||0)+(p.total||0) }).eq('id', p.cliente_id);
+              await supabase.from('clientes').update({ comision_ganada: (cli?.comision_ganada||0)+comisionTotal, monto_vendido: (cli?.monto_vendido||0)+(p.total||0) }).eq('id', p.cliente_id);
             }
           } else {
             const nuevasCompras = (usr.compras_mes||0) + (p.total||0);
