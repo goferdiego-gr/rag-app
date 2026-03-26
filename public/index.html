@@ -771,7 +771,7 @@ function renderPedidosAdmin(filtro=''){
       const usr=state.usuarios.find(u=>u.id===(p.vendedor_id||p.usuario_id))||p.usuarios||{nombre:'—'};
       const items=(p.pedido_items||[]).map(i=>`${i.productos?.nombre||''} ${i.productos?.presentacion||''} x${i.cantidad}`).join(', ');
       const clienteNombre=p.clientes?.empresa||p.clientes?.contacto||'—';
-      const facturaBtn=p.status==='entregado'?`<button class="btn btn-sm" style="margin-left:4px" data-pid="${p.id}" data-cli="${encodeURIComponent(JSON.stringify(p.clientes||{}))}" onclick="solicitarFacturaBtn(this)">Factura</button>`:'';
+      const facturaBtn=['pagado','enviado','entregado'].includes(p.status)?`<button class="btn btn-sm" style="margin-left:4px" data-pid="${p.id}" data-cli="${encodeURIComponent(JSON.stringify(p.clientes||{}))}" onclick="solicitarFacturaBtn(this)">Factura</button>`:'';
       return`<tr>
         <td>${fdate(p.creado_en)}</td>
         <td style="font-size:12px">${usr.nombre||usr.usuario||'—'} ${rolBadge(usr.rol||'')}</td>
@@ -1184,7 +1184,7 @@ function renderVendPedidos(){
     `<thead><tr><th>Fecha</th><th>Cliente</th><th>CEDIS</th><th>Productos</th><th>Total</th><th>Status</th></tr></thead><tbody>`+
     (p.length?p.map(x=>{
       const items=(x.pedido_items||[]).map(i=>`${i.productos?.nombre||''} ${i.productos?.presentacion||''} x${i.cantidad}`).join(', ');
-      const fBtn=x.status==='entregado'?'<button class="btn btn-sm" style="margin-left:4px" data-pid="'+x.id+'" data-cli="'+encodeURIComponent(JSON.stringify(x.clientes||{}))+'" onclick="solicitarFacturaBtn(this)">Factura</button>':'';
+      const fBtn=['pagado','enviado','entregado'].includes(x.status)?'<button class="btn btn-sm" style="margin-left:4px" data-pid="'+x.id+'" data-cli="'+encodeURIComponent(JSON.stringify(x.clientes||{}))+'" onclick="solicitarFacturaBtn(this)">Factura</button>':'';
       return`<tr>
         <td>${fdate(x.creado_en)}</td>
         <td style="font-size:12px">${x.clientes?.empresa||x.clientes?.contacto||'—'}</td>
@@ -1682,14 +1682,37 @@ async function solicitarCotizacion(){
 }
 
 
+
+async function subirCotizacion(cotId, input){
+  const file=input.files[0];
+  if(!file)return;
+  loading(true,'Subiendo archivo...');
+  try{
+    const SUPA_URL='https://ybuwfzbxtjsvkcpymcbo.supabase.co';
+    const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlidXdmemJ4dGpzdmtjcHltY2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNzQsImV4cCI6MjA4OTYxNTE3NH0.XL9czwelRyqiu-fiBDdAfq0ox_IMF1FsUDZTCpMYguE';
+    const fileName='cot_'+cotId+'_'+Date.now()+'.pdf';
+    const uploadRes=await fetch(SUPA_URL+'/storage/v1/object/cotizaciones/'+fileName,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/pdf','x-upsert':'true'},
+      body:file
+    });
+    if(!uploadRes.ok)throw new Error('Error al subir archivo');
+    const archivo_url=SUPA_URL+'/storage/v1/object/public/cotizaciones/'+fileName;
+    const r=await api('cotizaciones','PUT',{id:cotId,archivo_url});
+    if(r.ok){alert('Cotizacion subida. El vendedor ya puede descargarla.');await loadCotizacionesAdmin();}
+    else throw new Error(r.error||'Error al guardar');
+  }catch(e){alert('Error: '+e.message)}
+  finally{loading(false)}
+}
+
 async function loadCotizacionesAdmin(){
   try{
     const data=await api('cotizaciones?all=1');
     const list=el('list-cot-admin');
     if(!list)return;
     const STATUS_COT={pendiente:'Pendiente',en_proceso:'En proceso',completado:'Completado',cancelado:'Cancelado'};
-    list.innerHTML=(Array.isArray(data)&&data.length)?'<table class="tbl-wrap" style="width:100%"><thead><tr><th>Vendedor</th><th>Cliente</th><th>Notas</th><th>Fecha</th><th>Status</th></tr></thead><tbody>'+data.map(c=>
-      '<tr><td>'+(c.vendedor?.nombre||'—')+'</td><td>'+(c.clientes?.empresa||c.clientes?.contacto||'—')+'</td><td style="font-size:12px">'+(c.notas||'—').substring(0,60)+'</td><td>'+fdate(c.creado_en)+'</td><td><select data-cid="'+c.id+'" onchange="cambiarStatusCot(this.dataset.cid,this.value)" style="width:auto;padding:4px;font-size:12px">'+Object.entries(STATUS_COT).map(([k,v])=>'<option value="'+k+'"'+(k===c.status?' selected':'')+'>'+v+'</option>').join('')+'</select></td></tr>'
+    list.innerHTML=(Array.isArray(data)&&data.length)?'<table style="width:100%"><thead><tr><th>Vendedor</th><th>Cliente</th><th>Productos/Notas</th><th>Fecha</th><th>Status</th><th>Archivo</th></tr></thead><tbody>'+data.map(c=>
+      '<tr><td>'+(c.vendedor?.nombre||'—')+'</td><td>'+(c.clientes?.empresa||c.clientes?.contacto||'—')+'</td><td style="font-size:12px">'+(c.productos_solicitados||c.notas||'—').substring(0,80)+'</td><td>'+fdate(c.creado_en)+'</td><td><select data-cid="'+c.id+'" onchange="cambiarStatusCot(this.dataset.cid,this.value)" style="width:auto;padding:4px;font-size:12px">'+Object.entries(STATUS_COT).map(([k,v])=>'<option value="'+k+'"'+(k===c.status?' selected':'')+'>'+v+'</option>').join('')+'</select></td><td>'+(c.archivo_url?'<a href="'+c.archivo_url+'" target="_blank" class="btn btn-sm">Ver PDF</a> ':'')+'<label class="btn btn-sm" style="cursor:pointer">Subir PDF<input type="file" accept=".pdf" style="display:none" data-cid="'+c.id+'" onchange="subirCotizacion(this.dataset.cid,this)" /></label></td></tr>'
     ).join('')+'</tbody></table>':'<div class="empty">Sin solicitudes de cotizacion</div>';
   }catch(e){console.error(e)}
 }
