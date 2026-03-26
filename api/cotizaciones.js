@@ -15,18 +15,20 @@ module.exports = async (req, res) => {
       return res.status(200).json(data);
     }
     if (req.method === 'POST') {
-      const { vendedor_id, cliente_id, notas } = req.body;
+      const { vendedor_id, cliente_id, notas, productos_solicitados } = req.body;
       if (!vendedor_id || !cliente_id) return res.status(400).json({ error: 'Faltan campos' });
       const { data, error } = await supabase.from('cotizaciones')
-        .insert([{ vendedor_id, cliente_id, notas }]).select().single();
+        .insert([{ vendedor_id, cliente_id, notas, productos_solicitados: productos_solicitados || null }])
+        .select().single();
       if (error) throw error;
       return res.status(200).json({ ok: true, cotizacion: data });
     }
     if (req.method === 'PUT') {
-      const { id, status } = req.body;
+      const { id, status, archivo_url } = req.body;
       if (!id) return res.status(400).json({ error: 'ID requerido' });
-      const { error } = await supabase.from('cotizaciones')
-        .update({ status, actualizado_en: new Date() }).eq('id', id);
+      const updates = { status, actualizado_en: new Date() };
+      if (archivo_url) updates.archivo_url = archivo_url;
+      const { error } = await supabase.from('cotizaciones').update(updates).eq('id', id);
       if (error) throw error;
       return res.status(200).json({ ok: true });
     }
