@@ -65,6 +65,7 @@ module.exports = async (req, res) => {
         .select('status, vendedor_id, usuario_id, cliente_id, total, cedis_id, pedido_items(cantidad, producto_id, productos(presentacion))')
         .eq('id', id).single();
       const prevStatus = p?.status || 'pendiente';
+console.log('PREV:', prevStatus, 'NEW:', status, 'needsComision:', TRIGGERS_COMISION.includes(status) && !TRIGGERS_COMISION.includes(prevStatus));
 
       // Update status
       const { error } = await supabase.from('pedidos').update({ status, actualizado_en: new Date() }).eq('id', id);
