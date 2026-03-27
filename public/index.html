@@ -751,13 +751,14 @@ function renderUsuarios(filtro={}){
   if(filtro.nivel)users=users.filter(u=>u.nivel===filtro.nivel);
   const isSuperAdmin=state.user?.rol==='superadmin';
   const accionesHeader=isSuperAdmin?'<th>Acciones</th>':'';
+  const authHeader='<th>Auth</th>';
   const rows=users.length?users.map(u=>{
     const integradoPor=state.usuarios.find(x=>x.id===u.integrado_por)?.nombre||'—';
     const uid=u.id,unm=(u.nombre||u.usuario).replace(/'/g,"");
     const accionesTd=isSuperAdmin?('<td style="display:flex;gap:4px"><button class="btn btn-sm" onclick="editarUsuario(\'' +uid+ '\')">Editar</button>'+(u.rol==='distribuidor'?'<button class="btn btn-sm" onclick="editarPreciosDist(\'' +uid+ '\',\'' +unm+ '\')">Precios</button>':'')+' </td>'):'';
     return '<tr><td><strong>'+u.usuario+'</strong></td><td>'+((u.nombre||'')+' '+(u.apellidos||''))+'</td><td style="font-size:12px">'+(u.empresa||'—')+'</td><td>'+rolBadge(u.rol)+'</td><td>'+(u.rol==='distribuidor'?'—':nivelBadge(u.nivel||'semilla'))+'</td><td>'+fmx(u.compras_mes)+'</td><td>'+(u.comision_pct||0)+'%</td><td style="font-size:12px;color:#5d5d5d">'+integradoPor+'</td>'+accionesTd+'</tr>';
   }).join(''):'<tr><td colspan="'+(isSuperAdmin?9:8)+'" class="empty">Sin usuarios</td></tr>';
-  el('tbl-usuarios').innerHTML='<thead><tr><th>Usuario</th><th>Nombre</th><th>Empresa</th><th>Tipo</th><th>Nivel</th><th>Compras mes</th><th>Comision%</th><th>Integrado por</th>'+accionesHeader+'</tr></thead><tbody>'+rows+'</tbody>';
+  el('tbl-usuarios').innerHTML='<thead><tr><th>Usuario</th><th>Nombre</th><th>Empresa</th><th>Tipo</th><th>Nivel</th><th>Compras mes</th><th>Comision%</th><th>Integrado por</th><th>Auth</th>'+accionesHeader+'</tr></thead><tbody>'+rows+'</tbody>';
 }
 
 function filtrarUsuarios(){renderUsuarios({rol:el('filtro-rol').value,nivel:el('filtro-nivel').value})}
@@ -932,7 +933,7 @@ function editarUsuario(id){
 async function guardarUsuario(){
   const editId=el('modal-usuario').dataset.editId;
   const data={nombre:el('u-nombre').value.trim(),apellidos:el('u-apellidos').value.trim(),empresa:el('u-empresa').value.trim(),
-    email:el('u-email').value.trim(),telefono:el('u-tel').value.trim(),ciudad:el('u-ciudad').value.trim(),
+    email:el('u-email-new')?.value.trim()||el('u-email').value.trim(),telefono:el('u-tel').value.trim(),ciudad:el('u-ciudad').value.trim(),
     rol:el('u-rol').value,usuario:el('u-usuario').value.trim(),password:el('u-pass').value.trim(),integrado_por:el('u-integrado')?.value||null,
     comision_pct:parseFloat(el('u-comision').value||0)};
   if(!data.nombre||!data.usuario){showAlert('usr-alert','Nombre y usuario son requeridos','err');return}
@@ -1693,10 +1694,10 @@ async function subirCotizacion(cotId, input){
     const fileName='cot_'+cotId+'_'+Date.now()+'.pdf';
     const uploadRes=await fetch(SUPA_URL+'/storage/v1/object/cotizaciones/'+fileName,{
       method:'POST',
-      headers:{'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/pdf','x-upsert':'true'},
+      headers:{'Authorization':'Bearer '+SUPA_KEY,'Content-Type':file.type||'application/pdf','x-upsert':'true','cache-control':'3600'},
       body:file
     });
-    if(!uploadRes.ok)throw new Error('Error al subir archivo');
+    if(!uploadRes.ok){const errText=await uploadRes.text();throw new Error('Error al subir: '+errText);}
     const archivo_url=SUPA_URL+'/storage/v1/object/public/cotizaciones/'+fileName;
     const r=await api('cotizaciones','PUT',{id:cotId,archivo_url});
     if(r.ok){alert('Cotizacion subida. El vendedor ya puede descargarla.');await loadCotizacionesAdmin();}
