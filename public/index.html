@@ -1740,6 +1740,13 @@ async function actualizarStock(cedis_id,producto_id,cantidad){
   }catch(e){console.error(e)}
 }
 window.addEventListener('load',async()=>{
+  //Aquí empiezo a editar
+  const { data, error } = await supabase.auth.getSession();
+
+if (data.session) {
+  console.log("Usuario autenticado automáticamente");
+}
+  //Aquí terino de editar
   hide('loading-overlay');
   const saved=localStorage.getItem('grama_user');
   if(saved){
