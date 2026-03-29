@@ -1741,11 +1741,24 @@ async function actualizarStock(cedis_id,producto_id,cantidad){
 }
 window.addEventListener('load',async()=>{
   //Aquí empiezo a editar
+ window.addEventListener('load', async () => {
+
+  // 1. Revisar si ya hay sesión activa
   const { data, error } = await supabase.auth.getSession();
 
-if (data.session) {
-  console.log("Usuario autenticado automáticamente");
-}
+  if (data.session) {
+    console.log("Usuario autenticado automáticamente");
+  }
+
+  // 2. Escuchar cambios de auth (login, invite, etc.)
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN') {
+      console.log("Login por invite o normal");
+      // aquí puedes redirigir o cargar dashboard
+    }
+  });
+
+});
   //Aquí terino de editar
   hide('loading-overlay');
   const saved=localStorage.getItem('grama_user');
