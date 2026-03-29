@@ -1741,8 +1741,6 @@ async function actualizarStock(cedis_id,producto_id,cantidad){
 }
 window.addEventListener('load',async()=>{
   //Aquí empiezo a editar
- window.addEventListener('load', async () => {
-
   // 1. Revisar si ya hay sesión activa
   const { data, error } = await supabase.auth.getSession();
 
@@ -1753,6 +1751,9 @@ window.addEventListener('load',async()=>{
   // 2. Escuchar cambios de auth (login, invite, etc.)
   supabase.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_IN') {
+      if (event === 'SIGNED_IN') {
+  location.reload();
+}
       console.log("Login por invite o normal");
       // aquí puedes redirigir o cargar dashboard
     }
