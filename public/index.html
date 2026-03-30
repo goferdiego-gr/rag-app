@@ -2113,15 +2113,22 @@ async function doResetPassword() {
   const params = new URLSearchParams(window.location.search);
   const hash = window.location.hash;
 
+  // 🔥 FORZAR A SUPABASE A LEER EL TOKEN
+  await supabase.auth.refreshSession();
+
   const { data } = await supabase.auth.getSession();
 
-  // NUEVO: detectar invite o recovery
+  console.log("SESSION:", data.session);
+  console.log("HASH:", hash);
+
+  // 🔥 DETECTAR INVITE / RECOVERY (LO NUEVO)
   if (data.session && (hash.includes('type=invite') || hash.includes('type=recovery'))) {
+    console.log("ENTRANDO A SET PASSWORD");
     initSetPassword();
     return;
   }
 
-  // 🔹 lo que ya tenías
+  // 🔹 TU LÓGICA ORIGINAL
   if (params.get('page') === 'forgot-password') {
     showForgotPasswordPage();
   } else if (params.get('token') && params.get('page') === 'reset') {
