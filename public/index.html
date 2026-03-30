@@ -780,7 +780,9 @@ async function doLogin(){
   if(!usuario||!password){showAlert('l-alert','Ingresa usuario y contrasena','err');return}
   loading(true,'Iniciando sesion...');
   try{
-    const r=await api('login','POST',{usuario,password});
+    //const r=await api('login','POST',{usuario,password}); EMPIEZO A EDITAR
+    const r = await api('login', 'POST', { email: usuario, password });
+    //TERMINO DE EDITAR
     if(!r.ok){showAlert('l-alert',r.error||'Error','err');return}
     state.user=r.user;localStorage.setItem('grama_user',JSON.stringify(r.user));hide('s-login');
     const rol=r.user.rol;
