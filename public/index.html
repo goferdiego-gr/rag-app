@@ -774,25 +774,70 @@ async function api(path,method='GET',body=null){
   const r=await fetch('/api/'+path,opts);
   return r.json();
 }
-
-async function doLogin(){
+//EMPIEZO A EDITAR
+  async function doLogin(){
   const usuario=el('l-user').value.trim(),password=el('l-pass').value;
-  if(!usuario||!password){showAlert('l-alert','Ingresa usuario y contrasena','err');return}
-  loading(true,'Iniciando sesion...');
+  if(!usuario||!password){
+    showAlert('l-alert','Ingresa email y contraseña','err');
+    return;
+  }
+  loading(true,'Iniciando sesión...');
   try{
-    //const r=await api('login','POST',{usuario,password}); EMPIEZO A EDITAR
-    const r = await api('login', 'POST', { email: usuario, password });
-    //TERMINO DE EDITAR
-    if(!r.ok){showAlert('l-alert',r.error||'Error','err');return}
-    state.user=r.user;localStorage.setItem('grama_user',JSON.stringify(r.user));hide('s-login');
+    // CAMBIO CLAVE: usuario → email
+    const r=await api('login','POST',{email:usuario,password});
+    
+    if(!r.ok){
+      showAlert('l-alert',r.error||'Error','err');
+      return;
+    }
+    
+    state.user=r.user;
+    localStorage.setItem('grama_user',JSON.stringify(r.user));
+    hide('s-login');
+    
     const rol=r.user.rol;
-    if(['superadmin','admin'].includes(rol)){await loadAdmin();show('s-admin')}
-    else if(rol==='distribuidor'){await loadDist();show('s-dist')}
-    else if(rol==='vendedor'){await loadVend();show('s-vend')}
-    else{await loadAplic();show('s-aplic')}
-  }catch(e){showAlert('l-alert','Error de conexion','err')}
-  finally{loading(false)}
+    if(['superadmin','admin'].includes(rol)){
+      await loadAdmin();
+      show('s-admin');
+    }
+    else if(rol==='distribuidor'){
+      await loadDist();
+      show('s-dist');
+    }
+    else if(rol==='vendedor'){
+      await loadVend();
+      show('s-vend');
+    }
+    else{
+      await loadAplic();
+      show('s-aplic');
+    }
+  }catch(e){
+    showAlert('l-alert','Error de conexión','err');
+  }
+  finally{
+    loading(false);
+  }
 }
+//TERMINO DE EDITAR
+//async function doLogin(){
+  //const usuario=el('l-user').value.trim(),password=el('l-pass').value;
+  //if(!usuario||!password){showAlert('l-alert','Ingresa usuario y contrasena','err');return}
+  //loading(true,'Iniciando sesion...');
+  //try{
+    //const r=await api('login','POST',{usuario,password}); EMPIEZO A EDITAR
+    //const r = await api('login', 'POST', { email: usuario, password });
+    //TERMINO DE EDITAR
+    //if(!r.ok){showAlert('l-alert',r.error||'Error','err');return}
+    //state.user=r.user;localStorage.setItem('grama_user',JSON.stringify(r.user));hide('s-login');
+    //const rol=r.user.rol;
+    //if(['superadmin','admin'].includes(rol)){await loadAdmin();show('s-admin')}
+    //else if(rol==='distribuidor'){await loadDist();show('s-dist')}
+    //else if(rol==='vendedor'){await loadVend();show('s-vend')}
+    //else{await loadAplic();show('s-aplic')}
+  //}catch(e){showAlert('l-alert','Error de conexion','err')}
+  //finally{loading(false)}
+//}
 
 function doLogout(){
   state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],clientes:[],preciosDist:[]};localStorage.removeItem('grama_user');
