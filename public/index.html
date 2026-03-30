@@ -2107,20 +2107,44 @@ async function doResetPassword() {
 }
  
 // ─── INICIALIZACIÓN ───────────────────────────────────────────────────────
- 
-// Al cargar, verificar si estamos en una página de auth
-window.addEventListener('load', function() {
+ //EMPIEZO A EDITAR
+  window.addEventListener('load', async function() {
+
   const params = new URLSearchParams(window.location.search);
-  
+  const hash = window.location.hash;
+
+  const { data } = await supabase.auth.getSession();
+
+  // NUEVO: detectar invite o recovery
+  if (data.session && (hash.includes('type=invite') || hash.includes('type=recovery'))) {
+    initSetPassword();
+    return;
+  }
+
+  // 🔹 lo que ya tenías
   if (params.get('page') === 'forgot-password') {
     showForgotPasswordPage();
   } else if (params.get('token') && params.get('page') === 'reset') {
     initResetPassword();
   } else if (params.get('token')) {
-    // Asumir que es set-password
     initSetPassword();
   }
+
 }, { once: true });
+//TERMINO DE EDITAR
+// Al cargar, verificar si estamos en una página de auth
+//window.addEventListener('load', function() {
+  //const params = new URLSearchParams(window.location.search);
+  
+  //if (params.get('page') === 'forgot-password') {
+    //showForgotPasswordPage();
+  //} else if (params.get('token') && params.get('page') === 'reset') {
+    //initResetPassword();
+  //} else if (params.get('token')) {
+    // Asumir que es set-password
+    //initSetPassword();
+  //}
+//}, { once: true });
  
 // Link en login para "Olvide mi contraseña"
 function forgotPasswordLink() {
