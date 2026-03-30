@@ -11,7 +11,7 @@ const { createClient } = require('@supabase/supabase-js');
  
 const supabase = createClient(
   process.env.SUPABASE_URL || 'https://ybuwfzbxtjsvkcpymcbo.supabase.co',
-  process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' // ⚠️ Usa SERVICE KEY en Vercel (variables de entorno)
+  process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlidXdmemJ4dGpzdmtjcHltY2JvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDAzOTE3NCwiZXhwIjoyMDg5NjE1MTc0fQ.t10CrlRlm6eJeelWWFopTS7lFb5Y76s9pxQCrmoHU1w' // ⚠️ Usa SERVICE KEY en Vercel (variables de entorno)
 );
  
 const cors = (res) => {
