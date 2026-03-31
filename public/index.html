@@ -1293,7 +1293,8 @@ async function loadVend(){
 
 function renderVendInicio(){
   const c=state.clientes,p=state.pedidos;
-  const pagados=p.filter(x=>x.status==='pagado');
+  //const pagados=p.filter(x=>x.status==='pagado');
+  const pagados=p.filter(x=>['pagado','enviado','entregado'].includes(x.status));
   const comisionEstimada=pagados.reduce((a,x)=>a+(x.total||0)/1.16*(state.user.comision_pct||NIVELES[state.user.nivel||'semilla']?.pct||10)/100,0);
   const totalVentas=pagados.reduce((a,x)=>a+(x.total||0),0);
   el('vend-stats').innerHTML=stat(c.length,'Clientes')+stat(p.length,'Pedidos totales')+stat(fmx(totalVentas),'Ventas pagadas')+stat(fmx(comisionEstimada),'Mi comision');
@@ -1313,7 +1314,8 @@ function renderVendClientes(){
     `<thead><tr><th>Empresa</th><th>Contacto</th><th>Ciudad</th><th>Pedidos</th><th>Total ventas</th><th>Ultimo pedido</th><th>Status</th><th></th></tr></thead><tbody>`+
     (state.clientes.length?state.clientes.map(c=>{
       const pedsCli=state.pedidos.filter(p=>p.cliente_id===c.id);
-      const totalCli=pedsCli.filter(p=>p.status==='pagado').reduce((a,p)=>a+(p.total||0),0);
+      //const totalCli=pedsCli.filter(p=>p.status==='pagado').reduce((a,p)=>a+(p.total||0),0);
+      const totalCli=pedsCli.filter(p=>['pagado','enviado','entregado'].includes(p.status)).reduce((a,p)=>a+(p.total||0),0);
       const ultimo=pedsCli[0];
       return`<tr>
         <td>${c.empresa||'—'}</td><td>${c.contacto}</td><td style="font-size:12px">${c.ciudad||'—'}</td>
@@ -1348,7 +1350,8 @@ function renderVendPedidos(){
 
 function renderVendComision(){
   const p=state.pedidos;
-  const pagados=p.filter(x=>x.status==='pagado');
+  //const pagados=p.filter(x=>x.status==='pagado');
+  const pagados=p.filter(x=>['pagado','enviado','entregado'].includes(x.status));
   const totalVentas=pagados.reduce((a,x)=>a+(x.total||0),0);
   const totalSinIva=totalVentas/1.16;
   const pct=state.user.comision_pct||NIVELES[state.user.nivel||'semilla']?.pct||10;
@@ -1466,7 +1469,8 @@ function showDetalleCliente(id){
   const c=state.clientes.find(x=>x.id===id);if(!c)return;
   editClienteId=id;
   const pedsCli=state.pedidos.filter(p=>p.cliente_id===id);
-  const totalPagado=pedsCli.filter(p=>p.status==='pagado').reduce((a,p)=>a+(p.total||0),0);
+  //const totalPagado=pedsCli.filter(p=>p.status==='pagado').reduce((a,p)=>a+(p.total||0),0);
+  const totalPagado=pedsCli.filter(p=>['pagado','enviado','entregado'].includes(p.status)).reduce((a,p)=>a+(p.total||0),0);
   const pct=state.user.comision_pct||0;
   el('modal-cliente-body').innerHTML=`
     <div class="grid2" style="margin-bottom:1rem">
