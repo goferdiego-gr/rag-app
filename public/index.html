@@ -2108,55 +2108,56 @@ async function doResetPassword() {
  
 // ─── INICIALIZACIÓN ───────────────────────────────────────────────────────
  //EMPIEZO A EDITAR
+  window.addEventListener('load', async function() {
 
-//TERMINO DE EDITAR
-// Al cargar, verificar si estamos en una página de auth
-window.addEventListener('load', function() {
-  // Handle Auth redirect (password setup)
-const hash = window.location.hash;
-if(hash.includes('type=invite') || hash.includes('type=recovery')){
-  const params = new URLSearchParams(hash.replace('#',''));
-  const accessToken = params.get('access_token');
-  if(accessToken){
-    hide('loading-overlay');
-    show('s-set-password');
-    // Store token for password update
-    window._authToken = accessToken;
+  const params = new URLSearchParams(window.location.search);
+  const hash = window.location.hash;
+
+  // 🔥 FORZAR A SUPABASE A LEER EL TOKEN
+  await supabase.auth.refreshSession();
+
+  const { data } = await supabase.auth.getSession();
+
+  console.log("SESSION:", data.session);
+  console.log("HASH:", hash);
+
+  // 🔥 DETECTAR INVITE / RECOVERY (LO NUEVO)
+  if (data.session && (hash.includes('type=invite') || hash.includes('type=recovery'))) {
+    console.log("ENTRANDO A SET PASSWORD");
+    initSetPassword();
     return;
   }
-}
-  const params = new URLSearchParams(window.location.search);
-  
+
+  // 🔹 TU LÓGICA ORIGINAL
   if (params.get('page') === 'forgot-password') {
     showForgotPasswordPage();
   } else if (params.get('token') && params.get('page') === 'reset') {
     initResetPassword();
   } else if (params.get('token')) {
-     //Asumir que es set-password
     initSetPassword();
   }
+
 }, { once: true });
+//TERMINO DE EDITAR
+// Al cargar, verificar si estamos en una página de auth
+//window.addEventListener('load', function() {
+  //const params = new URLSearchParams(window.location.search);
+  
+  //if (params.get('page') === 'forgot-password') {
+    //showForgotPasswordPage();
+  //} else if (params.get('token') && params.get('page') === 'reset') {
+    //initResetPassword();
+  //} else if (params.get('token')) {
+    // Asumir que es set-password
+    //initSetPassword();
+  //}
+//}, { once: true });
  
 // Link en login para "Olvide mi contraseña"
 function forgotPasswordLink() {
   showForgotPasswordPage();
 }
- <div id="s-set-password" class="hidden">
-  <div style="max-width:380px;margin:3rem auto">
-    <div style="text-align:center;margin-bottom:2rem">
-      <img src="/Logo_Grama.png" alt="Grama" style="height:80px;width:auto" />
-      <div style="font-size:16px;font-weight:500;margin-top:12px">Define tu contraseña</div>
-    </div>
-    <div class="card">
-      <div id="sp-alert" class="hidden"></div>
-      <label>Nueva contraseña</label>
-      <input type="password" id="sp-pass" placeholder="Mínimo 6 caracteres" />
-      <label>Confirmar contraseña</label>
-      <input type="password" id="sp-pass2" placeholder="Repite la contraseña" />
-      <button class="btn btn-primary btn-full" style="margin-top:18px" onclick="definirPassword()">Guardar contraseña</button>
-    </div>
-  </div>
-</div>
+ 
   <!--//TERMINO DE EDITAR-->
 </script>
 </body>
