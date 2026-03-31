@@ -2132,7 +2132,7 @@ if(hash.includes('type=invite') || hash.includes('type=recovery')){
   } else if (params.get('token') && params.get('page') === 'reset') {
     initResetPassword();
   } else if (params.get('token')) {
-     Asumir que es set-password
+     //Asumir que es set-password
     initSetPassword();
   }
 }, { once: true });
