@@ -1,8 +1,3 @@
-// ============================================================================
-// ARCHIVO: /api/login.js (CORREGIDO PARA AUTH)
-// ============================================================================
-// Reemplaza TODO el contenido de tu /api/login.js con esto
-
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
@@ -19,86 +14,34 @@ const cors = (res) => {
 module.exports = async (req, res) => {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
-
   try {
-    // Puede venir como usuario/password O email/password
     const { usuario, password, email } = req.body;
-    const loginEmail = email || usuario; // Si viene usuario, usarlo como email
+    const loginId = email || usuario;
+    if (!loginId || !password) return res.status(400).json({ error: 'Credenciales requeridas' });
 
-    if (!loginEmail || !password) {
-      return res.status(400).json({ error: 'Email y contraseña requeridos' });
-    }
-
-    // PRIMERO: Intentar login con Supabase Auth (NEW)
-    console.log(`🔐 Intentando auth con: ${loginEmail}`);
-    
+    // 1. Try Supabase Auth (new users with email)
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email: loginEmail,
-      password: password
+      email: loginId, password
     });
-
-    if (!authError && authData.user) {
-      console.log(`✅ Auth exitoso para: ${loginEmail}`);
-      
-      // Obtener datos del usuario desde tabla usuarios
-      const { data: userData, error: userError } = await supabase
-        .from('usuarios')
-        .select('*')
-        .eq('auth_id', authData.user.id)
-        .single();
-
-      if (userError || !userData) {
-        console.warn(`⚠️ Usuario en Auth pero no en tabla usuarios: ${loginEmail}`);
-        // Usuario en Auth pero no sincronizado. Crear manualmente:
-        const { data: newUser, error: createError } = await supabase
-          .from('usuarios')
-          .insert([{
-            id: require('crypto').randomUUID(),
-            email: authData.user.email,
-            auth_id: authData.user.id,
-            usuario: authData.user.email,
-            nombre: authData.user.raw_user_meta_data?.nombre || 'Usuario',
-            password: 'auth_' + authData.user.id,
-            rol: authData.user.raw_user_meta_data?.rol || 'aplicador',
-            activo: true
-          }])
-          .select()
-          .single();
-        
-        if (!createError && newUser) {
-          const { password: _, ...user } = newUser;
-          return res.status(200).json({ ok: true, user, session: authData.session });
-        }
+    if (!authError && authData?.user) {
+      const { data: userData } = await supabase.from('usuarios')
+        .select('*').eq('auth_id', authData.user.id).single();
+      if (userData) {
+        const { password: _, ...user } = userData;
+        return res.status(200).json({ ok: true, user, session: authData.session });
       }
-
-      // Usuario existe en tabla usuarios
-      const { password: _, ...user } = userData;
-      return res.status(200).json({ ok: true, user, session: authData.session });
     }
 
-    // SEGUNDO: Si Auth falla, intentar tabla antigua (FALLBACK para migración)
-    console.log(`⚠️ Auth falló, intentando tabla antigua...`);
-    
-    const { data: oldUser, error: oldError } = await supabase
-      .from('usuarios')
-      .select('*')
-      .eq('usuario', loginEmail)
-      .eq('password', password)
-      .eq('activo', true)
-      .single();
-
+    // 2. Legacy login (existing users)
+    const { data: oldUser, error: oldError } = await supabase.from('usuarios')
+      .select('*').eq('usuario', loginId).eq('password', password).eq('activo', true).single();
     if (!oldError && oldUser) {
-      console.log(`✅ Login exitoso en tabla antigua: ${loginEmail}`);
       const { password: _, ...user } = oldUser;
       return res.status(200).json({ ok: true, user });
     }
 
-    // Ambos fallaron
-    console.log(`❌ Login fallido para: ${loginEmail}`);
-    return res.status(401).json({ error: 'Email o contraseña incorrectos' });
-
-  } catch (error) {
-    console.error('❌ Error en login:', error);
-    return res.status(500).json({ error: error.message });
+    return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
   }
 };

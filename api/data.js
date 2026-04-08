@@ -18,7 +18,8 @@ module.exports = async (req, res) => {
         return res.status(200).json(data);
       }
       if (resource === 'stock') {
-        const { data, error } = await supabase.from('stock').select('*, cedis(nombre,ciudad), productos(nombre,presentacion)');
+        const { data, error } = await supabase.from('stock')
+          .select('*, cedis(nombre,ciudad), productos(nombre,presentacion)');
         if (error) throw error;
         return res.status(200).json(data);
       }
@@ -48,13 +49,17 @@ module.exports = async (req, res) => {
       if (resource === 'stock') {
         const { cedis_id, producto_id, cantidad } = req.body;
         const { error } = await supabase.from('stock')
-          .upsert({ cedis_id, producto_id, cantidad, actualizado_en: new Date() }, { onConflict: 'cedis_id,producto_id' });
+          .upsert({ cedis_id, producto_id, cantidad, actualizado_en: new Date() },
+            { onConflict: 'cedis_id,producto_id' });
         if (error) throw error;
         return res.status(200).json({ ok: true });
       }
       if (resource === 'productos') {
-        const { id, precio_lista } = req.body;
-        const { error } = await supabase.from('productos').update({ precio_lista }).eq('id', id);
+        const { id, precio_lista, precio_sin_iva } = req.body;
+        const updates = {};
+        if (precio_lista !== undefined) updates.precio_lista = precio_lista;
+        if (precio_sin_iva !== undefined) updates.precio_sin_iva = precio_sin_iva;
+        const { error } = await supabase.from('productos').update(updates).eq('id', id);
         if (error) throw error;
         return res.status(200).json({ ok: true });
       }
