@@ -193,6 +193,62 @@ module.exports = async (req, res) => {
       return res.status(200).json({ ok: true });
     }
 
+    // ── DELETE ───────────────────────────────────────────────────────────────
+    // Solo el vendedor/usuario propietario puede eliminar pedidos en estado 'pendiente'
+    if (req.method === 'DELETE') {
+      const { id, usuario_id } = req.query;
+      if (!id || !usuario_id) {
+        return res.status(400).json({ error: 'ID de pedido y usuario requeridos' });
+      }
+
+      try {
+        // Obtener pedido
+        const { data: pedido, error: readErr } = await supabase.from('pedidos')
+          .select('id, status, vendedor_id, usuario_id')
+          .eq('id', id)
+          .single();
+
+        if (readErr || !pedido) {
+          return res.status(404).json({ error: 'Pedido no encontrado' });
+        }
+
+        // Verificar que sea propietario (vendedor_id o usuario_id coincida)
+        const esPropietario = pedido.vendedor_id === usuario_id || pedido.usuario_id === usuario_id;
+        if (!esPropietario) {
+          return res.status(403).json({ error: 'No tienes permiso para eliminar este pedido' });
+        }
+
+        // Solo permitir eliminar si está en estado 'pendiente'
+        if (pedido.status !== 'pendiente') {
+          return res.status(400).json({ 
+            error: `No se puede eliminar un pedido en estado '${pedido.status}'. Solo se pueden eliminar pedidos pendientes.` 
+          });
+        }
+
+        // Eliminar items del pedido primero
+        const { error: itemsErr } = await supabase.from('pedido_items')
+          .delete()
+          .eq('pedido_id', id);
+
+        if (itemsErr) throw itemsErr;
+
+        // Eliminar el pedido
+        const { error: delErr } = await supabase.from('pedidos')
+          .delete()
+          .eq('id', id);
+
+        if (delErr) throw delErr;
+
+        return res.status(200).json({ 
+          ok: true, 
+          message: 'Pedido eliminado correctamente' 
+        });
+      } catch (error) {
+        console.error('Error eliminando pedido:', error);
+        return res.status(500).json({ error: error.message });
+      }
+    }
+
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (e) {
     console.error('PEDIDOS ERROR:', e.message);
