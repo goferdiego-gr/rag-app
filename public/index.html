@@ -2198,6 +2198,296 @@ function forgotPasswordLink() {
 }
  
   <!--//TERMINO DE EDITAR-->
+//Empiezo a editar 08 abril
+    <script>
+async function eliminarPedido(pedidoId) {
+  // Buscar el pedido en la lista
+  const pedido = pedidos.find(p => p.id === pedidoId);
+  
+  // Validar que exista y esté pendiente
+  if (!pedido) {
+    alert('Pedido no encontrado');
+    return;
+  }
+  
+  if (pedido.status !== 'pendiente') {
+    alert(`No se puede eliminar un pedido en estado "${pedido.status}".\n\nSolo se pueden eliminar pedidos pendientes.`);
+    return;
+  }
+ 
+  // Pedir confirmación
+  if (!confirm(`¿Estás seguro de que deseas eliminar este pedido?\n\nCliente: ${pedido.clientes?.empresa || 'N/A'}\nTotal: $${pedido.total?.toFixed(2)}\n\nEsta acción no se puede deshacer.`)) {
+    return;
+  }
+ 
+  try {
+    const response = await fetch(`/api/pedidos?id=${pedidoId}&usuario_id=${usuarioActual.id}`, {
+      method: 'DELETE'
+    });
+ 
+    if (!response.ok) {
+      const error = await response.json();
+      alert('Error: ' + (error.error || 'Error desconocido'));
+      return;
+    }
+ 
+    const result = await response.json();
+    console.log('✅ Pedido eliminado:', result.message);
+    alert('✅ ' + result.message);
+ 
+    // Recargar lista de pedidos
+    cargarPedidos();
+    
+  } catch (error) {
+    console.error('Error eliminando pedido:', error);
+    alert('Error al eliminar el pedido: ' + error.message);
+  }
+}
+ 
+// ============================================================================
+ 
+async function eliminarCotizacion(cotizacionId) {
+  // Buscar la cotización en la lista
+  const cotizacion = cotizaciones.find(c => c.id === cotizacionId);
+  
+  // Validar que exista y esté pendiente
+  if (!cotizacion) {
+    alert('Cotización no encontrada');
+    return;
+  }
+  
+  if (cotizacion.status !== 'pendiente') {
+    alert(`No se puede eliminar una cotización en estado "${cotizacion.status}".\n\nSolo se pueden eliminar cotizaciones pendientes.`);
+    return;
+  }
+ 
+  // Pedir confirmación
+  const clienteNombre = cotizacion.clientes?.empresa || 'N/A';
+  if (!confirm(`¿Estás seguro de que deseas eliminar esta cotización?\n\nCliente: ${clienteNombre}\n\nEsta acción no se puede deshacer.`)) {
+    return;
+  }
+ 
+  try {
+    const response = await fetch(`/api/cotizaciones?id=${cotizacionId}&vendedor_id=${usuarioActual.id}`, {
+      method: 'DELETE'
+    });
+ 
+    if (!response.ok) {
+      const error = await response.json();
+      alert('Error: ' + (error.error || 'Error desconocido'));
+      return;
+    }
+ 
+    const result = await response.json();
+    console.log('✅ Cotización eliminada:', result.message);
+    alert('✅ ' + result.message);
+ 
+    // Recargar lista de cotizaciones
+    cargarCotizaciones();
+    
+  } catch (error) {
+    console.error('Error eliminando cotización:', error);
+    alert('Error al eliminar la cotización: ' + error.message);
+  }
+}
+ 
+// ============================================================================
+// FUNCIÓN AUXILIAR: Mostrar/Ocultar BOTONES DE ELIMINAR según estado y permisos
+// ============================================================================
+ 
+function actualizarVisibilidadBotonesEliminar() {
+  // Para PEDIDOS
+  if (document.getElementById('pedidosList')) {
+    document.querySelectorAll('[data-pedido-id]').forEach(elem => {
+      const pedidoId = elem.dataset.pedidoId;
+      const pedido = pedidos.find(p => p.id === pedidoId);
+      const btnEliminar = elem.querySelector('.btn-eliminar-pedido');
+      
+      if (!btnEliminar) return;
+      
+      // Mostrar solo si:
+      // 1. Está en estado pendiente
+      // 2. El usuario es propietario (vendedor_id o usuario_id)
+      const esPermitido = pedido && 
+                         pedido.status === 'pendiente' && 
+                         (pedido.vendedor_id === usuarioActual.id || 
+                          pedido.usuario_id === usuarioActual.id);
+      
+      btnEliminar.style.display = esPermitido ? 'inline-block' : 'none';
+    });
+  }
+ 
+  // Para COTIZACIONES
+  if (document.getElementById('cotizacionesList')) {
+    document.querySelectorAll('[data-cotizacion-id]').forEach(elem => {
+      const cotizacionId = elem.dataset.cotizacionId;
+      const cotizacion = cotizaciones.find(c => c.id === cotizacionId);
+      const btnEliminar = elem.querySelector('.btn-eliminar-cotizacion');
+      
+      if (!btnEliminar) return;
+      
+      // Mostrar solo si:
+      // 1. Está en estado pendiente
+      // 2. El usuario es propietario (vendedor_id)
+      const esPermitido = cotizacion && 
+                         cotizacion.status === 'pendiente' && 
+                         cotizacion.vendedor_id === usuarioActual.id;
+      
+      btnEliminar.style.display = esPermitido ? 'inline-block' : 'none';
+    });
+  }
+}
+ 
+// Llamar esta función después de cargar los pedidos/cotizaciones
+// Ej: cargarPedidos().then(() => actualizarVisibilidadBotonesEliminar());
+</script>
+ 
+<!-- ============================================================================ -->
+<!-- 2. EJEMPLO DE FILA EN LA TABLA DE PEDIDOS -->
+<!-- ============================================================================ -->
+ 
+<!-- Reemplazar la fila actual de pedidos con esta estructura: -->
+ 
+<tr data-pedido-id="${pedido.id}">
+  <td>${new Date(pedido.creado_en).toLocaleDateString('es-MX')}</td>
+  <td>${pedido.clientes?.empresa || 'N/A'}</td>
+  <td>${pedido.cedis?.nombre || 'N/A'}</td>
+  <td>$${(pedido.total || 0).toFixed(2)}</td>
+  <td>
+    <span class="badge" style="background-color: ${
+      pedido.status === 'pendiente' ? '#FFC107' :
+      pedido.status === 'confirmado' ? '#2196F3' :
+      pedido.status === 'pagado' ? '#4CAF50' :
+      pedido.status === 'enviado' ? '#9C27B0' :
+      pedido.status === 'entregado' ? '#4CAF50' : '#999'
+    }">
+      ${pedido.status.toUpperCase()}
+    </span>
+  </td>
+  <td>
+    <button class="btn btn-sm btn-info" onclick="abrirDetallesPedido('${pedido.id}')">
+      👁️ Ver Detalles
+    </button>
+    ${pedido.status === 'pagado' || pedido.status === 'enviado' || pedido.status === 'entregado' 
+      ? `<button class="btn btn-sm btn-success" onclick="solicitarFactura('${pedido.id}')">
+           📄 Factura
+         </button>` 
+      : ''}
+    <button class="btn btn-sm btn-danger btn-eliminar-pedido" 
+            onclick="eliminarPedido('${pedido.id}')" 
+            style="display: none;"
+            title="Eliminar este pedido">
+      🗑️ Eliminar
+    </button>
+  </td>
+</tr>
+ 
+<!-- ============================================================================ -->
+<!-- 3. EJEMPLO DE FILA EN LA TABLA DE COTIZACIONES -->
+<!-- ============================================================================ -->
+ 
+<!-- Reemplazar la fila actual de cotizaciones con esta estructura: -->
+ 
+<tr data-cotizacion-id="${cotizacion.id}">
+  <td>${new Date(cotizacion.creado_en).toLocaleDateString('es-MX')}</td>
+  <td>${cotizacion.clientes?.empresa || 'N/A'}</td>
+  <td>${cotizacion.clientes?.contacto || 'N/A'}</td>
+  <td>
+    <span class="badge" style="background-color: ${
+      cotizacion.status === 'pendiente' ? '#FFC107' :
+      cotizacion.status === 'completado' ? '#4CAF50' : '#999'
+    }">
+      ${cotizacion.status.toUpperCase()}
+    </span>
+  </td>
+  <td>
+    ${cotizacion.status === 'completado' && cotizacion.archivo_url
+      ? `<button class="btn btn-sm btn-info" onclick="descargarCotizacion('${cotizacion.archivo_url}')">
+           📥 Descargar PDF
+         </button>`
+      : `${cotizacion.status === 'pendiente' 
+          ? '<span class="text-warning">⏳ Esperando PDF</span>' 
+          : 'Sin PDF'}`}
+    <button class="btn btn-sm btn-danger btn-eliminar-cotizacion" 
+            onclick="eliminarCotizacion('${cotizacion.id}')" 
+            style="display: none;"
+            title="Eliminar esta cotización">
+      🗑️ Eliminar
+    </button>
+  </td>
+</tr>
+ 
+<!-- ============================================================================ -->
+<!-- 4. ESTILOS CSS RECOMENDADOS (agregar en <style>) -->
+<!-- ============================================================================ -->
+ 
+<style>
+  .btn-eliminar-pedido,
+  .btn-eliminar-cotizacion {
+    margin-left: 5px;
+    transition: background-color 0.3s ease;
+  }
+ 
+  .btn-eliminar-pedido:hover,
+  .btn-eliminar-cotizacion:hover {
+    background-color: #d32f2f !important;
+    transform: scale(1.05);
+  }
+ 
+  .btn-eliminar-pedido:disabled,
+  .btn-eliminar-cotizacion:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+ 
+  /* Iconos en botones */
+  .btn-danger::before {
+    content: '';
+    margin-right: 5px;
+  }
+</style>
+ 
+<!-- ============================================================================ -->
+<!-- 5. INTEGRACIÓN CON cargarPedidos() y cargarCotizaciones() -->
+<!-- ============================================================================ -->
+ 
+<!-- Modificar estas funciones para llamar a actualizarVisibilidadBotonesEliminar(): -->
+ 
+<!-- ANTES (estructura actual): -->
+<!--
+async function cargarPedidos() {
+  const response = await fetch('/api/pedidos?usuario_id=' + usuarioActual.id);
+  const data = await response.json();
+  pedidos = data;
+  renderizarPedidos();
+}
+-->
+ 
+<!-- DESPUÉS (con eliminación de soporte): -->
+<!--
+async function cargarPedidos() {
+  const response = await fetch('/api/pedidos?usuario_id=' + usuarioActual.id);
+  const data = await response.json();
+  pedidos = data;
+  renderizarPedidos();
+  // Actualizar visibilidad de botones de eliminar
+  actualizarVisibilidadBotonesEliminar();
+}
+ 
+async function cargarCotizaciones() {
+  const response = await fetch('/api/cotizaciones?vendedor_id=' + usuarioActual.id);
+  const data = await response.json();
+  cotizaciones = data;
+  renderizarCotizaciones();
+  // Actualizar visibilidad de botones de eliminar
+  actualizarVisibilidadBotonesEliminar();
+}
+-->
+ 
+<!-- ============================================================================ -->
+
+  <!--//Termino de editar 08 abril-->
+  
 </script>
 </body>
 </html>
