@@ -101,6 +101,11 @@ tr:hover td{background:#f9fdf9}
       <label>Usuario</label><input type="text" id="l-user" placeholder="tu.usuario" autocomplete="username" />
       <label>Contraseña</label><input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
       <button class="btn btn-primary btn-full" style="margin-top:18px" onclick="doLogin()">Entrar</button>
+      <!--EMPIEZO A EDITAR-->
+      <div style="text-align:center;margin-top:1rem;font-size:12px;color:#999">
+  <a href="#" onclick="forgotPasswordLink();return false" style="color:#1f7344;font-weight:500">¿Olvidaste tu contraseña?</a>
+</div>
+      <!--TERMINO DE EDITAR-->
     </div>
   </div>
 </div>
@@ -618,7 +623,104 @@ tr:hover td{background:#f9fdf9}
     </div>
   </div>
 </div>
-
+<!--EMPIEZO A EDITAR -->
+   
+<!-- SET PASSWORD PAGE (Cuando recibe invitación) -->
+<div id="s-set-password" class="hidden">
+  <div style="max-width:420px;margin:3rem auto">
+    <div style="text-align:center;margin-bottom:2rem">
+      <img src="/Logo_Grama.png" alt="Grama" style="height:80px;width:auto" />
+      <div style="font-size:13px;color:#999;margin-top:8px">Red de Distribuidores Grama</div>
+      <div style="font-size:14px;color:#1c402e;margin-top:1rem;font-weight:500">Establece tu contraseña</div>
+    </div>
+    <div class="card">
+      <div id="sp-alert" class="hidden"></div>
+      
+      <div style="background:#f9fdf9;border-radius:8px;padding:12px;margin-bottom:1rem;font-size:13px;color:#5d5d5d">
+        <strong>Bienvenido a Grama</strong><br>
+        <span id="sp-email" style="color:#1c402e;font-weight:500"></span><br>
+        <span id="sp-rol" style="font-size:12px;color:#999"></span>
+      </div>
+ 
+      <label>Contraseña *</label>
+      <input type="password" id="sp-pass" placeholder="Mínimo 6 caracteres" />
+      
+      <label>Confirmar contraseña *</label>
+      <input type="password" id="sp-pass-confirm" placeholder="Repite tu contraseña" onkeydown="if(event.key==='Enter')doSetPassword()" />
+      
+      <div style="font-size:12px;color:#999;margin-top:12px;padding:10px;background:#f4f4f4;border-radius:6px">
+        ✓ Mínimo 6 caracteres<br>
+        ✓ Usa mayúsculas, minúsculas y números si es posible
+      </div>
+ 
+      <button class="btn btn-primary btn-full" style="margin-top:18px" onclick="doSetPassword()">Establecer contraseña</button>
+      
+      <div style="text-align:center;margin-top:1rem;font-size:12px;color:#999">
+        ¿Ya tienes cuenta? <a href="#" onclick="show('s-login');hide('s-set-password');return false" style="color:#1f7344;font-weight:500">Inicia sesión</a>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- FORGOT PASSWORD PAGE (Solicitar reset) -->
+<div id="s-forgot-password" class="hidden">
+  <div style="max-width:420px;margin:3rem auto">
+    <div style="text-align:center;margin-bottom:2rem">
+      <img src="/Logo_Grama.png" alt="Grama" style="height:80px;width:auto" />
+      <div style="font-size:13px;color:#999;margin-top:8px">Red de Distribuidores Grama</div>
+      <div style="font-size:14px;color:#1c402e;margin-top:1rem;font-weight:500">Recupera tu contraseña</div>
+    </div>
+    <div class="card">
+      <div id="fp-alert" class="hidden"></div>
+      
+      <label>Email *</label>
+      <input type="email" id="fp-email" placeholder="tu@email.com" onkeydown="if(event.key==='Enter')doForgotPassword()" />
+      
+      <div style="font-size:12px;color:#999;margin-top:12px;padding:10px;background:#f4f4f4;border-radius:6px">
+        Ingresa el email asociado a tu cuenta. Te enviaremos un link para resetear tu contraseña.
+      </div>
+ 
+      <button class="btn btn-primary btn-full" style="margin-top:18px" onclick="doForgotPassword()">Enviar link de recuperación</button>
+      
+      <div style="text-align:center;margin-top:1rem;font-size:12px;color:#999">
+        <a href="#" onclick="show('s-login');hide('s-forgot-password');return false" style="color:#1f7344;font-weight:500">Volver al login</a>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- RESET PASSWORD PAGE (Cambiar contraseña con token) -->
+<div id="s-reset-password" class="hidden">
+  <div style="max-width:420px;margin:3rem auto">
+    <div style="text-align:center;margin-bottom:2rem">
+      <img src="/Logo_Grama.png" alt="Grama" style="height:80px;width:auto" />
+      <div style="font-size:13px;color:#999;margin-top:8px">Red de Distribuidores Grama</div>
+      <div style="font-size:14px;color:#1c402e;margin-top:1rem;font-weight:500">Nueva contraseña</div>
+    </div>
+    <div class="card">
+      <div id="rp-alert" class="hidden"></div>
+      
+      <label>Nueva contraseña *</label>
+      <input type="password" id="rp-pass" placeholder="Mínimo 6 caracteres" />
+      
+      <label>Confirmar contraseña *</label>
+      <input type="password" id="rp-pass-confirm" placeholder="Repite tu contraseña" onkeydown="if(event.key==='Enter')doResetPassword()" />
+      
+      <div style="font-size:12px;color:#999;margin-top:12px;padding:10px;background:#f4f4f4;border-radius:6px">
+        ✓ Mínimo 6 caracteres<br>
+        ✓ Usa mayúsculas, minúsculas y números si es posible
+      </div>
+ 
+      <button class="btn btn-primary btn-full" style="margin-top:18px" onclick="doResetPassword()">Cambiar contraseña</button>
+      
+      <div style="text-align:center;margin-top:1rem;font-size:12px;color:#999">
+        <a href="#" onclick="show('s-login');hide('s-reset-password');return false" style="color:#1f7344;font-weight:500">Volver al login</a>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!--TERMINO DE EDITAR -->
 <!-- MODAL SOLICITAR FACTURA -->
 <div id="modal-factura" class="modal-bg hidden">
   <div class="modal">
@@ -672,23 +774,70 @@ async function api(path,method='GET',body=null){
   const r=await fetch('/api/'+path,opts);
   return r.json();
 }
-
-async function doLogin(){
+//EMPIEZO A EDITAR
+  async function doLogin(){
   const usuario=el('l-user').value.trim(),password=el('l-pass').value;
-  if(!usuario||!password){showAlert('l-alert','Ingresa usuario y contrasena','err');return}
-  loading(true,'Iniciando sesion...');
+  if(!usuario||!password){
+    showAlert('l-alert','Ingresa email y contraseña','err');
+    return;
+  }
+  loading(true,'Iniciando sesión...');
   try{
-    const r=await api('login','POST',{usuario,password});
-    if(!r.ok){showAlert('l-alert',r.error||'Error','err');return}
-    state.user=r.user;localStorage.setItem('grama_user',JSON.stringify(r.user));hide('s-login');
+    // CAMBIO CLAVE: usuario → email
+    const r=await api('login','POST',{email:usuario,password});
+    
+    if(!r.ok){
+      showAlert('l-alert',r.error||'Error','err');
+      return;
+    }
+    
+    state.user=r.user;
+    localStorage.setItem('grama_user',JSON.stringify(r.user));
+    hide('s-login');
+    
     const rol=r.user.rol;
-    if(['superadmin','admin'].includes(rol)){await loadAdmin();show('s-admin')}
-    else if(rol==='distribuidor'){await loadDist();show('s-dist')}
-    else if(rol==='vendedor'){await loadVend();show('s-vend')}
-    else{await loadAplic();show('s-aplic')}
-  }catch(e){showAlert('l-alert','Error de conexion','err')}
-  finally{loading(false)}
+    if(['superadmin','admin'].includes(rol)){
+      await loadAdmin();
+      show('s-admin');
+    }
+    else if(rol==='distribuidor'){
+      await loadDist();
+      show('s-dist');
+    }
+    else if(rol==='vendedor'){
+      await loadVend();
+      show('s-vend');
+    }
+    else{
+      await loadAplic();
+      show('s-aplic');
+    }
+  }catch(e){
+    showAlert('l-alert','Error de conexión','err');
+  }
+  finally{
+    loading(false);
+  }
 }
+//TERMINO DE EDITAR
+//async function doLogin(){
+  //const usuario=el('l-user').value.trim(),password=el('l-pass').value;
+  //if(!usuario||!password){showAlert('l-alert','Ingresa usuario y contrasena','err');return}
+  //loading(true,'Iniciando sesion...');
+  //try{
+    //const r=await api('login','POST',{usuario,password}); EMPIEZO A EDITAR
+    //const r = await api('login', 'POST', { email: usuario, password });
+    //TERMINO DE EDITAR
+    //if(!r.ok){showAlert('l-alert',r.error||'Error','err');return}
+    //state.user=r.user;localStorage.setItem('grama_user',JSON.stringify(r.user));hide('s-login');
+    //const rol=r.user.rol;
+    //if(['superadmin','admin'].includes(rol)){await loadAdmin();show('s-admin')}
+    //else if(rol==='distribuidor'){await loadDist();show('s-dist')}
+    //else if(rol==='vendedor'){await loadVend();show('s-vend')}
+    //else{await loadAplic();show('s-aplic')}
+  //}catch(e){showAlert('l-alert','Error de conexion','err')}
+  //finally{loading(false)}
+//}
 
 function doLogout(){
   state={user:null,usuarios:[],servicios:[],pedidos:[],productos:[],cedis:[],stock:[],clientes:[],preciosDist:[]};localStorage.removeItem('grama_user');
@@ -751,14 +900,13 @@ function renderUsuarios(filtro={}){
   if(filtro.nivel)users=users.filter(u=>u.nivel===filtro.nivel);
   const isSuperAdmin=state.user?.rol==='superadmin';
   const accionesHeader=isSuperAdmin?'<th>Acciones</th>':'';
-  const authHeader='<th>Auth</th>';
   const rows=users.length?users.map(u=>{
     const integradoPor=state.usuarios.find(x=>x.id===u.integrado_por)?.nombre||'—';
     const uid=u.id,unm=(u.nombre||u.usuario).replace(/'/g,"");
     const accionesTd=isSuperAdmin?('<td style="display:flex;gap:4px"><button class="btn btn-sm" onclick="editarUsuario(\'' +uid+ '\')">Editar</button>'+(u.rol==='distribuidor'?'<button class="btn btn-sm" onclick="editarPreciosDist(\'' +uid+ '\',\'' +unm+ '\')">Precios</button>':'')+' </td>'):'';
     return '<tr><td><strong>'+u.usuario+'</strong></td><td>'+((u.nombre||'')+' '+(u.apellidos||''))+'</td><td style="font-size:12px">'+(u.empresa||'—')+'</td><td>'+rolBadge(u.rol)+'</td><td>'+(u.rol==='distribuidor'?'—':nivelBadge(u.nivel||'semilla'))+'</td><td>'+fmx(u.compras_mes)+'</td><td>'+(u.comision_pct||0)+'%</td><td style="font-size:12px;color:#5d5d5d">'+integradoPor+'</td>'+accionesTd+'</tr>';
   }).join(''):'<tr><td colspan="'+(isSuperAdmin?9:8)+'" class="empty">Sin usuarios</td></tr>';
-  el('tbl-usuarios').innerHTML='<thead><tr><th>Usuario</th><th>Nombre</th><th>Empresa</th><th>Tipo</th><th>Nivel</th><th>Compras mes</th><th>Comision%</th><th>Integrado por</th><th>Auth</th>'+accionesHeader+'</tr></thead><tbody>'+rows+'</tbody>';
+  el('tbl-usuarios').innerHTML='<thead><tr><th>Usuario</th><th>Nombre</th><th>Empresa</th><th>Tipo</th><th>Nivel</th><th>Compras mes</th><th>Comision%</th><th>Integrado por</th>'+accionesHeader+'</tr></thead><tbody>'+rows+'</tbody>';
 }
 
 function filtrarUsuarios(){renderUsuarios({rol:el('filtro-rol').value,nivel:el('filtro-nivel').value})}
@@ -933,7 +1081,7 @@ function editarUsuario(id){
 async function guardarUsuario(){
   const editId=el('modal-usuario').dataset.editId;
   const data={nombre:el('u-nombre').value.trim(),apellidos:el('u-apellidos').value.trim(),empresa:el('u-empresa').value.trim(),
-    email:el('u-email-new')?.value.trim()||el('u-email').value.trim(),telefono:el('u-tel').value.trim(),ciudad:el('u-ciudad').value.trim(),
+    email:el('u-email').value.trim(),telefono:el('u-tel').value.trim(),ciudad:el('u-ciudad').value.trim(),
     rol:el('u-rol').value,usuario:el('u-usuario').value.trim(),password:el('u-pass').value.trim(),integrado_por:el('u-integrado')?.value||null,
     comision_pct:parseFloat(el('u-comision').value||0)};
   if(!data.nombre||!data.usuario){showAlert('usr-alert','Nombre y usuario son requeridos','err');return}
@@ -1145,7 +1293,8 @@ async function loadVend(){
 
 function renderVendInicio(){
   const c=state.clientes,p=state.pedidos;
-  const pagados=p.filter(x=>x.status==='pagado');
+  //const pagados=p.filter(x=>x.status==='pagado');
+  const pagados=p.filter(x=>['pagado','enviado','entregado'].includes(x.status));
   const comisionEstimada=pagados.reduce((a,x)=>a+(x.total||0)/1.16*(state.user.comision_pct||NIVELES[state.user.nivel||'semilla']?.pct||10)/100,0);
   const totalVentas=pagados.reduce((a,x)=>a+(x.total||0),0);
   el('vend-stats').innerHTML=stat(c.length,'Clientes')+stat(p.length,'Pedidos totales')+stat(fmx(totalVentas),'Ventas pagadas')+stat(fmx(comisionEstimada),'Mi comision');
@@ -1165,7 +1314,8 @@ function renderVendClientes(){
     `<thead><tr><th>Empresa</th><th>Contacto</th><th>Ciudad</th><th>Pedidos</th><th>Total ventas</th><th>Ultimo pedido</th><th>Status</th><th></th></tr></thead><tbody>`+
     (state.clientes.length?state.clientes.map(c=>{
       const pedsCli=state.pedidos.filter(p=>p.cliente_id===c.id);
-      const totalCli=pedsCli.filter(p=>p.status==='pagado').reduce((a,p)=>a+(p.total||0),0);
+      //const totalCli=pedsCli.filter(p=>p.status==='pagado').reduce((a,p)=>a+(p.total||0),0);
+      const totalCli=pedsCli.filter(p=>['pagado','enviado','entregado'].includes(p.status)).reduce((a,p)=>a+(p.total||0),0);
       const ultimo=pedsCli[0];
       return`<tr>
         <td>${c.empresa||'—'}</td><td>${c.contacto}</td><td style="font-size:12px">${c.ciudad||'—'}</td>
@@ -1200,7 +1350,8 @@ function renderVendPedidos(){
 
 function renderVendComision(){
   const p=state.pedidos;
-  const pagados=p.filter(x=>x.status==='pagado');
+  //const pagados=p.filter(x=>x.status==='pagado');
+  const pagados=p.filter(x=>['pagado','enviado','entregado'].includes(x.status));
   const totalVentas=pagados.reduce((a,x)=>a+(x.total||0),0);
   const totalSinIva=totalVentas/1.16;
   const pct=state.user.comision_pct||NIVELES[state.user.nivel||'semilla']?.pct||10;
@@ -1318,7 +1469,8 @@ function showDetalleCliente(id){
   const c=state.clientes.find(x=>x.id===id);if(!c)return;
   editClienteId=id;
   const pedsCli=state.pedidos.filter(p=>p.cliente_id===id);
-  const totalPagado=pedsCli.filter(p=>p.status==='pagado').reduce((a,p)=>a+(p.total||0),0);
+  //const totalPagado=pedsCli.filter(p=>p.status==='pagado').reduce((a,p)=>a+(p.total||0),0);
+  const totalPagado=pedsCli.filter(p=>['pagado','enviado','entregado'].includes(p.status)).reduce((a,p)=>a+(p.total||0),0);
   const pct=state.user.comision_pct||0;
   el('modal-cliente-body').innerHTML=`
     <div class="grid2" style="margin-bottom:1rem">
@@ -1694,10 +1846,10 @@ async function subirCotizacion(cotId, input){
     const fileName='cot_'+cotId+'_'+Date.now()+'.pdf';
     const uploadRes=await fetch(SUPA_URL+'/storage/v1/object/cotizaciones/'+fileName,{
       method:'POST',
-      headers:{'Authorization':'Bearer '+SUPA_KEY,'Content-Type':file.type||'application/pdf','x-upsert':'true','cache-control':'3600'},
+      headers:{'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/pdf','x-upsert':'true'},
       body:file
     });
-    if(!uploadRes.ok){const errText=await uploadRes.text();throw new Error('Error al subir: '+errText);}
+    if(!uploadRes.ok)throw new Error('Error al subir archivo');
     const archivo_url=SUPA_URL+'/storage/v1/object/public/cotizaciones/'+fileName;
     const r=await api('cotizaciones','PUT',{id:cotId,archivo_url});
     if(r.ok){alert('Cotizacion subida. El vendedor ya puede descargarla.');await loadCotizacionesAdmin();}
@@ -1740,7 +1892,44 @@ async function actualizarStock(cedis_id,producto_id,cantidad){
     if(s)s.cantidad=parseInt(cantidad)||0;
   }catch(e){console.error(e)}
 }
+
+  
+
+async function definirPassword(){
+  const pass=el('sp-pass').value;
+  const pass2=el('sp-pass2').value;
+  if(pass.length<6){showAlert('sp-alert','Minimo 6 caracteres','err');return}
+  if(pass!==pass2){showAlert('sp-alert','Las contrasenas no coinciden','err');return}
+  loading(true,'Guardando...');
+  try{
+    const SUPA_URL='https://ybuwfzbxtjsvkcpymcbo.supabase.co';
+    const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlidXdmemJ4dGpzdmtjcHltY2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNzQsImV4cCI6MjA4OTYxNTE3NH0.XL9czwelRyqiu-fiBDdAfq0ox_IMF1FsUDZTCpMYguE';
+    const r=await fetch(SUPA_URL+'/auth/v1/user',{
+      method:'PUT',
+      headers:{'Authorization':'Bearer '+window._authToken,'apikey':SUPA_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({password:pass})
+    });
+    if(!r.ok){const e=await r.json();throw new Error(e.message||'Error al guardar');}
+    hide('s-set-password');
+    alert('Contrasena guardada correctamente. Ya puedes iniciar sesion.');
+    show('s-login');
+  }catch(e){showAlert('sp-alert',e.message,'err')}
+  finally{loading(false)}
+}
+
 window.addEventListener('load',async()=>{
+  // Handle Supabase Auth invite/recovery redirect
+  const hashStr = window.location.hash.substring(1);
+  if(hashStr.includes('type=invite')||hashStr.includes('type=recovery')){
+    const params=new URLSearchParams(hashStr);
+    const accessToken=params.get('access_token');
+    if(accessToken){
+      window._authToken=accessToken;
+      hide('loading-overlay');
+      show('s-set-password');
+      return;
+    }
+  }
   hide('loading-overlay');
   const saved=localStorage.getItem('grama_user');
   if(saved){
@@ -1762,6 +1951,253 @@ window.addEventListener('load',async()=>{
     else await loadAplic();
   },120000);
 });
+  //EMPIEZO A EDITAR
+   
+// Variables globales para Auth
+let currentInvitationToken = null;
+let currentResetToken = null;
+ 
+// ─── FUNCIONES DE SET PASSWORD ─────────────────────────────────────────────
+ 
+async function initSetPassword() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  
+  if (!token) {
+    show('s-login');
+    return;
+  }
+ 
+  loading(true, 'Validando invitación...');
+  try {
+    const r = await api('auth?action=validate-token&token=' + token);
+    
+    if (!r.ok) {
+      showAlert('sp-alert', r.error || 'Invitación inválida o expirada', 'err');
+      setTimeout(() => { show('s-login'); hide('s-set-password'); }, 2000);
+      return;
+    }
+ 
+    currentInvitationToken = token;
+    const inv = r.invitation;
+    
+    el('sp-email').textContent = inv.email;
+    el('sp-rol').innerHTML = `Rol: <strong>${inv.rol}</strong>${inv.empresa ? ` • ${inv.empresa}` : ''}`;
+    
+    show('s-set-password');
+  } catch (error) {
+    showAlert('sp-alert', 'Error validando invitación', 'err');
+    setTimeout(() => { show('s-login'); hide('s-set-password'); }, 2000);
+  } finally {
+    loading(false);
+  }
+}
+ 
+async function doSetPassword() {
+  const pass = el('sp-pass').value;
+  const passConfirm = el('sp-pass-confirm').value;
+ 
+  if (!pass || !passConfirm) {
+    showAlert('sp-alert', 'Completa todos los campos', 'err');
+    return;
+  }
+ 
+  if (pass.length < 6) {
+    showAlert('sp-alert', 'La contraseña debe tener mínimo 6 caracteres', 'err');
+    return;
+  }
+ 
+  if (pass !== passConfirm) {
+    showAlert('sp-alert', 'Las contraseñas no coinciden', 'err');
+    return;
+  }
+ 
+  loading(true, 'Estableciendo contraseña...');
+  try {
+    const r = await api('auth?action=set-password', 'POST', {
+      token: currentInvitationToken,
+      password: pass,
+      password_confirm: passConfirm
+    });
+ 
+    if (!r.ok) {
+      showAlert('sp-alert', r.error || 'Error', 'err');
+      return;
+    }
+ 
+    showAlert('sp-alert', '¡Contraseña establecida! Redirigiendo...', 'ok');
+    
+    // Opción 1: Redirect a login
+    // setTimeout(() => {
+    //   window.location.href = '/';
+    // }, 1500);
+ 
+    // Opción 2: Login automático con email y password
+    setTimeout(async () => {
+      // Aquí puedes hacer login automático si tu API lo soporta
+      show('s-login');
+      hide('s-set-password');
+      el('l-user').value = r.email;
+      el('l-pass').value = '';
+      el('l-pass').focus();
+    }, 1500);
+  } catch (error) {
+    showAlert('sp-alert', 'Error de conexión', 'err');
+  } finally {
+    loading(false);
+  }
+}
+ 
+// ─── FUNCIONES DE FORGOT PASSWORD ──────────────────────────────────────────
+ 
+function showForgotPasswordPage() {
+  hide('s-login');
+  show('s-forgot-password');
+  el('fp-email').value = '';
+  el('fp-email').focus();
+}
+ 
+async function doForgotPassword() {
+  const email = el('fp-email').value.trim();
+ 
+  if (!email) {
+    showAlert('fp-alert', 'Ingresa tu email', 'err');
+    return;
+  }
+ 
+  loading(true, 'Enviando link...');
+  try {
+    const r = await api('auth?action=forgot-password', 'POST', { email });
+ 
+    if (!r.ok) {
+      showAlert('fp-alert', r.error || 'Error', 'err');
+      return;
+    }
+ 
+    showAlert('fp-alert', 'Si el email existe, recibirás un link en tu bandeja de entrada', 'ok');
+    setTimeout(() => {
+      show('s-login');
+      hide('s-forgot-password');
+    }, 3000);
+  } catch (error) {
+    showAlert('fp-alert', 'Error de conexión', 'err');
+  } finally {
+    loading(false);
+  }
+}
+ 
+// ─── FUNCIONES DE RESET PASSWORD ───────────────────────────────────────────
+ 
+async function initResetPassword() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  
+  if (!token) {
+    show('s-forgot-password');
+    return;
+  }
+ 
+  // Aquí podrías validar el token, pero por ahora solo lo guardamos
+  currentResetToken = token;
+  show('s-reset-password');
+}
+ 
+async function doResetPassword() {
+  const pass = el('rp-pass').value;
+  const passConfirm = el('rp-pass-confirm').value;
+ 
+  if (!pass || !passConfirm) {
+    showAlert('rp-alert', 'Completa todos los campos', 'err');
+    return;
+  }
+ 
+  if (pass.length < 6) {
+    showAlert('rp-alert', 'La contraseña debe tener mínimo 6 caracteres', 'err');
+    return;
+  }
+ 
+  if (pass !== passConfirm) {
+    showAlert('rp-alert', 'Las contraseñas no coinciden', 'err');
+    return;
+  }
+ 
+  loading(true, 'Actualizando contraseña...');
+  try {
+    const r = await api('auth?action=reset-password', 'POST', {
+      token: currentResetToken,
+      password: pass,
+      password_confirm: passConfirm
+    });
+ 
+    if (!r.ok) {
+      showAlert('rp-alert', r.error || 'Error', 'err');
+      return;
+    }
+ 
+    showAlert('rp-alert', '¡Contraseña actualizada! Redirigiendo...', 'ok');
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1500);
+  } catch (error) {
+    showAlert('rp-alert', 'Error de conexión', 'err');
+  } finally {
+    loading(false);
+  }
+}
+ 
+// ─── INICIALIZACIÓN ───────────────────────────────────────────────────────
+ //EMPIEZO A EDITAR
+  window.addEventListener('load', async function() {
+
+  const params = new URLSearchParams(window.location.search);
+  const hash = window.location.hash;
+
+  // 🔥 FORZAR A SUPABASE A LEER EL TOKEN
+  await supabase.auth.refreshSession();
+
+  const { data } = await supabase.auth.getSession();
+
+  console.log("SESSION:", data.session);
+  console.log("HASH:", hash);
+
+  // 🔥 DETECTAR INVITE / RECOVERY (LO NUEVO)
+  if (data.session && (hash.includes('type=invite') || hash.includes('type=recovery'))) {
+    console.log("ENTRANDO A SET PASSWORD");
+    initSetPassword();
+    return;
+  }
+
+  // 🔹 TU LÓGICA ORIGINAL
+  if (params.get('page') === 'forgot-password') {
+    showForgotPasswordPage();
+  } else if (params.get('token') && params.get('page') === 'reset') {
+    initResetPassword();
+  } else if (params.get('token')) {
+    initSetPassword();
+  }
+
+}, { once: true });
+//TERMINO DE EDITAR
+// Al cargar, verificar si estamos en una página de auth
+//window.addEventListener('load', function() {
+  //const params = new URLSearchParams(window.location.search);
+  
+  //if (params.get('page') === 'forgot-password') {
+    //showForgotPasswordPage();
+  //} else if (params.get('token') && params.get('page') === 'reset') {
+    //initResetPassword();
+  //} else if (params.get('token')) {
+    // Asumir que es set-password
+    //initSetPassword();
+  //}
+//}, { once: true });
+ 
+// Link en login para "Olvide mi contraseña"
+function forgotPasswordLink() {
+  showForgotPasswordPage();
+}
+ 
+  <!--//TERMINO DE EDITAR-->
 </script>
 </body>
 </html>
