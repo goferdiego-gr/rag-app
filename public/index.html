@@ -131,11 +131,6 @@ tr:hover td{background:#f9fdf9}
     <button class="tab" onclick="adminTab(this,'at-servicios')">Servicios</button>
     <button class="tab" onclick="adminTab(this,'at-stock')" id="tab-stock">Stock</button>
     <button class="tab" onclick="adminTab(this,'at-config')" id="tab-config">Configuracion</button>
-    <button class="tab" onclick="adminTab(this,'at-mis-clientes')" style="border-left:2px solid #a2f5ba;margin-left:8px">Mis clientes</button>
-    <button class="tab" onclick="adminTab(this,'at-nuevo-cliente')">+ Cliente</button>
-    <button class="tab" onclick="adminTab(this,'at-mis-pedidos')">Mis pedidos</button>
-    <button class="tab" onclick="adminTab(this,'at-cotizar-adm')">Cotizar</button>
-    <button class="tab" onclick="adminTab(this,'at-mi-comision')">Mi comision</button>
   </div>
 
   <div id="at-dash">
@@ -241,81 +236,6 @@ tr:hover td{background:#f9fdf9}
     </div>
   </div>
 </div>
-
-  <div id="at-mis-clientes" class="hidden">
-    <div class="card tbl-wrap">
-      <div class="section-title">Mis clientes</div>
-      <table id="tbl-adm-mis-clientes"></table>
-    </div>
-  </div>
-
-  <div id="at-nuevo-cliente" class="hidden">
-    <div class="card" style="max-width:540px">
-      <div class="section-title">Nuevo cliente</div>
-      <div id="adm-nc-alert" class="hidden"></div>
-      <div class="grid2">
-        <div><label>Empresa</label><input type="text" id="adm-nc-empresa" /></div>
-        <div><label>Contacto *</label><input type="text" id="adm-nc-contacto" /></div>
-      </div>
-      <div class="grid2">
-        <div><label>Telefono</label><input type="tel" id="adm-nc-tel" /></div>
-        <div><label>Email</label><input type="email" id="adm-nc-email" /></div>
-      </div>
-      <div class="grid2">
-        <div><label>Estado</label><input type="text" id="adm-nc-estado" /></div>
-        <div><label>Ciudad</label><input type="text" id="adm-nc-ciudad" /></div>
-      </div>
-      <label>Direccion</label><input type="text" id="adm-nc-dir" />
-      <label>RFC</label><input type="text" id="adm-nc-rfc" />
-      <label>Notas</label><textarea id="adm-nc-notas" rows="2"></textarea>
-      <button class="btn btn-primary" style="margin-top:14px" onclick="guardarClienteAdmin()">Guardar cliente</button>
-    </div>
-  </div>
-
-  <div id="at-mis-pedidos" class="hidden">
-    <div class="card tbl-wrap">
-      <div class="section-title">Mis pedidos como vendedor</div>
-      <table id="tbl-adm-mis-pedidos"></table>
-    </div>
-    <div class="card" style="margin-top:1rem;max-width:580px">
-      <div class="section-title">Nuevo pedido</div>
-      <div id="adm-vp-alert" class="hidden"></div>
-      <label>Cliente *</label>
-      <select id="adm-vp-cliente" onchange="onAdmClienteChange()"><option value="">-- Selecciona cliente --</option></select>
-      <div id="adm-vp-cliente-info" class="hidden" style="margin-top:8px;padding:10px;background:#f9fdf9;border-radius:8px;font-size:13px"></div>
-      <label>CEDIS *</label><select id="adm-vp-cedis"></select>
-      <label>Direccion de entrega</label><input type="text" id="adm-vp-dir" />
-      <div style="margin-top:1rem"><div style="font-size:14px;font-weight:500;margin-bottom:8px">Productos *</div>
-        <div id="adm-vp-items"></div>
-        <button class="btn btn-sm" style="margin-top:8px" onclick="agregarItemAdmVend()">+ Agregar producto</button>
-      </div>
-      <label>Notas</label><textarea id="adm-vp-notas" rows="2"></textarea>
-      <div style="margin-top:14px;padding:12px;background:#f4f4f4;border-radius:8px;display:flex;justify-content:space-between">
-        <span style="font-size:14px;font-weight:500">Total</span>
-        <span style="font-size:18px;font-weight:700;color:#1f7344" id="adm-vp-total">$0 MXN</span>
-      </div>
-      <button class="btn btn-primary btn-full" style="margin-top:14px" onclick="enviarPedidoAdmin()">Enviar pedido</button>
-    </div>
-  </div>
-
-  <div id="at-cotizar-adm" class="hidden">
-    <div class="card" style="max-width:500px">
-      <div class="section-title">Solicitar cotizacion</div>
-      <div id="adm-cot-alert" class="hidden"></div>
-      <label>Cliente *</label><select id="adm-cot-cliente"><option value="">-- Selecciona cliente --</option></select>
-      <label>Productos *</label>
-      <div id="adm-cot-productos-list"></div>
-      <button class="btn btn-sm" style="margin-top:6px;margin-bottom:8px" onclick="agregarProductoCotAdm()">+ Agregar producto</button>
-      <label>Notas</label><textarea id="adm-cot-notas" rows="2"></textarea>
-      <button class="btn btn-primary" style="margin-top:14px" onclick="solicitarCotizacionAdmin()">Enviar solicitud</button>
-    </div>
-    <div class="card" style="margin-top:1rem"><div class="section-title">Mis solicitudes</div><div id="adm-list-cotizaciones"></div></div>
-  </div>
-
-  <div id="at-mi-comision" class="hidden">
-    <div class="card" style="max-width:600px"><div class="section-title">Mi comision como vendedor</div><div id="adm-vend-com-det"></div></div>
-  </div>
-
 
 <!-- DISTRIBUIDOR -->
 <div id="s-dist" class="hidden">
@@ -849,6 +769,7 @@ function loading(on,msg='Cargando...'){on?show('loading-overlay'):hide('loading-
 function showAlert(elId,msg,type){const e=el(elId);if(!e)return;e.className='alert alert-'+(type==='err'?'err':'ok');e.textContent=msg;e.classList.remove('hidden');if(type!=='err')setTimeout(()=>e.classList.add('hidden'),3500);}
 
 async function api(path,method='GET',body=null){
+  if(method==='DELETE'&&body===null)body=undefined;
   const opts={method,headers:{'Content-Type':'application/json'}};
   if(body)opts.body=JSON.stringify(body);
   const r=await fetch('/api/'+path,opts);
@@ -946,7 +867,7 @@ async function loadAdmin(){
     el('admin-name').textContent=u.nombre||u.usuario;
     el('admin-sub').textContent=u.rol==='superadmin'?'Super Administrador':'Administrador';
     if(u.rol!=='superadmin'){hide('tab-config')}
-    renderDash();renderUsuarios();renderPedidosAdmin();renderSvcsAdmin();renderStock();renderClientesAdmin();await loadCotizacionesAdmin();await loadFacturasAdmin();await loadAdminVendData();
+    renderDash();renderUsuarios();renderPedidosAdmin();renderSvcsAdmin();renderStock();renderClientesAdmin();await loadCotizacionesAdmin();await loadFacturasAdmin();
     const btnNuevo=el('btn-nuevo-usuario');
     if(btnNuevo)btnNuevo.innerHTML=u.rol==='superadmin'?'<button class="btn btn-primary btn-sm" onclick="showModalUsuario()">+ Nuevo usuario</button>':'';
     if(u.rol==='superadmin')renderConfig();
@@ -1001,13 +922,14 @@ function renderPedidosAdmin(filtro=''){
       const items=(p.pedido_items||[]).map(i=>`${i.productos?.nombre||''} ${i.productos?.presentacion||''} x${i.cantidad}`).join(', ');
       const clienteNombre=p.clientes?.empresa||p.clientes?.contacto||'—';
       const facturaBtn=['pagado','enviado','entregado'].includes(p.status)?`<button class="btn btn-sm" style="margin-left:4px" data-pid="${p.id}" data-cli="${encodeURIComponent(JSON.stringify(p.clientes||{}))}" onclick="solicitarFacturaBtn(this)">Factura</button>`:'';
+      const remisionBtn=['pagado','enviado','entregado'].includes(p.status)?`<button class="btn btn-sm" style="margin-left:4px;background:#f0f9ff;color:#0369a1" onclick="abrirSubirRemision('${p.id}')">${p.remision_url?'Ver remision ↗':'Subir remision'}</button>`:'';
       return`<tr>
         <td>${fdate(p.creado_en)}</td>
         <td style="font-size:12px">${usr.nombre||usr.usuario||'—'} ${rolBadge(usr.rol||'')}</td>
         <td style="font-size:12px">${clienteNombre}</td>
         <td style="font-size:12px">${p.cedis?.nombre||'—'}</td>
         <td style="font-size:12px;max-width:180px">${items||'—'}</td>
-        <td>${fmx(p.total)}${facturaBtn}</td>
+        <td>${fmx(p.total)}${facturaBtn}${remisionBtn}</td>
         <td><select onchange="cambiarStatusPedido('${p.id}',this.value)" style="width:auto;padding:4px 8px;font-size:12px">
           ${['pendiente','confirmado','pagado','enviado','entregado','cancelado'].map(s=>`<option value="${s}"${s===p.status?' selected':''}>${STATUS_LABELS[s]||s}</option>`).join('')}
         </select></td>
@@ -1342,7 +1264,14 @@ async function enviarPedidoDist(){
   if(!cedis_id||!items.length){showAlert('dist-pedido-alert','Selecciona CEDIS y agrega productos','err');return}
   loading(true,'Enviando pedido...');
   try{
-    const r=await api('pedidos','POST',{usuario_id:state.user.id,cedis_id,items,notas});
+    _pendingPedidoData={usuario_id:state.user.id,vendedor_id:state.user.id,cliente_id,cedis_id,items,notas,direccion_entrega,skip_stock:skipStock};
+    const r=await api('pedidos','POST',_pendingPedidoData);
+    if(r.sin_stock&&!skipStock){
+      el('stock-aviso-msg').textContent=r.error;
+      show('modal-stock-aviso');
+      loading(false);
+      return;
+    }
     if(r.ok){showAlert('dist-pedido-alert','Pedido enviado correctamente','ok');state.pedidos.unshift(r.pedido||{});renderDistInicio();renderDistPedidos();renderDistPedidoForm();}
     else showAlert('dist-pedido-alert',r.error||'Error','err');
   }finally{loading(false)}
@@ -1422,7 +1351,7 @@ function renderVendPedidos(){
         <td style="font-size:12px">${x.cedis?.nombre||'—'}</td>
         <td style="font-size:12px;max-width:200px">${items||'—'}</td>
         <td>${fmx(x.total)}</td>
-        <td>${badge(x.status,STATUS_LABELS[x.status]||x.status)}${fBtn}</td>
+        <td>${badge(x.status,STATUS_LABELS[x.status]||x.status)}${fBtn}${x.remision_url?'<a href="'+x.remision_url+'" target="_blank" class="btn btn-sm" style="margin-left:4px;background:#f0f9ff;color:#0369a1">Ver remision</a>':''}${['pendiente','confirmado'].includes(x.status)?'<button class="btn btn-danger btn-sm" style="margin-left:4px" data-pid="'+x.id+'" onclick="eliminarPedido(this.dataset.pid)">Eliminar</button>':''}</td>
       </tr>`;
     }).join(''):'<tr><td colspan="6" class="empty">Sin pedidos aun</td></tr>')+
     '</tbody>';
@@ -1493,7 +1422,7 @@ function calcTotalVend(){
   el('vp-total').textContent=fmx(total);
 }
 
-async function enviarPedidoVend(){
+async function enviarPedidoVend(skipStock=false){
   const cliente_id=el('vp-cliente').value;
   const cedis_id=el('vp-cedis').value;
   const direccion_entrega=el('vp-dir').value.trim();
@@ -1720,7 +1649,14 @@ async function enviarPedidoAplic(){
   if(!cedis_id||!items.length){showAlert('aplic-pedido-alert','Selecciona CEDIS y agrega productos','err');return}
   loading(true,'Enviando pedido...');
   try{
-    const r=await api('pedidos','POST',{usuario_id:state.user.id,cedis_id,items,notas});
+    _pendingPedidoData={usuario_id:state.user.id,vendedor_id:state.user.id,cliente_id,cedis_id,items,notas,direccion_entrega,skip_stock:skipStock};
+    const r=await api('pedidos','POST',_pendingPedidoData);
+    if(r.sin_stock&&!skipStock){
+      el('stock-aviso-msg').textContent=r.error;
+      show('modal-stock-aviso');
+      loading(false);
+      return;
+    }
     if(r.ok){showAlert('aplic-pedido-alert','Pedido enviado correctamente','ok');state.pedidos.unshift(r.pedido||{});renderAplicInicio();renderAplicHistorial();renderAplicPedidoForm();}
     else showAlert('aplic-pedido-alert',r.error||'Error','err');
   }finally{loading(false)}
@@ -1752,7 +1688,7 @@ async function registrarServicio(){
 }
 
 // TABS
-function adminTab(btn,target){document.querySelectorAll('#s-admin .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['at-dash','at-usuarios','at-pedidos','at-clientes','at-cotizaciones','at-facturas','at-servicios','at-stock','at-config','at-mis-clientes','at-nuevo-cliente','at-mis-pedidos','at-cotizar-adm','at-mi-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
+function adminTab(btn,target){document.querySelectorAll('#s-admin .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['at-dash','at-usuarios','at-pedidos','at-clientes','at-cotizaciones','at-facturas','at-servicios','at-stock','at-config'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 function distTab(btn,target){document.querySelectorAll('#s-dist .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['dt-inicio','dt-precios','dt-pedido','dt-historial'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 function vendTab(btn,target){document.querySelectorAll('#s-vend .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['vt-inicio','vt-clientes','vt-nuevo-cliente','vt-mis-pedidos','vt-pedido','vt-cotizar','vt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
 function aplicTab(btn,target){document.querySelectorAll('#s-aplic .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['apt-inicio','apt-pedido','apt-registro','apt-historial','apt-comision'].forEach(id=>{const e=el(id);if(e)e.classList.add('hidden')});show(target)}
@@ -1961,7 +1897,8 @@ async function loadCotizaciones(){
   const STATUS_COT={pendiente:'Solicitada',en_proceso:'En proceso',completado:'Lista para descargar',cancelado:'Cancelada'};
   list.innerHTML=(Array.isArray(data)&&data.length)?data.map(c=>{
     const dlBtn=c.archivo_url&&c.status==='completado'?'<a href="'+c.archivo_url+'" target="_blank" class="btn btn-primary btn-sm" style="margin-left:8px">Descargar</a>':'';
-    return '<div class="row-item"><div><div style="font-size:13px;font-weight:500">'+(c.clientes?.empresa||c.clientes?.contacto||'—')+'</div><div style="font-size:12px;color:#999">'+fdate(c.creado_en)+(c.productos_solicitados?' · '+c.productos_solicitados.substring(0,50):'')+' </div></div><div style="display:flex;align-items:center">'+badge(c.status,STATUS_COT[c.status]||c.status)+dlBtn+'</div></div>';
+    const delBtn=c.status!=='completado'?'<button class="btn btn-danger btn-sm" style="margin-left:6px" data-cid="'+c.id+'" onclick="eliminarCotizacion(this.dataset.cid)">✕</button>':'';
+    return '<div class="row-item"><div><div style="font-size:13px;font-weight:500">'+(c.clientes?.empresa||c.clientes?.contacto||'—')+'</div><div style="font-size:12px;color:#999">'+fdate(c.creado_en)+(c.productos_solicitados?' · '+c.productos_solicitados.substring(0,50):'')+' </div></div><div style="display:flex;align-items:center">'+badge(c.status,STATUS_COT[c.status]||c.status)+dlBtn+delBtn+'</div></div>';
   }).join(''):'<div class="empty">Sin solicitudes de cotizacion</div>';
 }
 
@@ -1998,210 +1935,68 @@ async function definirPassword(){
 }
 
 
-// ── ADMIN AS VENDEDOR ────────────────────────────────────────────────────────
+let _pendingPedidoData = null;
+let _currentRemisionPedidoId = null;
 
-function isAdminVend(){
-  return ['admin','superadmin'].includes(state.user?.rol);
+function confirmarPedidoSinStock(){
+  hide('modal-stock-aviso');
+  if(_pendingPedidoData) enviarPedidoVend(true);
 }
 
-async function loadAdminVendData(){
-  if(!isAdminVend()) return;
-  const [clientes, pedidos] = await Promise.all([
-    api('clientes?vendedor_id='+state.user.id),
-    api('pedidos?vendedor_id='+state.user.id)
-  ]);
-  state.misClientes = Array.isArray(clientes) ? clientes : [];
-  state.misPedidos  = Array.isArray(pedidos)  ? pedidos  : [];
-  renderAdmMisClientes();
-  renderAdmMisPedidos();
-  renderAdmMiComision();
-  renderAdmPedidoForm();
-  // populate cot cliente select
-  const cotSel=el('adm-cot-cliente');
-  if(cotSel) cotSel.innerHTML='<option value="">-- Selecciona cliente --</option>'+state.misClientes.map(c=>'<option value="'+c.id+'">'+(c.empresa||c.contacto)+'</option>').join('');
-  const admCotList=el('adm-list-cotizaciones');
-  if(admCotList){
-    const cots=await api('cotizaciones?vendedor_id='+state.user.id);
-    const STATUS_COT={pendiente:'Solicitada',en_proceso:'En proceso',completado:'Lista',cancelado:'Cancelada'};
-    admCotList.innerHTML=Array.isArray(cots)&&cots.length?cots.map(c=>{
-      const dlBtn=c.archivo_url&&c.status==='completado'?'<a href="'+c.archivo_url+'" target="_blank" class="btn btn-primary btn-sm" style="margin-left:8px">Descargar</a>':'';
-      const delBtn=c.status!=='completado'?'<button class="btn btn-danger btn-sm" style="margin-left:6px" data-cid="'+c.id+'" onclick="eliminarCotizacionAdm(this.dataset.cid)">✕</button>':'';
-      return '<div class="row-item"><div><div style="font-size:13px;font-weight:500">'+(c.clientes?.empresa||c.clientes?.contacto||'—')+'</div><div style="font-size:12px;color:#999">'+fdate(c.creado_en)+(c.productos_solicitados?' · '+c.productos_solicitados.substring(0,50):'')+'</div></div><div style="display:flex;align-items:center">'+badge(c.status,STATUS_COT[c.status]||c.status)+dlBtn+delBtn+'</div></div>';
-    }).join(''):'<div class="empty">Sin solicitudes</div>';
-  }
+function previewRemision(input){
+  const f = input.files[0];
+  el('rem-preview').textContent = f ? '📄 '+f.name : '';
 }
 
-function renderAdmMisClientes(){
-  const t=el('tbl-adm-mis-clientes');
-  if(!t)return;
-  const c=state.misClientes||[];
-  t.innerHTML='<thead><tr><th>Empresa</th><th>Contacto</th><th>Ciudad</th><th>Pedidos</th><th>Total vendido</th><th>Status</th></tr></thead><tbody>'+(c.length?c.map(x=>{
-    const peds=(state.misPedidos||[]).filter(p=>p.cliente_id===x.id);
-    const total=peds.filter(p=>['pagado','enviado','entregado'].includes(p.status)).reduce((a,p)=>a+(p.total||0),0);
-    return '<tr><td>'+(x.empresa||'—')+'</td><td>'+x.contacto+'</td><td style="font-size:12px">'+(x.ciudad||'—')+'</td><td>'+peds.length+'</td><td>'+fmx(total)+'</td><td>'+badge(x.status,statusClienteLabel(x.status))+'</td></tr>';
-  }).join(''):'<tr><td colspan="6" class="empty">Sin clientes</td></tr>')+'</tbody>';
+async function abrirSubirRemision(pedidoId){
+  _currentRemisionPedidoId = pedidoId;
+  el('rem-file').value = '';
+  el('rem-preview').textContent = '';
+  hide('rem-alert');
+  show('modal-remision');
 }
 
-function renderAdmMisPedidos(){
-  const t=el('tbl-adm-mis-pedidos');
-  if(!t)return;
-  const p=state.misPedidos||[];
-  t.innerHTML='<thead><tr><th>Fecha</th><th>Cliente</th><th>CEDIS</th><th>Total</th><th>Status</th></tr></thead><tbody>'+(p.length?p.map(x=>{
-    const fBtn=['pagado','enviado','entregado'].includes(x.status)?'<button class="btn btn-sm" style="margin-left:4px" data-pid="'+x.id+'" data-cli="'+encodeURIComponent(JSON.stringify(x.clientes||{}))+'" onclick="solicitarFacturaBtn(this)">Factura</button>':'';
-    return '<tr><td>'+fdate(x.creado_en)+'</td><td style="font-size:12px">'+(x.clientes?.empresa||x.clientes?.contacto||'—')+'</td><td style="font-size:12px">'+(x.cedis?.nombre||'—')+'</td><td>'+fmx(x.total)+'</td><td>'+badge(x.status,STATUS_LABELS[x.status]||x.status)+fBtn+'</td></tr>';
-  }).join(''):'<tr><td colspan="5" class="empty">Sin pedidos</td></tr>')+'</tbody>';
-}
-
-function renderAdmMiComision(){
-  const det=el('adm-vend-com-det');
-  if(!det)return;
-  const p=state.misPedidos||[];
-  const pagados=p.filter(x=>['pagado','enviado','entregado'].includes(x.status));
-  const totalVentas=pagados.reduce((a,x)=>a+(x.total||0),0);
-  const totalSinIva=totalVentas/1.16;
-  const pct=state.user.comision_pct||NIVELES[state.user.nivel||'semilla']?.pct||10;
-  const pctInm=10;
-  const comisionTotal=totalSinIva*pct/100;
-  const comisionInm=totalSinIva*pctInm/100;
-  const comisionBono=comisionTotal-comisionInm;
-  det.innerHTML=`
-    <div class="com-row"><span>Tu nivel actual</span>${nivelBadge(state.user.nivel||'semilla')}</div>
-    <div class="com-row"><span>Tu comision en este nivel</span><span style="font-weight:500">${pct}%</span></div>
-    <div class="com-row"><span>Litros vendidos este mes</span><span style="font-weight:500">${(state.user.litros_mes||0).toFixed(1)} L</span></div>
-    <div style="background:#e8f5ec;border-radius:8px;padding:10px;margin:8px 0;font-size:13px;color:#1c402e">
-      <strong>Pago inmediato (jueves sig.):</strong> ${pctInm}% sobre precio sin IVA = ${fmx(comisionInm)}<br>
-      <strong>Bono fin de mes:</strong> ${pct-pctInm}% adicional = ${fmx(comisionBono)}
-    </div>
-    <div class="com-row"><span>Total ventas pagadas (sin IVA)</span><span style="font-weight:500">${fmx(totalSinIva)}</span></div>
-    <div class="com-total"><span>Comision total estimada</span><span>${fmx(comisionTotal)}</span></div>
-    <div style="margin-top:1rem"><div class="section-title" style="font-size:13px">Detalle por pedido</div>
-    <table style="width:100%;margin-top:8px"><thead><tr><th>Cliente</th><th>Fecha</th><th>Monto</th><th>Tu comision</th></tr></thead><tbody>
-    ${pagados.length?pagados.map(x=>'<tr><td style="font-size:12px">'+(x.clientes?.empresa||x.clientes?.contacto||'—')+'</td><td style="font-size:12px">'+fdate(x.creado_en)+'</td><td>'+fmx(x.total)+'</td><td style="color:#1f7344;font-weight:500">'+fmx((x.total||0)/1.16*pct/100)+'</td></tr>').join(''):'<tr><td colspan="4" class="empty">Sin pedidos pagados</td></tr>'}
-    </tbody></table></div>`;
-}
-
-function renderAdmPedidoForm(){
-  const cedisEl=el('adm-vp-cedis');
-  if(cedisEl) cedisEl.innerHTML=state.cedis.map(c=>'<option value="'+c.id+'">'+c.nombre+' — '+c.ciudad+'</option>').join('');
-  const cliEl=el('adm-vp-cliente');
-  if(cliEl) cliEl.innerHTML='<option value="">-- Selecciona cliente --</option>'+(state.misClientes||[]).map(c=>'<option value="'+c.id+'">'+(c.empresa||c.contacto)+(c.ciudad?' — '+c.ciudad:'')+'</option>').join('');
-  const itemsEl=el('adm-vp-items');
-  if(itemsEl){itemsEl.innerHTML='';agregarItemAdmVend();}
-}
-
-function onAdmClienteChange(){
-  const id=el('adm-vp-cliente').value;
-  const c=(state.misClientes||[]).find(x=>x.id===id);
-  const info=el('adm-vp-cliente-info');
-  if(c&&info){
-    info.innerHTML='<strong>'+(c.empresa||c.contacto)+'</strong> · '+(c.telefono||'')+' · '+(c.email||'')+'<br>'+(c.direccion||'')+' '+(c.ciudad||'')+' '+(c.estado||'');
-    info.classList.remove('hidden');
-    if(c.direccion)el('adm-vp-dir').value=(c.direccion+', '+c.ciudad+', '+c.estado).trim();
-  } else if(info) info.classList.add('hidden');
-}
-
-function agregarItemAdmVend(){
-  const container=el('adm-vp-items');
-  if(!container)return;
-  const prodOpts=state.productos.map(p=>'<option value="'+p.id+'" data-precio="'+(p.precio_sin_iva?Math.round(p.precio_sin_iva*1.16):p.precio_lista)+'">'+p.nombre+' '+p.presentacion+' — '+fmx(p.precio_sin_iva?Math.round(p.precio_sin_iva*1.16):p.precio_lista)+'</option>').join('');
-  const div=document.createElement('div');
-  div.style.cssText='display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-bottom:8px;align-items:end';
-  div.innerHTML='<div><label style="margin-top:0">Producto</label><select class="item-prod" onchange="calcTotalAdmVend()">'+prodOpts+'</select></div><div><label style="margin-top:0">Cantidad</label><input type="number" class="item-cant" value="1" min="1" style="width:70px" onchange="calcTotalAdmVend()" /></div><button class="btn btn-danger btn-sm" style="margin-bottom:1px" onclick="this.parentElement.remove();calcTotalAdmVend()">✕</button>';
-  container.appendChild(div);calcTotalAdmVend();
-}
-
-function calcTotalAdmVend(){
-  let total=0;
-  document.querySelectorAll('#adm-vp-items > div').forEach(row=>{
-    const sel=row.querySelector('.item-prod');
-    const cant=parseInt(row.querySelector('.item-cant')?.value||1);
-    total+=parseFloat(sel?.selectedOptions[0]?.dataset.precio||0)*cant;
-  });
-  const t=el('adm-vp-total');if(t)t.textContent=fmx(total);
-}
-
-async function enviarPedidoAdmin(){
-  const cliente_id=el('adm-vp-cliente').value;
-  const cedis_id=el('adm-vp-cedis').value;
-  const direccion_entrega=el('adm-vp-dir').value.trim();
-  const notas=el('adm-vp-notas').value.trim();
-  if(!cliente_id){showAlert('adm-vp-alert','Selecciona un cliente','err');return}
-  const items=[];
-  document.querySelectorAll('#adm-vp-items > div').forEach(row=>{
-    const sel=row.querySelector('.item-prod');
-    const cant=parseInt(row.querySelector('.item-cant')?.value||1);
-    const precio=parseFloat(sel?.selectedOptions[0]?.dataset.precio||0);
-    if(sel?.value&&cant>0)items.push({producto_id:sel.value,cantidad:cant,precio_unitario:precio,subtotal:precio*cant});
-  });
-  if(!items.length){showAlert('adm-vp-alert','Agrega al menos un producto','err');return}
-  loading(true,'Enviando pedido...');
+async function subirRemision(){
+  const file = el('rem-file').files[0];
+  if(!file){showAlert('rem-alert','Selecciona un archivo PDF','err');return}
+  loading(true,'Subiendo remision...');
   try{
-    const r=await api('pedidos','POST',{
-      usuario_id:state.user.id,vendedor_id:state.user.id,
-      cliente_id,cedis_id,items,notas,direccion_entrega
+    const SUPA_URL='https://ybuwfzbxtjsvkcpymcbo.supabase.co';
+    const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlidXdmemJ4dGpzdmtjcHltY2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNzQsImV4cCI6MjA4OTYxNTE3NH0.XL9czwelRyqiu-fiBDdAfq0ox_IMF1FsUDZTCpMYguE';
+    const fileName='rem_'+_currentRemisionPedidoId+'_'+Date.now()+'.pdf';
+    const uploadRes=await fetch(SUPA_URL+'/storage/v1/object/remisiones/'+fileName,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/pdf','x-upsert':'true','cache-control':'3600'},
+      body:file
     });
+    if(!uploadRes.ok){const t=await uploadRes.text();throw new Error('Error al subir: '+t);}
+    const remision_url=SUPA_URL+'/storage/v1/object/public/remisiones/'+fileName;
+    const r=await api('pedidos','PUT',{id:_currentRemisionPedidoId,remision_url});
     if(r.ok){
-      showAlert('adm-vp-alert','Pedido enviado correctamente','ok');
-      el('adm-vp-notas').value='';
-      await loadAdminVendData();
-    }else showAlert('adm-vp-alert',r.error||'Error al enviar','err');
-  }finally{loading(false)}
+      hide('modal-remision');
+      const p=state.pedidos.find(x=>x.id===_currentRemisionPedidoId);
+      if(p)p.remision_url=remision_url;
+      renderPedidosAdmin();
+      alert('Remision subida correctamente.');
+    }else throw new Error(r.error||'Error');
+  }catch(e){showAlert('rem-alert',e.message,'err')}
+  finally{loading(false)}
 }
 
-async function guardarClienteAdmin(){
-  const contacto=el('adm-nc-contacto').value.trim();
-  if(!contacto){showAlert('adm-nc-alert','El contacto es requerido','err');return}
-  loading(true);
-  try{
-    const r=await api('clientes','POST',{
-      vendedor_id:state.user.id,
-      empresa:el('adm-nc-empresa').value.trim(),contacto,
-      telefono:el('adm-nc-tel').value.trim(),email:el('adm-nc-email').value.trim(),
-      estado:el('adm-nc-estado').value.trim(),ciudad:el('adm-nc-ciudad').value.trim(),
-      direccion:el('adm-nc-dir').value.trim(),rfc:el('adm-nc-rfc').value.trim(),
-      notas:el('adm-nc-notas').value.trim(),comision_pct:state.user.comision_pct||0
-    });
-    if(r.ok){
-      showAlert('adm-nc-alert','Cliente guardado correctamente','ok');
-      ['adm-nc-empresa','adm-nc-contacto','adm-nc-tel','adm-nc-email','adm-nc-estado','adm-nc-ciudad','adm-nc-dir','adm-nc-rfc','adm-nc-notas'].forEach(id=>{const e=el(id);if(e)e.value='';});
-      await loadAdminVendData();
-    }else showAlert('adm-nc-alert',r.error||'Error','err');
-  }finally{loading(false)}
-}
-
-function agregarProductoCotAdm(){
-  const container=el('adm-cot-productos-list');
-  if(!container)return;
-  const prodOpts=state.productos.map(p=>'<option value="'+p.id+'">'+p.nombre+' '+p.presentacion+'</option>').join('');
-  const div=document.createElement('div');
-  div.className='cot-prod-item';
-  div.style.cssText='display:grid;grid-template-columns:1fr auto auto;gap:6px;margin-bottom:6px;align-items:center';
-  div.innerHTML='<select style="padding:7px">'+prodOpts+'</select><input type="number" value="1" min="1" style="width:60px;padding:7px" /><button class="btn btn-sm" onclick="this.parentElement.remove()">✕</button>';
-  container.appendChild(div);
-}
-
-async function solicitarCotizacionAdmin(){
-  const cliente_id=el('adm-cot-cliente').value;
-  const notas=el('adm-cot-notas').value.trim();
-  if(!cliente_id){showAlert('adm-cot-alert','Selecciona un cliente','err');return}
-  const prodItems=document.querySelectorAll('#adm-cot-productos-list .cot-prod-item');
-  const productos_solicitados=Array.from(prodItems).map(row=>{
-    const sel=row.querySelector('select');const cant=row.querySelector('input');
-    return sel?.value?(sel.options[sel.selectedIndex].text.split(' —')[0]+' x'+(cant?.value||1)):null;
-  }).filter(Boolean).join(', ');
-  loading(true,'Enviando...');
-  try{
-    const r=await api('cotizaciones','POST',{vendedor_id:state.user.id,cliente_id,notas,productos_solicitados});
-    if(r.ok){showAlert('adm-cot-alert','Solicitud enviada','ok');el('adm-cot-notas').value='';await loadAdminVendData();}
-    else showAlert('adm-cot-alert',r.error||'Error','err');
-  }finally{loading(false)}
-}
-
-async function eliminarCotizacionAdm(id){
-  if(!confirm('Eliminar esta solicitud?'))return;
+async function eliminarCotizacion(id){
+  if(!confirm('¿Eliminar esta solicitud de cotizacion?'))return;
   const r=await api('cotizaciones?id='+id,'DELETE');
-  if(r.ok)await loadAdminVendData();
-  else alert(r.error||'Error');
+  if(r.ok){state.cotizaciones=(state.cotizaciones||[]).filter(c=>c.id!==id);loadCotizaciones();}
+  else alert(r.error||'Error al eliminar');
+}
+
+async function eliminarPedido(id){
+  if(!confirm('¿Eliminar este pedido? Esta accion no se puede deshacer.'))return;
+  const r=await api('pedidos?id='+id,'DELETE');
+  if(r.ok){
+    state.pedidos=state.pedidos.filter(p=>p.id!==id);
+    renderVendPedidos();renderVendInicio();
+  }else alert(r.error||'Error: '+r.error);
 }
 
 window.addEventListener('load',async()=>{
@@ -2486,5 +2281,36 @@ function forgotPasswordLink() {
  
   <!--//TERMINO DE EDITAR-->
 </script>
+
+<!-- MODAL AVISO STOCK -->
+<div id="modal-stock-aviso" class="modal-bg hidden">
+  <div class="modal">
+    <div class="modal-title" style="color:#b45309">⚠️ Aviso de stock</div>
+    <div id="stock-aviso-msg" style="margin:12px 0;font-size:14px;line-height:1.6"></div>
+    <div style="font-size:13px;color:#666;margin-bottom:16px">El pedido se enviara con un aviso al administrador sobre el stock faltante.</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="confirmarPedidoSinStock()">Enviar de todas formas</button>
+      <button class="btn" onclick="hide('modal-stock-aviso')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUBIR REMISION -->
+<div id="modal-remision" class="modal-bg hidden">
+  <div class="modal">
+    <div class="modal-title">Subir remision</div>
+    <div id="rem-alert" class="hidden"></div>
+    <div style="font-size:13px;color:#666;margin-bottom:12px">Sube el PDF de la remision para el pedido pagado.</div>
+    <label class="btn btn-primary" style="cursor:pointer;display:inline-block">
+      Seleccionar PDF
+      <input type="file" id="rem-file" accept=".pdf" style="display:none" onchange="previewRemision(this)" />
+    </label>
+    <div id="rem-preview" style="margin-top:10px;font-size:13px;color:#1f7344"></div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn btn-primary" onclick="subirRemision()">Subir</button>
+      <button class="btn" onclick="hide('modal-remision')">Cancelar</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
