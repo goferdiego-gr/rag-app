@@ -33,6 +33,14 @@ module.exports = async (req, res) => {
       if (error) throw error;
       return res.status(200).json({ ok: true });
     }
+    if (req.method === 'DELETE') {
+      const { id } = req.query;
+      if (!id) return res.status(400).json({ error: 'ID requerido' });
+      const { data: c } = await supabase.from('cotizaciones').select('status').eq('id',id).single();
+      if (c?.status === 'completado') return res.status(400).json({ error: 'No se puede eliminar una cotizacion completada' });
+      await supabase.from('cotizaciones').delete().eq('id', id);
+      return res.status(200).json({ ok: true });
+    }
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (e) {
     return res.status(500).json({ error: e.message });
