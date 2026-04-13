@@ -12,7 +12,6 @@ module.exports = async (req, res) => {
       if (error) throw error;
       return res.status(200).json(data);
     }
-
     if (req.method === 'POST') {
       const { vendedor_id, empresa, contacto, telefono, email, estado, ciudad, direccion, rfc, notas, comision_pct } = req.body;
       if (!vendedor_id || !contacto) return res.status(400).json({ error: 'Faltan campos requeridos' });
@@ -22,24 +21,19 @@ module.exports = async (req, res) => {
       if (error) throw error;
       return res.status(200).json({ ok: true, cliente: data });
     }
-
     if (req.method === 'PUT') {
       const { id, ...updates } = req.body;
       if (!id) return res.status(400).json({ error: 'ID requerido' });
       updates.actualizado_en = new Date();
-
-      // Si status cambia a 'pagado', calcular comision
       if (updates.status === 'pagado' && updates.monto_vendido) {
         const { data: cliente } = await supabase.from('clientes').select('comision_pct').eq('id', id).single();
         const pct = updates.comision_pct || cliente?.comision_pct || 0;
         updates.comision_ganada = (updates.monto_vendido * pct) / 100;
       }
-
       const { error } = await supabase.from('clientes').update(updates).eq('id', id);
       if (error) throw error;
       return res.status(200).json({ ok: true });
     }
-
     if (req.method === 'DELETE') {
       const { id } = req.query;
       if (!id) return res.status(400).json({ error: 'ID requerido' });
@@ -47,7 +41,6 @@ module.exports = async (req, res) => {
       if (error) throw error;
       return res.status(200).json({ ok: true });
     }
-
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (e) {
     return res.status(500).json({ error: e.message });

@@ -2,8 +2,6 @@ const { supabase, cors } = require('./_supabase');
 
 const TRIGGERS_COMISION = ['pagado', 'enviado', 'entregado'];
 const TRIGGERS_STOCK    = ['enviado', 'entregado'];
-const SUPA_URL = 'https://ybuwfzbxtjsvkcpymcbo.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlidXdmemJ4dGpzdmtjcHltY2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzkxNzQsImV4cCI6MjA4OTYxNTE3NH0.XL9czwelRyqiu-fiBDdAfq0ox_IMF1FsUDZTCpMYguE';
 
 module.exports = async (req, res) => {
   cors(res);
@@ -30,7 +28,6 @@ module.exports = async (req, res) => {
       if (!usuario_id || !cedis_id || !items?.length)
         return res.status(400).json({ error: 'Faltan campos requeridos' });
 
-      // Stock check - warn but allow if skip_stock=true
       const stockWarnings = [];
       for (const item of items) {
         const { data: s } = await supabase.from('stock').select('cantidad')
@@ -49,7 +46,7 @@ module.exports = async (req, res) => {
 
       const total = items.reduce((a, i) => a + i.subtotal, 0);
       const notasConAviso = stockWarnings.length
-        ? `⚠️ AVISO STOCK: ${stockWarnings.join('; ')}${notas ? '. '+notas : ''}`
+        ? `⚠️ AVISO STOCK: ${stockWarnings.join('; ')}${notas ? '. ' + notas : ''}`
         : notas;
 
       const { data: pedido, error } = await supabase.from('pedidos')
@@ -63,12 +60,15 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'PUT') {
-      const { id, status, remision_url } = req.body;
-      if (!id) return res.status(400).json({ error: 'Faltan campos' });
+      const { id, status, remision_url, fecha_entrega } = req.body;
+      if (!id) return res.status(400).json({ error: 'ID requerido' });
 
-      // Upload remision URL
-      if (remision_url !== undefined) {
-        const { error } = await supabase.from('pedidos').update({ remision_url, actualizado_en: new Date() }).eq('id', id);
+      // Handle file URL updates and date without status change
+      if (remision_url !== undefined || fecha_entrega !== undefined) {
+        const updates = { actualizado_en: new Date() };
+        if (remision_url !== undefined) updates.remision_url = remision_url;
+        if (fecha_entrega !== undefined) updates.fecha_entrega = fecha_entrega;
+        const { error } = await supabase.from('pedidos').update(updates).eq('id', id);
         if (error) throw error;
         return res.status(200).json({ ok: true });
       }
@@ -101,10 +101,11 @@ module.exports = async (req, res) => {
         const vendId = p.vendedor_id || p.usuario_id;
         if (!vendId) return res.status(200).json({ ok: true });
         const { data: usr } = await supabase.from('usuarios')
-          .select('ventas_pagadas, compras_mes, comision_pct, rol, nivel, litros_mes').eq('id', vendId).single();
+          .select('ventas_pagadas, compras_mes, comision_pct, rol, nivel, litros_mes')
+          .eq('id', vendId).single();
         if (!usr) return res.status(200).json({ ok: true });
 
-        if (usr.rol === 'vendedor') {
+        if (usr.rol === 'vendedor' || usr.rol === 'admin' || usr.rol === 'superadmin') {
           const litrosVendidos = (p.pedido_items||[]).reduce((acc, item) => {
             const pres = item.productos?.presentacion || '1L';
             const match = pres.match(/(\d+\.?\d*)\s*[Ll]/);
@@ -114,68 +115,87 @@ module.exports = async (req, res) => {
           const nuevosLitros = (usr.litros_mes||0) + litrosVendidos;
           const nuevasVentas = (usr.ventas_pagadas||0) + (p.total||0);
 
+          // Load nivel config
           const { data: cfgRow } = await supabase.from('configuracion').select('valor').eq('clave','niveles_vendedor').single();
           const { data: cfgInm } = await supabase.from('configuracion').select('valor').eq('clave','comision_inmediata_pct').single();
-          const nivelesVend = cfgRow ? JSON.parse(cfgRow.valor) : {semilla:{min_litros:0,pct:10},verde:{min_litros:100,pct:15},master:{min_litros:500,pct:18},socio:{min_litros:1000,pct:20}};
+          const nivelesVend = cfgRow
+            ? JSON.parse(cfgRow.valor)
+            : { semilla:{min_litros:0,pct:10}, verde:{min_litros:100,pct:15}, master:{min_litros:500,pct:18}, socio:{min_litros:1000,pct:20} };
           const pctInmediata = cfgInm ? parseFloat(cfgInm.valor) : 10;
 
+          // Determine nivel by litros
           const sorted = Object.entries(nivelesVend).sort((a,b) => b[1].min_litros - a[1].min_litros);
           let nuevoNivel = 'semilla';
-          for (const [k,n] of sorted) { if (nuevosLitros >= (n.min_litros||0)) { nuevoNivel=k; break; } }
+          for (const [k,n] of sorted) {
+            if (nuevosLitros >= (n.min_litros||0)) { nuevoNivel = k; break; }
+          }
 
-          const pctVendedor = (usr.comision_pct > 0) ? usr.comision_pct : (nivelesVend[nuevoNivel]?.pct||10);
-          const totalSinIva = (p.total||0) / 1.16;
-          const comisionInm = totalSinIva * pctInmediata / 100;
+          // Use individual pct if set, else nivel pct from config
+          const pctVendedor = (usr.comision_pct > 0)
+            ? usr.comision_pct
+            : (nivelesVend[nuevoNivel]?.pct || 10);
+
+          const totalSinIva   = (p.total||0) / 1.16;
+          const comisionInm   = totalSinIva * pctInmediata / 100;
           const comisionTotal = totalSinIva * pctVendedor / 100;
-          const comisionBono = Math.max(0, comisionTotal - comisionInm);
+          const comisionBono  = Math.max(0, comisionTotal - comisionInm);
 
           const hoy = new Date();
-          const diasParaJueves = ((4 - hoy.getDay() + 7) % 7) || 7;
+          const diasJueves = ((4 - hoy.getDay() + 7) % 7) || 7;
           const jueves = new Date(hoy);
-          jueves.setDate(hoy.getDate() + diasParaJueves);
+          jueves.setDate(hoy.getDate() + diasJueves);
 
           await supabase.from('usuarios').update({
-            ventas_pagadas: nuevasVentas, litros_mes: nuevosLitros,
-            nivel: nuevoNivel, comision_pct: pctVendedor
+            ventas_pagadas: nuevasVentas,
+            litros_mes: nuevosLitros,
+            nivel: nuevoNivel,
+            comision_pct: pctVendedor
           }).eq('id', vendId);
 
           await supabase.from('comision_pagos').insert([{
-            vendedor_id: vendId, pedido_id: id, monto_venta: totalSinIva,
-            pct_aplicado: pctInmediata, monto_comision: comisionInm,
-            tipo: 'inmediata', status: 'pendiente',
+            vendedor_id: vendId, pedido_id: id,
+            monto_venta: totalSinIva, pct_aplicado: pctInmediata,
+            monto_comision: comisionInm, tipo: 'inmediata', status: 'pendiente',
             fecha_pago_esperada: jueves.toISOString().split('T')[0]
           }]);
 
           if (comisionBono > 0.01) {
             await supabase.from('comision_pagos').insert([{
-              vendedor_id: vendId, pedido_id: id, monto_venta: totalSinIva,
-              pct_aplicado: pctVendedor - pctInmediata, monto_comision: comisionBono,
-              tipo: 'bono_mensual', status: 'pendiente', fecha_pago_esperada: null
+              vendedor_id: vendId, pedido_id: id,
+              monto_venta: totalSinIva, pct_aplicado: pctVendedor - pctInmediata,
+              monto_comision: comisionBono, tipo: 'bono_mensual', status: 'pendiente',
+              fecha_pago_esperada: null
             }]);
           }
 
           if (p.cliente_id) {
-            const { data: cli } = await supabase.from('clientes').select('comision_ganada,monto_vendido').eq('id',p.cliente_id).single();
+            const { data: cli } = await supabase.from('clientes')
+              .select('comision_ganada,monto_vendido').eq('id', p.cliente_id).single();
             await supabase.from('clientes').update({
-              comision_ganada: (cli?.comision_ganada||0)+comisionTotal,
-              monto_vendido: (cli?.monto_vendido||0)+(p.total||0)
+              comision_ganada: (cli?.comision_ganada||0) + comisionTotal,
+              monto_vendido:   (cli?.monto_vendido||0)   + (p.total||0)
             }).eq('id', p.cliente_id);
           }
+
         } else {
-          const nuevasCompras = (usr.compras_mes||0)+(p.total||0);
-          await supabase.from('usuarios').update({ compras_mes: nuevasCompras, nivel: getNivelCompras(nuevasCompras) }).eq('id',vendId);
+          const nuevasCompras = (usr.compras_mes||0) + (p.total||0);
+          await supabase.from('usuarios').update({
+            compras_mes: nuevasCompras,
+            nivel: getNivelCompras(nuevasCompras)
+          }).eq('id', vendId);
         }
       }
+
       return res.status(200).json({ ok: true });
     }
 
     if (req.method === 'DELETE') {
       const { id } = req.query;
       if (!id) return res.status(400).json({ error: 'ID requerido' });
-      // Only allow delete if status is pendiente
-      const { data: p } = await supabase.from('pedidos').select('status,vendedor_id,usuario_id').eq('id',id).single();
+      const { data: p } = await supabase.from('pedidos').select('status').eq('id', id).single();
       if (!p) return res.status(404).json({ error: 'Pedido no encontrado' });
-      if (!['pendiente','confirmado'].includes(p.status)) return res.status(400).json({ error: 'Solo se pueden cancelar pedidos pendientes o confirmados' });
+      if (!['pendiente','confirmado'].includes(p.status))
+        return res.status(400).json({ error: 'Solo se pueden eliminar pedidos pendientes o confirmados' });
       await supabase.from('pedido_items').delete().eq('pedido_id', id);
       await supabase.from('pedidos').delete().eq('id', id);
       return res.status(200).json({ ok: true });
@@ -188,4 +208,6 @@ module.exports = async (req, res) => {
   }
 };
 
-function getNivelCompras(c) { return c>=30000?'socio':c>=15000?'master':c>=5000?'verde':'semilla'; }
+function getNivelCompras(c) {
+  return c >= 30000 ? 'socio' : c >= 15000 ? 'master' : c >= 5000 ? 'verde' : 'semilla';
+}

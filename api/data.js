@@ -4,6 +4,7 @@ module.exports = async (req, res) => {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   const { resource } = req.query;
+
   try {
     if (req.method === 'GET') {
       if (resource === 'productos') {
@@ -17,7 +18,8 @@ module.exports = async (req, res) => {
         return res.status(200).json(data);
       }
       if (resource === 'stock') {
-        const { data, error } = await supabase.from('stock').select('*, cedis(nombre,ciudad), productos(nombre,presentacion)');
+        const { data, error } = await supabase.from('stock')
+          .select('*, cedis(nombre,ciudad), productos(nombre,presentacion)');
         if (error) throw error;
         return res.status(200).json(data);
       }
@@ -29,11 +31,13 @@ module.exports = async (req, res) => {
       if (resource === 'precios_dist') {
         const { usuario_id } = req.query;
         const { data, error } = await supabase.from('precios_distribuidor')
-          .select('*, productos(nombre,presentacion,precio_lista)').eq('usuario_id', usuario_id);
+          .select('*, productos(nombre,presentacion,precio_lista)')
+          .eq('usuario_id', usuario_id);
         if (error) throw error;
         return res.status(200).json(data);
       }
     }
+
     if (req.method === 'PUT') {
       if (resource === 'config') {
         const { clave, valor } = req.body;
@@ -45,7 +49,8 @@ module.exports = async (req, res) => {
       if (resource === 'stock') {
         const { cedis_id, producto_id, cantidad } = req.body;
         const { error } = await supabase.from('stock')
-          .upsert({ cedis_id, producto_id, cantidad, actualizado_en: new Date() }, { onConflict: 'cedis_id,producto_id' });
+          .upsert({ cedis_id, producto_id, cantidad, actualizado_en: new Date() },
+            { onConflict: 'cedis_id,producto_id' });
         if (error) throw error;
         return res.status(200).json({ ok: true });
       }
@@ -62,11 +67,13 @@ module.exports = async (req, res) => {
         const { usuario_id, precios } = req.body;
         for (const p of precios) {
           await supabase.from('precios_distribuidor')
-            .upsert({ usuario_id, producto_id: p.producto_id, precio: p.precio, actualizado_en: new Date() }, { onConflict: 'usuario_id,producto_id' });
+            .upsert({ usuario_id, producto_id: p.producto_id, precio: p.precio, actualizado_en: new Date() },
+              { onConflict: 'usuario_id,producto_id' });
         }
         return res.status(200).json({ ok: true });
       }
     }
+
     return res.status(400).json({ error: 'Recurso no valido' });
   } catch (e) {
     return res.status(500).json({ error: e.message });
