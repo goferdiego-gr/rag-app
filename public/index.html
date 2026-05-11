@@ -1038,16 +1038,15 @@ async function cambiarStatusPedido(id,status){
 
 function renderClientesAdmin(){
   el('tbl-clientes-admin').innerHTML=
-    `<thead><tr><th>Empresa</th><th>Contacto</th><th>Ciudad</th><th>Vendedor</th><th>Status</th><th>Monto</th><th>Comision</th></tr></thead><tbody>`+
+    `<thead><tr><th>Empresa</th><th>Contacto</th><th>Ciudad</th><th>Vendedor</th><th>Monto</th><th>Comision</th></tr></thead><tbody>`+
     (state.clientes.length?state.clientes.map(c=>{
       const vend=state.usuarios.find(u=>u.id===c.vendedor_id)||{nombre:'—'};
       return`<tr>
         <td>${c.empresa||'—'}</td><td>${c.contacto}</td><td style="font-size:12px">${c.ciudad||'—'}</td>
         <td style="font-size:12px">${vend.nombre||vend.usuario}</td>
-        <td>${badge(c.status,statusClienteLabel(c.status))}</td>
         <td>${fmx(c.monto_vendido)}</td><td>${fmx(c.comision_ganada)}</td>
       </tr>`;
-    }).join(''):'<tr><td colspan="7" class="empty">Sin clientes</td></tr>')+
+    }).join(''):'<tr><td colspan="6" class="empty">Sin clientes</td></tr>')+
     '</tbody>';
 }
 
@@ -1398,7 +1397,7 @@ function renderVendInicio(){
 
 function renderVendClientes(){
   el('tbl-vend-clientes').innerHTML=
-    `<thead><tr><th>Empresa</th><th>Contacto</th><th>Ciudad</th><th>Pedidos</th><th>Total ventas</th><th>Ultimo pedido</th><th>Status</th><th></th></tr></thead><tbody>`+
+    `<thead><tr><th>Empresa</th><th>Contacto</th><th>Ciudad</th><th>Pedidos</th><th>Total ventas</th><th>Ultimo pedido</th><th></th></tr></thead><tbody>`+
     (state.clientes.length?state.clientes.map(c=>{
       const pedsCli=state.pedidos.filter(p=>p.cliente_id===c.id);
       //const totalCli=pedsCli.filter(p=>p.status==='pagado').reduce((a,p)=>a+(p.total||0),0);
@@ -1408,10 +1407,9 @@ function renderVendClientes(){
         <td>${c.empresa||'—'}</td><td>${c.contacto}</td><td style="font-size:12px">${c.ciudad||'—'}</td>
         <td>${pedsCli.length}</td><td>${fmx(totalCli)}</td>
         <td style="font-size:12px">${ultimo?fdate(ultimo.creado_en)+'  '+badge(ultimo.status,STATUS_LABELS[ultimo.status]||ultimo.status):'—'}</td>
-        <td>${badge(c.status,statusClienteLabel(c.status))}</td>
         <td><button class="btn btn-sm" onclick="showDetalleCliente('${c.id}')">Ver</button></td>
       </tr>`;
-    }).join(''):'<tr><td colspan="8" class="empty">Sin clientes</td></tr>')+
+    }).join(''):'<tr><td colspan="7" class="empty">Sin clientes</td></tr>')+
     '</tbody>';
 }
 
@@ -2148,11 +2146,11 @@ function renderAdmMisClientes(){
   const t=el('tbl-adm-mis-clientes');
   if(!t)return;
   const c=state.misClientes||[];
-  t.innerHTML='<thead><tr><th>Empresa</th><th>Contacto</th><th>Ciudad</th><th>Pedidos</th><th>Total vendido</th><th>Status</th></tr></thead><tbody>'+(c.length?c.map(x=>{
+  t.innerHTML='<thead><tr><th>Empresa</th><th>Contacto</th><th>Ciudad</th><th>Pedidos</th><th>Total vendido</th></tr></thead><tbody>'+(c.length?c.map(x=>{
     const peds=(state.misPedidos||[]).filter(p=>p.cliente_id===x.id);
     const total=peds.filter(p=>['pagado','enviado','entregado'].includes(p.status)).reduce((a,p)=>a+(p.total||0),0);
-    return '<tr><td>'+(x.empresa||'—')+'</td><td>'+x.contacto+'</td><td style="font-size:12px">'+(x.ciudad||'—')+'</td><td>'+peds.length+'</td><td>'+fmx(total)+'</td><td>'+badge(x.status,statusClienteLabel(x.status))+'</td></tr>';
-  }).join(''):'<tr><td colspan="6" class="empty">Sin clientes</td></tr>')+'</tbody>';
+    return '<tr><td>'+(x.empresa||'—')+'</td><td>'+x.contacto+'</td><td style="font-size:12px">'+(x.ciudad||'—')+'</td><td>'+peds.length+'</td><td>'+fmx(total)+'</td></tr>';
+  }).join(''):'<tr><td colspan="5" class="empty">Sin clientes</td></tr>')+'</tbody>';
 }
 
 function renderAdmMisPedidos(){
@@ -2350,7 +2348,7 @@ window.addEventListener('load',async()=>{
     else if(rol==='vendedor')await loadVend();
     else if(rol==='distribuidor')await loadDist();
     else await loadAplic();
-  },120000);
+  },300000);
 });
   //EMPIEZO A EDITAR
    
